@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inferencia Estadística en Ciencia de Datos | Interactive App</title>
+
+    <!-- Tipografía Moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX (Renderizado Matemático Profesional) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Gráficos (Mermaid & Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================
+           1. TOKENS DE DISEÑO & THEMES (APP AESTHETIC)
+           ========================================================== */
+        :root {
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+            
+            /* Light Theme - App Palette */
+            --bg-base: #f0f4f8;
+            --blob-1: #3b82f6; --blob-2: #8b5cf6; --blob-3: #10b981;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-card: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
+
+        body.dark-mode {
+            /* Dark Theme - App Palette */
+            --bg-base: #09090b;
+            --blob-1: #1e3a8a; --blob-2: #5b21b6; --blob-3: #064e3b;
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-card: rgba(30, 41, 59, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --success: #34d399;
+            --danger: #f87171;
+            --warning: #fbbf24;
+        }
+
+        /* ==========================================================
+           2. FONDOS ANIMADOS (GLASMORPHISM BASE)
+           ========================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-main); background-color: var(--bg-base); color: var(--text-main); display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; transition: background-color 0.4s; }
+        
+        .bg-shapes { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; filter: blur(80px); opacity: 0.6; }
+        .shape { position: absolute; border-radius: 50%; animation: float 20s infinite ease-in-out alternate; }
+        .shape-1 { top: 10%; left: 10%; width: 40vw; height: 40vw; background: var(--blob-1); animation-delay: 0s; }
+        .shape-2 { bottom: 10%; right: 10%; width: 35vw; height: 35vw; background: var(--blob-2); animation-delay: -5s; }
+        .shape-3 { top: 40%; left: 50%; width: 30vw; height: 30vw; background: var(--blob-3); animation-delay: -10s; }
+
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5vw, 5vh) scale(1.1); } }
+
+        /* ==========================================================
+           3. APLICACIÓN (CONTENEDOR PRINCIPAL Y SLIDES)
+           ========================================================== */
+        #app-window {
+            width: 96vw; height: 92vh; max-width: 1440px; max-height: 900px;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 30px; box-shadow: var(--glass-shadow);
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
+        }
+
+        /* Encabezado de la App */
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid var(--glass-border); }
+        .app-title { font-weight: 700; font-size: 1.1rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Contenedor de Diapositivas con Scroll Interno */
+        #canvas-container {
+            flex: 1; overflow: auto; padding: 2rem 3rem 6rem 3rem; scroll-behavior: smooth;
+            scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+        }
+        #canvas-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        #canvas-container::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 10px; }
+
+        .slide { display: none; min-width: 900px; animation: slideFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active { display: block; }
+        @keyframes slideFade { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* ==========================================================
+           4. TIPOGRAFÍA Y COMPONENTES UI (TARJETAS, TABLAS)
+           ========================================================== */
+        h1 { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), #8b5cf6); -webkit-background-clip: text; color: transparent; line-height: 1.2; margin-bottom: 1rem;}
+        h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        h3 { font-size: 1.2rem; color: var(--accent); margin-bottom: 0.8rem; font-weight: 700; }
+        p { margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.6; }
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1.2rem; font-size: 1.05rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+
+        /* App Icon (Iconos redondos) */
+        .app-icon { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; display: inline-flex; justify-content: center; align-items: center; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .app-icon.success { background: var(--success); box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);}
+        .app-icon.warning { background: var(--warning); box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);}
+        .app-icon.danger { background: var(--danger); box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);}
+
+        /* Tarjetas de Datos (Data Cards) */
+        .card { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.5rem; box-shadow: var(--glass-shadow); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); }
+        .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.8rem;}
+        
+        /* Bloques Matemáticos KaTeX */
+        .math-box { font-family: var(--font-mono); font-size: 1.15rem; background: rgba(0,0,0,0.03); padding: 1.2rem; border-radius: 12px; border-left: 5px solid var(--accent); overflow-x: auto; margin-bottom: 1.2rem; }
+        body.dark-mode .math-box { background: rgba(255,255,255,0.03); }
+
+        /* Tablas de Datos (Dashboard Style) */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 1.5rem 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); font-size: 0.95rem; }
+        .data-table th { background: rgba(59, 130, 246, 0.1); font-weight: 700; color: var(--accent); padding: 12px 15px; text-align: left; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid var(--glass-border); background: var(--glass-card); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover td { background: rgba(59, 130, 246, 0.05); }
+
+        /* Tooltips interactivos (Anotaciones) */
+        .ttip { position: relative; cursor: help; color: var(--accent); font-weight: 600; border-bottom: 2px dotted var(--accent); }
+        .ttip-text { 
+            visibility: hidden; width: max-content; max-width: 320px; background-color: var(--text-main); color: var(--bg-base); 
+            text-align: left; border-radius: 12px; padding: 12px 16px; position: absolute; z-index: 100; 
+            bottom: 140%; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; 
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); font-size: 0.85rem; font-weight: 500; font-family: var(--font-main);
+        }
+        .ttip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: var(--text-main) transparent transparent transparent; }
+        .ttip:hover .ttip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ==========================================================
+           5. BOTONES Y DOCK FLOTANTE (NAVEGACIÓN)
+           ========================================================== */
+        .btn { background: var(--accent); color: #fff; border: none; padding: 0.8rem 1.8rem; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: all 0.2s; font-family: var(--font-main);}
+        .btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--text-main); box-shadow: none;}
+        .btn-outline:hover { background: var(--accent); color: #fff; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;}
+        
+        .btn-circle { width: 50px; height: 50px; padding: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+
+        /* Floating Dock */
+        .floating-dock {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--glass-card); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 50px; padding: 10px 25px;
+            display: flex; align-items: center; gap: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); z-index: 10;
+        }
+        .progress-badge { background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-family: var(--font-mono); font-size: 0.9rem;}
+
+        /* Theme Toggle */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 34px; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Controles Simuladores */
+        .sim-grid { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; display: flex; justify-content: space-between;}
+        .val-badge { background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-family: var(--font-mono);}
+        .form-group input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        .form-group select { width: 100%; padding: 0.6rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); font-family: inherit; outline: none;}
+        
+        .result-dashboard { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: white; padding: 1.5rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); margin-top: 1.5rem;}
+        .result-dashboard .ic-display { font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); margin: 0.5rem 0; letter-spacing: 1px;}
+        
+        .disclaimer { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); }
+    </style>
+</head>
+<body>
+
+    <!-- FONDOS ANIMADOS -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- APP WINDOW -->
+    <div id="app-window">
+        <!-- HEADER APP -->
+        <header class="app-header">
+            <div class="app-title"><i class="fas fa-layer-group"></i> Estadística Inferencial | Data Science Track</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-sun" style="color: #f59e0b;"></i>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fas fa-moon" style="color: #64748b;"></i>
+            </div>
+        </header>
+
+        <!-- CANVAS DE CONTENIDO -->
+        <div id="canvas-container">
+
+            <!-- ==========================================
+                 SLIDE 1: INTRODUCCIÓN
+                 ========================================== -->
+            <div class="slide active" id="slide-1">
+                <div style="text-align: center; margin-top: 2rem; margin-bottom: 3rem;">
+                    <div class="app-icon" style="width: 80px; height: 80px; font-size: 2.5rem; margin-bottom: 1.5rem;"><i class="fas fa-database"></i></div>
+                    <h1>Inferencia Estadística Aplicada</h1>
+                    <p style="font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto;">De los datos a la toma de decisiones. Aprende a extraer conocimiento de grandes volúmenes de datos usando muestreo, distribuciones y contraste de hipótesis.</p>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="card" style="text-align: center; cursor: pointer;" onclick="goToSlide(2)">
+                        <div class="app-icon success" style="margin-bottom: 1rem;"><i class="fas fa-users-viewfinder"></i></div>
+                        <h3>Población vs Muestra</h3>
+                        <p style="font-size: 0.9rem;">Por qué no procesamos todo el Big Data. Eficiencia, costo y simulador de muestreo.</p>
+                    </div>
+                    <div class="card" style="text-align: center; cursor: pointer;" onclick="goToSlide(4)">
+                        <div class="app-icon warning" style="margin-bottom: 1rem;"><i class="fas fa-chart-line"></i></div>
+                        <h3>Teorema Límite Central</h3>
+                        <p style="font-size: 0.9rem;">El secreto de la Campana de Gauss. Simulador generador de medias muestrales.</p>
+                    </div>
+                    <div class="card" style="text-align: center; cursor: pointer;" onclick="goToSlide(8)">
+                        <div class="app-icon" style="margin-bottom: 1rem;"><i class="fas fa-code-branch"></i></div>
+                        <h3>A/B Testing e Hipótesis</h3>
+                        <p style="font-size: 0.9rem;">Cómo usan las empresas tecnológicas el p-valor para validar cambios y nuevos modelos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 2: POR QUÉ INFERIR EN DATA SCIENCE
+                 ========================================== -->
+            <div class="slide" id="slide-2">
+                <h2><div class="app-icon"><i class="fas fa-server"></i></div> La Inferencia en Ciencia de Datos</h2>
+                <p>En el mundo del Big Data, tener acceso a <em>toda</em> la información no siempre es posible ni eficiente. La inferencia es el motor detrás de la validación científica en tecnología.</p>
+                
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="app-icon success"><i class="fas fa-coins"></i></div>
+                            <h3 style="margin:0;">Costos de Computación (Big Data)</h3>
+                        </div>
+                        <p><strong>El problema:</strong> Procesar una tabla en SQL/BigQuery con 5 billones de filas puede costar miles de dólares y tardar horas.</p>
+                        <p><strong>La solución:</strong> Extraer una muestra aleatoria de 50,000 registros, calcular la media de ventas ($\bar{x}$) y generar un <strong>Intervalo de Confianza</strong>. Ahorramos un 99% de recursos manteniendo una precisión del 95%.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="app-icon warning"><i class="fas fa-robot"></i></div>
+                            <h3 style="margin:0;">Machine Learning (Train/Test)</h3>
+                        </div>
+                        <p><strong>El problema:</strong> ¿Cómo sabemos si nuestro modelo de IA predecirá bien el futuro?</p>
+                        <p><strong>La solución:</strong> Nunca conocemos los datos futuros (población). Evaluamos el modelo en un conjunto de prueba (muestra). El rendimiento en <em>test</em> es una <strong>estimación puntual</strong> de cómo se comportará en el mundo real.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 3: POBLACIÓN, MUESTRA Y PARÁMETROS
+                 ========================================== -->
+            <div class="slide" id="slide-3">
+                <h2><div class="app-icon"><i class="fas fa-users"></i></div> Población, Muestra y Estimadores</h2>
+                <p>La base de la estadística paramétrica es usar datos medibles (estadísticos) para inferir la verdad oculta (parámetros).</p>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Característica a Medir</th>
+                            <th>Población (El Universo) <br> <span style="font-size:0.8rem; font-weight:normal; color:var(--text-main);">Parámetros Reales y Ocultos</span></th>
+                            <th>Muestra (El Subconjunto) <br> <span style="font-size:0.8rem; font-weight:normal; color:var(--text-main);">Estimadores Calculables</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Media</strong> (Promedio)</td>
+                            <td><span class="ttip">$\mu$<span class="ttip-text">Media Universal.</span></span></td>
+                            <td><span class="ttip">$\bar{x}$<span class="ttip-text">Suma de elementos divido en n.</span></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Varianza</strong> (Dispersión)</td>
+                            <td><span class="ttip">$\sigma^2$<span class="ttip-text">Varianza real.</span></span></td>
+                            <td><span class="ttip">$s^2$<span class="ttip-text">Cuasivarianza. Se divide por n-1 para ser insesgada.</span></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proporción</strong> (%)</td>
+                            <td>$P$</td>
+                            <td>$\hat{p}$ (Éxitos / Total)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="card" style="margin-top: 1.5rem; border-left: 5px solid var(--accent);">
+                    <h3 style="margin-bottom: 5px;">Propiedades de un buen estimador:</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Insesgado:</strong> Su valor promedio esperado acierta justo en el parámetro real. (ej. La media muestral no tira ni por arriba ni por debajo).</li>
+                        <li><strong>Eficiente:</strong> Su varianza es mínima frente a otros métodos.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 4: SIMULADOR 1 (POBLACIÓN VS MUESTRA)
+                 ========================================== -->
+            <div class="slide" id="slide-4">
+                <h2><div class="app-icon"><i class="fas fa-crosshairs"></i></div> Simulador 1: Extracción de Muestra</h2>
+                <p>Tenemos una base de datos ficticia de <strong>5,000 usuarios</strong> (Población) conociendo su edad exacta. Modifica el tamaño de la muestra ($n$) y extrae usuarios al azar. Observa cómo la media de la muestra ($\bar{x}$) se acerca a la real ($\mu$).</p>
+                
+                <div class="sim-grid">
+                    <div class="card">
+                        <div class="form-group">
+                            <label>Tamaño de la Muestra ($n$) <span class="val-badge" id="s1-val-n">50</span></label>
+                            <input type="range" id="s1-n" min="5" max="500" value="50" step="5">
+                        </div>
+                        <button class="btn" style="width: 100%; margin-bottom: 1.5rem;" onclick="s1_extractSample()"><i class="fas fa-random"></i> Extraer Muestra Aleatoria</button>
+                        
+                        <div style="background: var(--bg-base); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Población (N = 5000)</div>
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent);">Edad $\mu$ = <span id="s1-mu">--</span></div>
+                        </div>
+                        <div style="background: rgba(5, 150, 105, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(5, 150, 105, 0.3);">
+                            <div style="font-size: 0.85rem; color: var(--success); text-transform: uppercase;">Tu Muestra (n)</div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--success); font-family: var(--font-mono);">Edad $\bar{x}$ = <span id="s1-xbar">--</span></div>
+                            <div style="font-size: 0.85rem; margin-top: 5px;">Error Absoluto: <span id="s1-err" style="font-weight:bold;">--</span> años</div>
+                        </div>
+                    </div>
+                    <div style="position: relative; width: 100%; height: 380px; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border); padding: 15px;">
+                        <canvas id="chartSim1"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 5: TEOREMA DEL LÍMITE CENTRAL (TCL)
+                 ========================================== -->
+            <div class="slide" id="slide-5">
+                <h2><div class="app-icon"><i class="fas fa-bell"></i></div> El Teorema del Límite Central (TCL)</h2>
+                <p>Es la magia matemática que hace funcionar el Machine Learning y la estadística. Dice que <strong>la suma (o media) de muchas variables aleatorias independientes tenderá siempre a formar una Campana de Gauss</strong>, sin importar qué forma rara tenían los datos originales.</p>
+                
+                <div class="math-box" style="text-align: center; font-size: 1.5rem;">
+                    $$ \bar{X} \sim N\left(\mu, \frac{\sigma}{\sqrt{n}}\right) $$
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>¿Qué significa esto?</h3>
+                        <ul>
+                            <li>No importa si tu base de datos de salarios tiene un sesgo extremo (pocos ganan millones, muchos ganan el mínimo).</li>
+                            <li>Si extraes muestras de tamaño $n \ge 30$ y calculas sus medias, las <strong>medias formarán una curva Normal perfecta</strong>.</li>
+                            <li>Esto nos permite usar fórmulas paramétricas estables (Z, T-Student) en el 99% de los casos reales.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: rgba(217, 119, 6, 0.1); border-color: rgba(217, 119, 6, 0.3);">
+                        <h3 class="text-warning">El Error Estándar (SE)</h3>
+                        <p>Fíjate en el término inferior de la fórmula: $\frac{\sigma}{\sqrt{n}}$.</p>
+                        <p>Esto explica matemáticamente por qué <strong>el Big Data es preciso</strong>. Si aumentas tu muestra ($n$), divides la desviación entre un número mayor. El error tiende a cero y la campana se vuelve una aguja perfecta sobre la verdad.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 6: SIMULADOR 2 (TCL)
+                 ========================================== -->
+            <div class="slide" id="slide-6">
+                <h2><div class="app-icon"><i class="fas fa-chart-bar"></i></div> Simulador 2: Magia del TCL</h2>
+                <p>Vamos a generar datos poblacionales con una distribución totalmente <strong>asimétrica / sesgada</strong>. Luego extraemos 200 muestras de tamaño $n$, calculamos la media de cada muestra y las graficamos. ¡Verás nacer la campana!</p>
+                
+                <div class="sim-grid">
+                    <div class="card">
+                        <div class="form-group">
+                            <label>Tamaño de cada muestra ($n$) <span class="val-badge" id="s2-val-n">30</span></label>
+                            <input type="range" id="s2-n" min="2" max="100" value="30">
+                            <small style="color: var(--text-muted);">Si n < 10, la curva será deforme. Si n > 30, será perfecta.</small>
+                        </div>
+                        <button class="btn" style="width: 100%; margin-top: 1rem; background: var(--warning);" onclick="s2_simulateCLT()"><i class="fas fa-play"></i> Extraer 200 Muestras</button>
+                        
+                        <div style="margin-top: 1.5rem; padding: 10px; border-left: 3px solid var(--warning); font-size: 0.9rem;">
+                            <strong>Observación:</strong> La gráfica de la derecha muestra el histograma de las 200 medias. A mayor $n$, más estrecha y centrada es la campana normal resultante.
+                        </div>
+                    </div>
+                    <div style="position: relative; width: 100%; height: 380px; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border); padding: 15px;">
+                        <canvas id="chartSim2"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 7: INTERVALOS DE CONFIANZA
+                 ========================================== -->
+            <div class="slide" id="slide-7">
+                <h2><div class="app-icon"><i class="fas fa-arrows-left-right"></i></div> Intervalos de Confianza (IC)</h2>
+                <p>Dar un número fijo ($\bar{x}$) para estimar el universo es arriesgado. El IC crea un escudo (Margen de Error) alrededor de nuestro cálculo para atrapar al parámetro real ($\mu$).</p>
+                
+                <div class="math-box" style="text-align: center; padding: 1.5rem; font-size: 1.6rem;">
+                    $$ IC = \bar{x} \pm Z_{\alpha/2} \left( \frac{\sigma}{\sqrt{n}} \right) $$
+                </div>
+
+                <div class="grid-2">
+                    <div class="card" style="background: rgba(5, 150, 105, 0.1); border-color: rgba(5, 150, 105, 0.3);">
+                        <h3 class="text-success"><i class="fas fa-mug-hot"></i> Caso Real: Sacos de Café (Bucaramanga)</h3>
+                        <p style="font-size: 0.95rem;">Exportamos café etiquetado de 500g. En control de calidad tomamos una muestra de <strong>$n = 36$</strong> sacos y pesan en media <strong>$\bar{x} = 502g$</strong>. Históricamente, la máquina tiene una variabilidad de <strong>$\sigma = 12g$</strong>. Calculemos el IC al 95%.</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-calculator"></i> Desarrollo</h3>
+                        <ol style="font-size: 0.95rem; padding-left: 20px;">
+                            <li>Confianza 95% $\Rightarrow Z_{0.025} = 1.96$ (Tabla Normal).</li>
+                            <li>Error Estándar (SE) = $12 / \sqrt{36} = 12 / 6 = 2g$.</li>
+                            <li>Margen Error (E) = $1.96 \times 2g = 3.92g$.</li>
+                            <li>IC = $502 \pm 3.92 \Rightarrow [498.08 , 505.92]g$.</li>
+                        </ol>
+                        <p style="font-size: 0.9rem; font-weight: 600; margin-top: 10px;">Conclusión: Con un 95% de confianza, el lote total pesa en promedio entre 498g y 506g.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 8: SIMULADOR 3 (INTERVALOS Y Z)
+                 ========================================== -->
+            <div class="slide" id="slide-8">
+                <h2><div class="app-icon"><i class="fas fa-sliders-h"></i></div> Simulador 3: El Margen de Error</h2>
+                <p>Interactúa con las variables de un modelo de inferencia de la media. Observa cómo al aumentar el tamaño de la muestra ($n$), la campana se vuelve fina y el intervalo se reduce (mayor certeza).</p>
+                
+                <div class="sim-grid">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div class="form-group">
+                            <label>Media Observada $\bar{x}$ <span class="val-badge" id="s3-val-m">50</span></label>
+                            <input type="range" id="s3-m" min="10" max="90" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label>Desv. Típica $\sigma$ <span class="val-badge" id="s3-val-sd">10</span></label>
+                            <input type="range" id="s3-sd" min="2" max="25" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Tamaño de Muestra ($n$) <span class="val-badge" id="s3-val-n">30</span></label>
+                            <input type="range" id="s3-n" min="10" max="300" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label>Confianza $1-\alpha$</label>
+                            <select id="s3-conf">
+                                <option value="1.645">90% Confianza</option>
+                                <option value="1.960" selected>95% Confianza</option>
+                                <option value="2.576">99% Confianza</option>
+                            </select>
+                        </div>
+
+                        <div class="result-dashboard">
+                            <div style="font-size: 0.85rem; text-transform: uppercase;">Margen Error (E)</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px;">± <span id="s3-res-me">--</span></div>
+                            <div style="font-size: 0.85rem; text-transform: uppercase;">Intervalo Calculado</div>
+                            <div class="ic-display">[<span id="s3-res-inf">--</span>, <span id="s3-res-sup">--</span>]</div>
+                        </div>
+                    </div>
+                    
+                    <div style="position: relative; width: 100%; height: 100%; min-height: 380px; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border); padding: 15px;">
+                        <canvas id="chartSim3"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 9: CONTRASTE DE HIPÓTESIS
+                 ========================================== -->
+            <div class="slide" id="slide-9">
+                <h2><div class="app-icon danger"><i class="fas fa-gavel"></i></div> A/B Testing, Hipótesis y el P-Valor</h2>
+                <p>En ciencia de datos, a menudo necesitamos probar si un cambio en el sistema funciona (ej. ¿El nuevo botón rojo en la app genera más ventas?). Esto se resuelve con un <strong>Contraste de Hipótesis</strong>.</p>
+
+                <div class="grid-2">
+                    <div>
+                        <ul style="list-style: none; margin-left: 0;">
+                            <li style="margin-bottom: 10px; background: var(--bg-body); padding: 10px; border-radius: 8px;"><span class="ttip" style="font-size: 1.2rem; color: var(--danger);">$H_0$<span class="ttip-text">Hipótesis Nula: Asume que nada ha cambiado. Es la postura conservadora.</span></span> <strong>Hipótesis Nula:</strong> El botón rojo vende IGUAL que el viejo.</li>
+                            <li style="background: var(--bg-body); padding: 10px; border-radius: 8px;"><span class="ttip" style="font-size: 1.2rem; color: var(--success);">$H_1$<span class="ttip-text">Hipótesis Alternativa: Lo que queremos demostrar. El cambio es real.</span></span> <strong>Hipótesis Alternativa:</strong> El botón rojo vende MÁS.</li>
+                        </ul>
+                        
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <h3>El Juez Supremo: El P-Valor</h3>
+                            <p style="font-size: 0.95rem;">Mide la probabilidad de que la mejora observada sea pura casualidad (ruido). Umbral estándar de riesgo ($\alpha$): 0.05 (5%).</p>
+                            <hr style="margin:10px 0; border-color: var(--glass-border);">
+                            <ul style="font-size: 0.95rem; margin-bottom: 0;">
+                                <li>Si <strong>p-valor < 0.05</strong> $\rightarrow$ Rechazamos $H_0$. ¡El botón funciona!</li>
+                                <li>Si <strong>p-valor $\ge$ 0.05</strong> $\rightarrow$ Aceptamos $H_0$. El incremento fue suerte.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="data-table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th>Decisión del Data Scientist</th>
+                                    <th>Realidad: $H_0$ es Verdad</th>
+                                    <th>Realidad: $H_1$ es Verdad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Aseguramos que funciona</strong> (Rechazar $H_0$)</td>
+                                    <td><span class="ttip" style="color: var(--danger); font-weight: bold;">Error Tipo I ($\alpha$)<span class="ttip-text">Falso Positivo. Implementamos código basura creyendo que servía.</span></span></td>
+                                    <td style="color: var(--success);"><i class="fas fa-check-circle"></i> Éxito</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Decimos que no sirve</strong> (Aceptar $H_0$)</td>
+                                    <td style="color: var(--success);"><i class="fas fa-check-circle"></i> Éxito</td>
+                                    <td><span class="ttip" style="color: var(--warning); font-weight: bold;">Error Tipo II ($\beta$)<span class="ttip-text">Falso Negativo. Descartamos una mejora millonaria por accidente.</span></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 10: CASO CLÍNICO REAL
+                 ========================================== -->
+            <div class="slide" id="slide-10">
+                <h2><div class="app-icon"><i class="fas fa-vial"></i></div> Caso de Estudio: Muestras Independientes</h2>
+                <p>Aplicación de un <strong>Test t de Student</strong> (usando R-Commander) sobre la base de datos real `ObesidadInfantil2.rda`.</p>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 5px;">Pregunta Clínica: ¿Recibieron distinto tiempo de lactancia materna los niños que hoy son obesos frente a los no obesos?</h3>
+                    <p style="font-size: 0.95rem; margin-bottom: 1rem;">$H_0: \mu_{\text{No_obeso}} = \mu_{\text{Obeso}}$ <br> $H_1: \mu_{\text{No_obeso}} \neq \mu_{\text{Obeso}}$</p>
+                    
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th>Grupo Infantil</th>
+                                <th>Media de Lactancia</th>
+                                <th>Estadísticos del Test</th>
+                                <th>P-Valor Obtenido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Niños NO Obesos</td>
+                                <td><strong>23.07</strong> meses</td>
+                                <td rowspan="2" style="vertical-align: middle;">$t = 7.815$<br>Grados libertad = 34.8</td>
+                                <td rowspan="2" style="vertical-align: middle;"><span class="ttip" style="color: var(--danger); font-weight: bold; font-size:1.1rem;">$3.6 \times 10^{-9}$<span class="ttip-text">Equivale a 0.0000000036. Extremadamente menor que 0.05.</span></span></td>
+                            </tr>
+                            <tr>
+                                <td>Niños Obesos</td>
+                                <td><strong>5.00</strong> meses</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="background: rgba(37, 99, 235, 0.1); padding: 15px; border-radius: 12px; margin-top: 15px; border-left: 4px solid var(--accent); font-size: 1rem;">
+                        <strong>Conclusión Inferencial:</strong> Como el <strong>p-valor $\ll 0.05$</strong>, rechazamos con seguridad la Hipótesis Nula. Existen diferencias altamente significativas. Los datos avalan clínicamente que los niños no obesos recibieron más meses de lactancia.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 SLIDE 11: CIERRE Y REGISTRO LMS
+                 ========================================== -->
+            <div class="slide" id="slide-11">
+                <h2><div class="app-icon success"><i class="fas fa-check"></i></div> Finalización del Módulo</h2>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--text-main);"><i class="fas fa-server text-accent"></i> Resumen Analítico</h3>
+                        <ul style="padding-left: 20px; font-size: 1rem;">
+                            <li>La inferencia economiza el procesamiento en Big Data y fundamenta el Machine Learning.</li>
+                            <li>Los <strong>Intervalos de Confianza</strong> evitan el error de dar predicciones absolutas.</li>
+                            <li>El <strong>Teorema del Límite Central</strong> es la justificación geométrica de que podemos usar estadística tradicional en datos locos.</li>
+                            <li>El <strong>p-valor</strong> domina la toma de decisiones empresariales (A/B testing).</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                        <i class="fas fa-cloud-arrow-up fa-4x" style="color: var(--success); margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 10px;">Sincronizar Progreso</h3>
+                        <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem;">Almacena tu completitud en la plataforma LMS del curso de Ciencia de Datos.</p>
+                        <button class="btn" style="width: 100%; max-width: 250px; font-size:1.1rem; padding: 1rem;" onclick="comunicarLMS()"><i class="fas fa-satellite-dish"></i> Enviar al LMS</button>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    © 2026 Universidad / Depto. Ciencia de Datos. Todos los derechos reservados. <br>
+                    <strong>Aviso Legal:</strong> Interfaz, simuladores JavaScript en tiempo real y lógica generados estructuradamente mediante IA. Contenidos adaptados de literatura académica validada.
+                </div>
+            </div>
+
+        </div> <!-- Fin Canvas Container -->
+
+        <!-- DOCK DE NAVEGACIÓN FLOTANTE -->
+        <div class="floating-dock">
+            <button class="btn btn-outline btn-circle" id="btn-prev" onclick="changeSlide(-1)" disabled><i class="fas fa-arrow-left"></i></button>
+            <div class="progress-badge" id="slide-counter">Slide 1 de 11</div>
+            <button class="btn btn-circle" id="btn-next" onclick="changeSlide(1)"><i class="fas fa-arrow-right"></i></button>
+        </div>
+
+    </div> <!-- Fin App Window -->
+
+    <!-- ==========================================================
+         JAVASCRIPT LOGIC (Navegación + 3 Simuladores)
+         ========================================================== -->
+    <script>
+        // 1. Iniciar KaTeX & Mermaid
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false} ],
+                throwOnError : false
+            });
+            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+            
+            // Init Simulators
+            initSim1();
+            initSim2();
+            actualizarSim3();
+        });
+
+        // 2. Lógica Navegación App
+        let currSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const numSlides = slides.length;
+        const counter = document.getElementById('slide-counter');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        function updateNav() {
+            slides.forEach((el, i) => {
+                if (i === currSlide) { el.classList.add('active'); } 
+                else { el.classList.remove('active'); }
+            });
+            counter.innerText = `Slide ${currSlide + 1} de ${numSlides}`;
+            btnPrev.disabled = (currSlide === 0);
+            btnNext.disabled = (currSlide === numSlides - 1);
+            
+            canvasContainer.scrollTop = 0; // Reset scroll
+
+            // Trigger redraws for charts to fit containers if they were hidden
+            if (currSlide === 3) s1_extractSample();
+            if (currSlide === 5) s2_simulateCLT();
+            if (currSlide === 7) actualizarSim3(); 
+        }
+
+        function changeSlide(dir) {
+            currSlide += dir;
+            if (currSlide < 0) currSlide = 0;
+            if (currSlide >= numSlides) currSlide = numSlides - 1;
+            updateNav();
+        }
+        function goToSlide(index) { currSlide = index; updateNav(); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode', themeToggle.checked);
+            // Refresh charts for dark mode colors
+            if (currSlide === 3) s1_extractSample();
+            if (currSlide === 5) s2_simulateCLT();
+            if (currSlide === 7) actualizarSim3();
+        });
+
+        /* ==========================================================
+           SIMULADOR 1: Población vs Muestra (Slide 4)
+           ========================================================== */
+        let sim1ChartInstance = null;
+        let s1_population = [];
+        let s1_popMean = 0;
+
+        function initSim1() {
+            // Generate a random skewed population (5000 users ages 18-65)
+            s1_population = [];
+            let sum = 0;
+            for(let i=0; i<5000; i++){
+                // Skewed towards 25-35
+                let age = 18 + Math.floor(Math.random()*47 * Math.random()); 
+                s1_population.push(age);
+                sum += age;
+            }
+            s1_popMean = sum / 5000;
+            document.getElementById('s1-mu').innerText = s1_popMean.toFixed(2);
+            
+            document.getElementById('s1-n').addEventListener('input', function() {
+                document.getElementById('s1-val-n').innerText = this.value;
+            });
+        }
+
+        function s1_extractSample() {
+            const n = parseInt(document.getElementById('s1-n').value);
+            let sample = [];
+            let sum = 0;
+            for(let i=0; i<n; i++) {
+                let idx = Math.floor(Math.random() * 5000);
+                sample.push(s1_population[idx]);
+                sum += s1_population[idx];
+            }
+            const sampleMean = sum / n;
+            
+            document.getElementById('s1-xbar').innerText = sampleMean.toFixed(2);
+            document.getElementById('s1-err').innerText = Math.abs(s1_popMean - sampleMean).toFixed(2);
+
+            // Prepare Data for Scatter Plot (Visualizing just 100 points of pop vs sample for performance)
+            let popScatter = s1_population.slice(0, 100).map((y, x) => ({x: x, y: y}));
+            let sampScatter = sample.map((y, x) => ({x: x*(100/n), y: y})); // spread out for visual overlap
+
+            const ctx = document.getElementById('chartSim1').getContext('2d');
+            const isDark = document.body.classList.contains('dark-mode');
+            const popColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)';
+            const sampColor = isDark ? '#34d399' : '#059669'; // Success color
+            const meanLineColor = isDark ? '#f87171' : '#dc2626';
+
+            if (sim1ChartInstance) sim1ChartInstance.destroy();
+
+            sim1ChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Población (Muestra de fondo)', data: popScatter, backgroundColor: popColor, pointRadius: 3 },
+                        { label: 'Muestra Seleccionada', data: sampScatter, backgroundColor: sampColor, pointRadius: 6, pointBorderColor: '#fff', pointBorderWidth: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: isDark ? '#94a3b8' : '#475569' } },
+                        annotation: { /* Plugin needed for mean line, simulated below via scales/grid if omitted */ }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { title: { display: true, text: 'Edades', color: isDark ? '#94a3b8' : '#475569'}, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#475569'} }
+                    }
+                }
+            });
+        }
+
+        /* ==========================================================
+           SIMULADOR 2: Teorema Límite Central (Slide 6)
+           ========================================================== */
+        let sim2ChartInstance = null;
+
+        function initSim2() {
+            document.getElementById('s2-n').addEventListener('input', function() {
+                document.getElementById('s2-val-n').innerText = this.value;
+            });
+        }
+
+        function s2_simulateCLT() {
+            const n = parseInt(document.getElementById('s2-n').value);
+            const numSamples = 200;
+            let sampleMeans = [];
+
+            // Generar 200 medias de muestras de tamaño n desde una población asimétrica (Math.random() cuadrado)
+            for(let i=0; i<numSamples; i++) {
+                let sum = 0;
+                for(let j=0; j<n; j++) { sum += Math.pow(Math.random(), 2) * 100; }
+                sampleMeans.push(sum / n);
+            }
+
+            // Crear Histograma (Binning manual)
+            let min = Math.min(...sampleMeans);
+            let max = Math.max(...sampleMeans);
+            if(min === max) max += 0.1;
+            const binsCount = 15;
+            let binWidth = (max - min) / binsCount;
+            let bins = new Array(binsCount).fill(0);
+            let labels = [];
+
+            for(let i=0; i<binsCount; i++) { labels.push((min + i*binWidth + binWidth/2).toFixed(1)); }
+            
+            for(let mean of sampleMeans) {
+                let binIndex = Math.floor((mean - min) / binWidth);
+                if(binIndex >= binsCount) binIndex = binsCount - 1;
+                bins[binIndex]++;
+            }
+
+            const ctx = document.getElementById('chartSim2').getContext('2d');
+            const isDark = document.body.classList.contains('dark-mode');
+            const barColor = isDark ? 'rgba(251, 191, 36, 0.7)' : 'rgba(217, 119, 6, 0.7)'; // Warning color
+
+            if (sim2ChartInstance) sim2ChartInstance.destroy();
+
+            sim2ChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Frecuencia de Medias Muestrales', data: bins, backgroundColor: barColor, borderRadius: 4 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 500 },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { title: { display: true, text: 'Valor de las Medias (X̄)', color: isDark ? '#94a3b8' : '#475569'}, grid: { display: false }, ticks: { color: isDark ? '#94a3b8' : '#475569'} },
+                        y: { title: { display: true, text: 'Cantidad de Muestras', color: isDark ? '#94a3b8' : '#475569'}, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: isDark ? '#94a3b8' : '#475569'} }
+                    }
+                }
+            });
+        }
+
+        /* ==========================================================
+           SIMULADOR 3: Intervalos de Confianza (Slide 8)
+           ========================================================== */
+        let sim3ChartInstance = null;
+        const dom3 = {
+            m: document.getElementById('s3-m'), sd: document.getElementById('s3-sd'),
+            n: document.getElementById('s3-n'), z: document.getElementById('s3-conf'),
+            vm: document.getElementById('s3-val-m'), vsd: document.getElementById('s3-val-sd'), vn: document.getElementById('s3-val-n'),
+            rme: document.getElementById('s3-res-me'), rinf: document.getElementById('s3-res-inf'), rsup: document.getElementById('s3-res-sup')
+        };
+
+        [dom3.m, dom3.sd, dom3.n, dom3.z].forEach(el => el.addEventListener('input', actualizarSim3));
+
+        function gaussPDF(x, mean, se) { return (1 / (se * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / se, 2)); }
+
+        function actualizarSim3() {
+            const mean = parseFloat(dom3.m.value);
+            const sd = parseFloat(dom3.sd.value);
+            const n = parseInt(dom3.n.value);
+            const z = parseFloat(dom3.z.value);
+
+            dom3.vm.innerText = mean; dom3.vsd.innerText = sd; dom3.vn.innerText = n;
+
+            const se = sd / Math.sqrt(n); 
+            const me = z * se;            
+            const limInf = mean - me;
+            const limSup = mean + me;
+
+            dom3.rme.innerText = me.toFixed(2);
+            dom3.rinf.innerText = limInf.toFixed(2);
+            dom3.rsup.innerText = limSup.toFixed(2);
+
+            const globalMaxSe = 25 / Math.sqrt(10); 
+            const minX = mean - (4 * globalMaxSe);
+            const maxX = mean + (4 * globalMaxSe);
+            const step = (maxX - minX) / 150;
+            
+            let labels = [], dataLine = [], dataFill = [];
+
+            for (let x = minX; x <= maxX; x += step) {
+                labels.push(x.toFixed(1));
+                let y = gaussPDF(x, mean, se);
+                dataLine.push(y);
+                dataFill.push((x >= limInf && x <= limSup) ? y : 0);
+            }
+
+            dibujarGrafica3(labels, dataLine, dataFill);
+        }
+
+        function dibujarGrafica3(labels, dataLine, dataFill) {
+            const ctx = document.getElementById('chartSim3').getContext('2d');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            const colorLine = isDark ? '#60a5fa' : '#2563eb';
+            const colorArea = isDark ? 'rgba(96, 165, 250, 0.4)' : 'rgba(37, 99, 235, 0.3)';
+            const colorGrid = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+            const colorText = isDark ? '#94a3b8' : '#475569';
+
+            if (sim3ChartInstance) { sim3ChartInstance.destroy(); }
+
+            sim3ChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Densidad Probabilidad', data: dataLine, borderColor: colorLine, borderWidth: 3, pointRadius: 0, fill: false, tension: 0.4 },
+                        { label: 'Intervalo (IC)', data: dataFill, backgroundColor: colorArea, borderColor: 'transparent', pointRadius: 0, fill: true, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 250, easing: 'easeOutQuad' },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { grid: { color: colorGrid }, ticks: { color: colorText, maxTicksLimit: 8 } },
+                        y: { display: false, min: 0, max: 1.2 } 
+                    }
+                }
+            });
+        }
+
+        // 6. PostMessage API LMS
+        let lmsSent = false;
+        function comunicarLMS() {
+            if (!lmsSent) {
+                try {
+                    window.parent.postMessage({ tipo: 'actividad_completada', bloque: 3, semana: 9, actividad: 'diapositivas' }, '*');
+                    lmsSent = true;
+                    alert("✅ Petición exitosa. El LMS ha registrado tu progreso en el módulo de Inferencia para Ciencia de Datos.");
+                } catch(e) {
+                    console.warn("LMS iframe no encontrado.");
+                }
+            } else {
+                alert("ℹ️ La petición de completitud ya ha sido enviada.");
+            }
+        }
+    </script>
+</body>
+</html>
