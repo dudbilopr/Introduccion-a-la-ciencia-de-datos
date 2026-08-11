@@ -256,12 +256,11 @@
                             </div>
                         </div>
 
-                        <!-- NUEVO: ÁREA DE DIAPOSITIVAS EXTERNAS (IFRAME) -->
                         <div class="glass p-6 md:p-8 rounded-2xl mb-6 shadow-xl">
                             <h3 class="text-xl font-bold mb-4 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fas fa-desktop mr-2 text-primary"></i>Diapositivas Interactivas</h3>
                             <div class="w-full aspect-[16/9] bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 shadow-inner">
-                                <iframe src="diapositivas_semana_${data.w}.html" width="100%" height="100%" frameborder="0" allowfullscreen title="Diapositivas Semana ${data.w}"></iframe>
-                                <div class="p-2 text-center text-xs text-gray-500 bg-gray-100 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-600">[Marcador: Aquí se carga el archivo "diapositivas_semana_${data.w}.html"]</div>
+                                <iframe src="Semanas/Semana_${data.w}/diapositivas_semana_${data.w}.html" width="100%" height="100%" frameborder="0" allowfullscreen title="Diapositivas Semana ${data.w}"></iframe>
+                                <div class="p-2 text-center text-xs text-gray-500 bg-gray-100 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-600">[Marcador: Aquí se carga el archivo "Semanas/Semana_${data.w}/diapositivas_semana_${data.w}.html"]</div>
                             </div>
                         </div>
 
@@ -285,7 +284,7 @@
                             
                             <div class="w-full min-h-[450px] bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 shadow-inner">
                                 <!-- El ID del iframe es dinámico para identificar de qué semana es el quiz -->
-                                <iframe src="quiz_semana_${data.w}.html" id="quizIframe_${data.w}" width="100%" height="100%" style="min-height: 450px;" frameborder="0" title="Quiz Semana ${data.w}"></iframe>
+                                <iframe src="Semanas/Semana_${data.w}/quiz_semana_${data.w}.html" id="quizIframe_${data.w}" width="100%" height="100%" style="min-height: 450px;" frameborder="0" title="Quiz Semana ${data.w}"></iframe>
                             </div>
                             <p class="mt-3 text-sm text-center text-gray-600 dark:text-gray-400 font-semibold"><i class="fas fa-sync fa-spin mr-1 text-green-500"></i> Esperando resultados del quiz...</p>
                         </div>
