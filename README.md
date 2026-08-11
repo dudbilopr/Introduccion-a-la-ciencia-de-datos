@@ -38,6 +38,15 @@ El curso está estructurado en 16 semanas. El material interactivo se irá publi
   - [Presentación Interactiva Web](./Semanas/Semana_1/Presentacion_Clase1_Interactiva.html)
   - [Actividad Interactiva (HTML)](./Semanas/Semana_1/Actividad_Semana1.html)
 
+### [Semana 2: Ecosistema Python y Colab](./Semanas/Semana_2)
+- **Conceptos:** Lenguaje Python, Google Colab, Librerías (Pandas, NumPy).
+- **Actividad Central:** Pair Programming - Generación de datos sintéticos y analítica básica.
+- **Recursos Públicos:**
+  - [Guía del Docente](./Semanas/Semana_2/Guia_Clase2.md)
+  - [Presentación Interactiva Web](./Semanas/Semana_2/Presentacion_Clase2_Interactiva.html)
+  - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_2/Actividad_EMI_Semana2.html)
+  - [Colab Guiado (.ipynb)](./Semanas/Semana_2/Colab_Guiado_Semana2.ipynb)
+
 *(Las siguientes semanas se habilitarán progresivamente).*
 
 ---

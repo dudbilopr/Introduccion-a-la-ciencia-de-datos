@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Introducción a la Ciencia de Datos - Semana 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --unab-blue: #003865;
+            --unab-orange: #E85C0B;
+        }
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3,
+        .reveal h4 {
+            color: var(--unab-blue);
+            text-transform: none;
+            font-weight: 700;
+        }
+
+        .reveal h2 {
+            border-bottom: 2px solid var(--unab-orange);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .accent {
+            color: var(--unab-orange);
+        }
+
+        .reveal li {
+            margin-bottom: 15px;
+        }
+
+        .reveal .controls {
+            color: var(--unab-orange);
+        }
+
+        .reveal .progress {
+            color: var(--unab-orange);
+        }
+
+        .icon-container {
+            font-size: 3rem;
+            color: var(--unab-orange);
+            margin-bottom: 20px;
+        }
+        
+        .box {
+            background-color: #f4f4f4;
+            border-left: 8px solid var(--unab-orange);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Título -->
+            <section>
+                <div class="icon-container">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <h1>Introducción a la Ciencia de Datos</h1>
+                <h3>Semana 2: Ecosistema Python y <span class="accent">Colab</span></h3>
+                <p>
+                    <small>Programa de Ciencia de Datos - UNAB</small>
+                </p>
+            </section>
+
+            <!-- Slide 2: Reglas -->
+            <section>
+                <h2><i class="fa-solid fa-clipboard-check"></i> Reglas de Oro</h2>
+                <ul>
+                    <li class="fragment">Puntualidad: La clase inicia a las <strong class="accent">7:00 AM</strong>.</li>
+                    <li class="fragment">Participación Activa: No hay respuestas equivocadas.</li>
+                    <li class="fragment">Pausas Cognitivas: Fundamentales para asimilar la información.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: Agenda -->
+            <section>
+                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
+                <ul>
+                    <li class="fragment">Espacio EMI (English as a Medium of Instruction)</li>
+                    <li class="fragment">Teoría: El lenguaje Python</li>
+                    <li class="fragment">Google Colab vs. Entornos Locales</li>
+                    <li class="fragment">Práctica: Pair Programming con Datos Sintéticos</li>
+                </ul>
+            </section>
+
+            <!-- Slide 4: EMI Space -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-globe"></i> EMI Space</h2>
+                    <h3 class="accent">Data Types and Classifications</h3>
+                    <p class="fragment">Vamos a la pizarra digital.</p>
+                </section>
+                <section>
+                    <h2><i class="fa-brands fa-youtube"></i> Video Analysis</h2>
+                    <p>Six Data Types</p>
+                    <div class="box fragment">
+                        Presten atención a las dos formas de clasificar la información.
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 5: Python -->
+            <section>
+                <section>
+                    <h2><i class="fa-brands fa-python"></i> ¿Qué es Python?</h2>
+                    <ul>
+                        <li class="fragment">Lenguaje de programación de <strong>alto nivel</strong>.</li>
+                        <li class="fragment">Interpretado y multiparadigma.</li>
+                        <li class="fragment">Sintaxis clara y legible (casi como leer inglés).</li>
+                        <li class="fragment">El estándar actual en <span class="accent">Ciencia de Datos</span> e Inteligencia Artificial.</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-cubes"></i> El Ecosistema</h2>
+                    <p>Python no trabaja solo. Se apoya en librerías:</p>
+                    <ul>
+                        <li class="fragment"><strong class="accent">Pandas:</strong> Manipulación y análisis de datos tabulares (como Excel pero con esteroides).</li>
+                        <li class="fragment"><strong class="accent">NumPy:</strong> Cálculo numérico y matricial.</li>
+                        <li class="fragment"><strong class="accent">Matplotlib/Seaborn:</strong> Visualización de datos.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Slide 6: Colab -->
+            <section>
+                <h2><i class="fa-brands fa-google"></i> Google Colab</h2>
+                <ul>
+                    <li class="fragment">Un entorno de <em>Jupyter Notebook</em> en la nube.</li>
+                    <li class="fragment"><strong>Cero Configuración:</strong> No requieres instalar nada localmente.</li>
+                    <li class="fragment">Permite intercalar código, resultados y texto explicativo (Markdown).</li>
+                    <li class="fragment">Se guarda automáticamente en <span class="accent">Google Drive</span>.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 7: Práctica -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-laptop-code"></i> Pair Programming</h2>
+                    <p>Programación en parejas para el taller práctico.</p>
+                    <div class="box fragment">
+                        <strong>Piloto:</strong> Escribe el código.<br>
+                        <strong>Copiloto:</strong> Revisa, busca errores y guía la lógica.
+                    </div>
+                    <p class="fragment accent"><i class="fa-solid fa-rotate"></i> ¡Cambiaremos roles a la mitad!</p>
+                </section>
+                <section>
+                    <h2>El Reto de Hoy</h2>
+                    <h3>Generación de Datos Sintéticos</h3>
+                    <ul>
+                        <li class="fragment">Simularemos ser analistas de una tienda sin datos históricos.</li>
+                        <li class="fragment">Generaremos registros aleatorios (productos, ventas, fechas) usando Python.</li>
+                        <li class="fragment">Convertiremos estos datos a un <strong>DataFrame de Pandas</strong>.</li>
+                        <li class="fragment">Analizaremos las métricas principales.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Slide 8: Cierre -->
+            <section>
+                <h2><i class="fa-brands fa-github"></i> Portafolio y Cierre</h2>
+                <ul>
+                    <li class="fragment">Descarguen su Notebook <code>(.ipynb)</code> de Colab.</li>
+                    <li class="fragment">Hagan su primer <strong>Push</strong> a su repositorio de GitHub.</li>
+                </ul>
+                <div class="box fragment">
+                    <h3 class="accent">¡Nos vemos la próxima semana!</h3>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'zoom', // convex, slide, zoom, fade
+            controls: true,
+            progress: true,
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Activity - Six Data Types</title>
+    <style>
+        :root {
+            --unab-blue: #003865;
+            --unab-orange: #E85C0B;
+            --bg-color: #f4f4f4;
+            --text-color: #333333;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: var(--unab-blue);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: var(--unab-orange);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .instructions {
+            background-color: rgba(0, 56, 101, 0.05);
+            padding: 15px;
+            border-left: 5px solid var(--unab-blue);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        .text-content {
+            font-size: 1.2em;
+            line-height: 2;
+        }
+        input.blank {
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 1em;
+            width: 130px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: var(--unab-blue);
+        }
+        input.blank:focus {
+            border-color: var(--unab-orange);
+            box-shadow: 0 0 5px rgba(232, 92, 11, 0.3);
+        }
+        .correct {
+            border-color: #4CAF50 !important;
+            background-color: #E8F5E9 !important;
+            color: #2E7D32 !important;
+        }
+        .incorrect {
+            border-color: #F44336 !important;
+            background-color: #FFEBEE !important;
+            color: #C62828 !important;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+        button {
+            background-color: var(--unab-orange);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: #d14f08;
+        }
+        #result-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Six Data Types & Classifications</h1>
+        <h3>EMI Space - English as a Medium of Instruction</h3>
+
+        <div class="instructions">
+            <strong>Instructions:</strong> Based on the video you just watched, fill in the blanks with the correct data types and classifications in English. Write them down in your notebook, and then we will check the answers together on the screen!
+        </div>
+
+        <div class="text-content">
+            <p>
+                A single letter, number or symbol is called a <input type="text" class="blank" data-answer="Character" autocomplete="off">. For English text these are typically represented using ASCII. 
+            </p>
+            <p>
+                A sequence of multiple characters forming words or phrases is a <input type="text" class="blank" data-answer="String" autocomplete="off">. 
+            </p>
+            <p>
+                A whole number without any fractional or decimal parts is an <input type="text" class="blank" data-answer="Integer" autocomplete="off">. 
+            </p>
+            <p>
+                Numbers that include decimal points are <input type="text" class="blank" data-answer="Real" autocomplete="off"> numbers. 
+            </p>
+            <p>
+                A <input type="text" class="blank" data-answer="Date" autocomplete="off"> type is complex because it must accommodate various formats like day/month ordering. 
+            </p>
+            <p>
+                A <input type="text" class="blank" data-answer="Boolean" autocomplete="off"> value has only two options: true or false, often stored as 1 and 0.
+            </p>
+            <p>
+                When it comes to data classifications, descriptive, text-based data is considered <input type="text" class="blank" data-answer="Qualitative" autocomplete="off">, while measurable, numeric data that is excellent for calculations is <input type="text" class="blank" data-answer="Quantitative" autocomplete="off">.
+            </p>
+            <p>
+                Data that lacks a consistent organization is <input type="text" class="blank" data-answer="Unstructured" autocomplete="off">, whereas data stored in a consistent format like a database table is <input type="text" class="blank" data-answer="Structured" autocomplete="off">.
+            </p>
+        </div>
+
+        <div class="btn-container">
+            <button onclick="checkAnswers()">Check Answers</button>
+            <button onclick="showAnswers()" style="background-color: var(--unab-blue); margin-left: 10px;">Show All Answers</button>
+        </div>
+        
+        <div id="result-message"></div>
+    </div>
+
+    <script>
+        function checkAnswers() {
+            const inputs = document.querySelectorAll('.blank');
+            let correctCount = 0;
+
+            inputs.forEach(input => {
+                // Remove previous styling
+                input.classList.remove('correct', 'incorrect');
+                
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = input.getAttribute('data-answer').toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    input.classList.add('correct');
+                    correctCount++;
+                } else if (userAnswer !== "") {
+                    input.classList.add('incorrect');
+                }
+            });
+
+            const resultMessage = document.getElementById('result-message');
+            if (correctCount === inputs.length) {
+                resultMessage.style.color = "#4CAF50";
+                resultMessage.textContent = "Excellent! All answers are correct.";
+            } else {
+                resultMessage.style.color = "var(--unab-orange)";
+                resultMessage.textContent = `You got ${correctCount} out of ${inputs.length} correct. Keep trying!`;
+            }
+        }
+
+        function showAnswers() {
+            const inputs = document.querySelectorAll('.blank');
+            inputs.forEach(input => {
+                input.value = input.getAttribute('data-answer');
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+            });
+            document.getElementById('result-message').textContent = "";
+        }
+    </script>
+
+</body>
+</html>
