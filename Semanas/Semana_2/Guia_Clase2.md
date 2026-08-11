@@ -1,20 +1,20 @@
 # Guía del Docente - Semana 2: Ecosistema Python y Google Colab
 
-## 📅 Agenda de la Clase (3 Horas / 180 Minutos)
+##  Agenda de la Clase (3 Horas / 180 Minutos)
 
 | Hora | Actividad | Descripción |
 | :--- | :--- | :--- |
 | **07:00 - 07:10** | **Llegada y Organización** | Saludo, registro de asistencia, preparación del entorno. Recordatorio de la regla de puntualidad (7:00 AM). |
 | **07:10 - 07:30** | **Espacio EMI (English as a Medium of Instruction)** | Warmup en pizarra, visualización del video sobre "Data Types" y actividad interactiva. |
 | **07:30 - 08:15** | **Teoría: ¿Qué es Python y Google Colab?** | Introducción al lenguaje, características, ventajas de Colab vs local, concepto de Notebooks. |
-| **08:15 - 08:30** | **☕ Pausa Cognitiva** | Break para descansar. |
+| **08:15 - 08:30** | ** Pausa Cognitiva** | Break para descansar. |
 | **08:30 - 09:30** | **Hands-on: Pair Programming (Parte 1)** | Primeros pasos en Colab: Variables, Listas, y Generación de Datos Sintéticos. |
 | **09:30 - 09:50** | **Hands-on: Pair Programming (Parte 2)** | Introducción a Pandas: Guardar y leer CSV, análisis descriptivo básico. |
 | **09:50 - 10:00** | **Cierre y Q&A** | Push inicial a GitHub (guardar el notebook) y conclusiones. |
 
 ---
 
-## 🗣️ Guía para el Espacio EMI (20 Minutos)
+## ️ Guía para el Espacio EMI (20 Minutos)
 
 El objetivo de esta sección es introducir vocabulario técnico en inglés utilizando el video recomendado.
 
@@ -37,7 +37,7 @@ El objetivo de esta sección es introducir vocabulario técnico en inglés utili
 
 ---
 
-## 🐍 Teoría: Ecosistema Python (45 Minutos)
+##  Teoría: Ecosistema Python (45 Minutos)
 
 Utiliza la presentación `Presentacion_Clase2_Interactiva.html` para apoyar esta sección.
 
@@ -53,7 +53,7 @@ Utiliza la presentación `Presentacion_Clase2_Interactiva.html` para apoyar esta
 
 ---
 
-## 💻 Práctica Guiada: Generación y Análisis de Datos (Colab)
+##  Práctica Guiada: Generación y Análisis de Datos (Colab)
 
 **Archivo a utilizar:** `Colab_Guiado_Semana2.ipynb` (Los estudiantes lo pueden descargar o abrir en Colab).
 

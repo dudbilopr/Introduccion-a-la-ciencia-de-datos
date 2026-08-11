@@ -204,7 +204,7 @@
                 if (isLocked) icon = 'fa-lock text-gray-400'; // Cambiar a candado si está bloqueado
                 
                 const bgHover = isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/50 dark:hover:bg-gray-800/50 cursor-pointer';
-                const clickAction = isLocked ? `onclick="alert('🔒 Debes iniciar sesión con tu correo para acceder a este contenido.')"` : `onclick="loadContent(${index})"`;
+                const clickAction = isLocked ? `onclick="alert(' Debes iniciar sesión con tu correo para acceder a este contenido.')"` : `onclick="loadContent(${index})"`;
                 
                 html += `
                     <button ${clickAction} class="w-full text-left p-2 rounded-lg ${bgHover} transition flex items-start gap-3 mb-1 group">
