@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
 
     <style>
         :root {
@@ -224,6 +225,124 @@
                 </section>
             </section>
 
+            <!-- Loop en Diccionarios -->
+            <section>
+                <h2><i class="fa-solid fa-book"></i> Iterando en Diccionarios</h2>
+                <div class="box-glass">
+                    <pre><code class="python" data-trim data-noescape>
+world = { "afghanistan": 30.55,
+          "albania": 2.77,
+          "algeria": 39.21 }
+
+for key, value in world.items():
+    print(key + " -- " + str(value))
+                    </code></pre>
+                </div>
+                <div class="fragment box-glass" style="margin-top: 10px; border-left: 5px solid #28a745;">
+                    <pre><code class="plaintext" data-trim data-noescape>
+algeria -- 39.21
+afghanistan -- 30.55
+albania -- 2.77
+                    </code></pre>
+                </div>
+            </section>
+
+            <!-- Loop en Numpy Arrays (1D y 2D) -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-layer-group"></i> Numpy Arrays (1D)</h2>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+import numpy as np
+
+np_height = np.array([1.73, 1.68, 1.71, 1.89, 1.79])
+np_weight = np.array([65.4, 59.2, 63.6, 88.4, 68.7])
+bmi = np_weight / np_height ** 2
+
+for val in bmi:
+    print(val)
+                        </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-layer-group"></i> Numpy Arrays (2D)</h2>
+                    <p class="fragment">Si iteramos un array 2D, obtendremos cada fila (1D array).</p>
+                    <div class="box-glass fragment">
+                        <pre><code class="python" data-trim data-noescape>
+meas = np.array([np_height, np_weight])
+
+for val in meas:
+    print(val)
+                        </code></pre>
+                    </div>
+                    <p class="fragment accent" style="margin-top:20px;">¿Y si queremos cada elemento individual?</p>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bolt"></i> Numpy: <span class="accent">nditer()</span></h2>
+                    <p>La función mágica para visitar cada valor escalar.</p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+for val in np.nditer(meas):
+    print(val)
+                        </code></pre>
+                    </div>
+                    <div class="fragment box-glass" style="border-left: 5px solid #28a745;">
+                        <pre><code class="plaintext" data-trim data-noescape>
+1.73
+1.68
+...
+65.4
+                        </code></pre>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Loop en DataFrames -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-table"></i> Iterando en DataFrames</h2>
+                    <p>Imagina que tenemos este dataset: <span class="accent">brics.csv</span></p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+import pandas as pd
+brics = pd.read_csv("brics.csv", index_col=0)
+                        </code></pre>
+                    </div>
+                    <table class="fragment" style="color: white; font-size: 0.8rem; margin-top: 20px;">
+                        <thead><tr><th></th><th>country</th><th>capital</th><th>area</th><th>population</th></tr></thead>
+                        <tbody>
+                            <tr><th>BR</th><td>Brazil</td><td>Brasilia</td><td>8.516</td><td>200.40</td></tr>
+                            <tr><th>RU</th><td>Russia</td><td>Moscow</td><td>17.100</td><td>143.50</td></tr>
+                            <tr><th>IN</th><td>India</td><td>New Delhi</td><td>3.286</td><td>1252.00</td></tr>
+                            <tr><th>CH</th><td>China</td><td>Beijing</td><td>9.597</td><td>1357.00</td></tr>
+                            <tr><th>SA</th><td>South Africa</td><td>Pretoria</td><td>1.221</td><td>52.98</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-sync"></i> iterrows()</h2>
+                    <p>Itera sobre un DataFrame devolviendo el índice y la serie (fila).</p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+for lab, row in brics.iterrows():
+    print(lab)
+    print(row)
+                        </code></pre>
+                    </div>
+                    <div class="fragment box-glass" style="margin-top:10px; font-size:0.8rem; border-left: 5px solid #28a745;">
+                        <pre><code class="plaintext" data-trim data-noescape>
+BR
+country         Brazil
+capital       Brasilia
+area             8.516
+population       200.4
+Name: BR, dtype: object
+...
+                        </code></pre>
+                    </div>
+                </section>
+            </section>
+
             <!-- Slide 6: Pair Programming -->
             <section>
                 <h2><i class="fa-solid fa-user-astronaut"></i> Pair Programming</h2>
@@ -263,6 +382,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
     <script>
         Reveal.initialize({
@@ -274,14 +394,15 @@
             height: "100%", 
             margin: 0, 
             minScale: 1, 
-            maxScale: 1
+            maxScale: 1,
+            plugins: [ RevealHighlight ]
         });
 
         // Typed.js setup
         var typedInstance = null;
         Reveal.on('slidechanged', event => {
-            // El slide 6 es el último (index 6, 0-based)
-            if (event.indexh === 6) {
+            // El slide final es el index 9
+            if (event.indexh === 9) {
                 if(typedInstance) { typedInstance.destroy(); }
                 typedInstance = new Typed('#typed-output', {
                     strings: [
