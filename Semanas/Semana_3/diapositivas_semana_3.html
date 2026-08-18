@@ -157,7 +157,28 @@
                 </p>
             </section>
 
-            <!-- Slide 2: Reglas -->
+            <!-- Slide 2: Introducción y RAE -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-door-open"></i> Introducción</h2>
+                    <div class="box-glass">
+                        <p>En el mundo real, los Científicos de Datos rara vez encuentran datos limpios y organizados. A menudo, necesitamos aplicar transformaciones repetitivas a miles o millones de registros.</p>
+                        <p>Esta semana dominaremos las <strong>Estructuras de Control (Ciclos)</strong> y su integración con <strong>Pandas</strong> para automatizar el procesamiento y limpieza de volúmenes masivos de datos.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje (RAE)</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li class="fragment"><strong>RAE 1:</strong> Comprender y aplicar ciclos (FOR) para recorrer estructuras de datos complejas (Diccionarios, Arrays).</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Manipular DataFrames de Pandas utilizando métodos de iteración eficientes.</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Contrastar métodos iterativos básicos con operaciones vectorizadas avanzadas como <code>.apply()</code>.</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 3: Reglas -->
             <section>
                 <h2><i class="fa-solid fa-terminal"></i> Terminal Rules</h2>
                 <div class="box-glass">
@@ -169,7 +190,22 @@
                 </div>
             </section>
 
-            <!-- Slide 3: EMI Space -->
+            <!-- Slide 5: Glosario -->
+            <section>
+                <h2><i class="fa-solid fa-book-open-reader"></i> Glosario de Términos</h2>
+                <div class="split-layout">
+                    <div class="box-glass" style="font-size: 0.9rem;">
+                        <p><strong class="accent">Iteración:</strong> Repetición de un proceso de forma estructurada.</p>
+                        <p><strong class="accent">Vectorización:</strong> Operación matemática que se aplica a todo un array o matriz a la vez (evita el uso de ciclos, es más rápido).</p>
+                    </div>
+                    <div class="box-glass fragment" style="font-size: 0.9rem;">
+                        <p><strong class="accent">DataFrame:</strong> Tabla bidimensional de datos con filas y columnas.</p>
+                        <p><strong class="accent">Script:</strong> Archivo de texto plano que contiene instrucciones lógicas para ser ejecutadas por el computador.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: EMI Space -->
             <section>
                 <section>
                     <h2><i class="fa-solid fa-language"></i> EMI Space (10 Min)</h2>
@@ -423,7 +459,31 @@ print(brics)
                 </div>
             </section>
 
-            <!-- Slide 7: Cierre Automático (Typed.js) -->
+            <!-- Slide 12: Conclusiones y Bibliografía -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-flag-checkered"></i> Conclusiones</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li class="fragment">Los diccionarios y arrays son la base para construir estructuras complejas.</li>
+                            <li class="fragment">El método <code>iterrows()</code> es útil, pero debe usarse con precaución en datasets grandes por su impacto en el rendimiento.</li>
+                            <li class="fragment">Las <strong>funciones vectorizadas</strong> y el uso de <code>.apply()</code> son el estándar de la industria para optimizar recursos computacionales.</li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-book"></i> Bibliografía</h2>
+                    <div class="box-glass" style="font-size: 0.9rem;">
+                        <ul>
+                            <li>McKinney, W. (2017). <em>Python for Data Analysis</em>. O'Reilly Media.</li>
+                            <li>VanderPlas, J. (2016). <em>Python Data Science Handbook</em>. O'Reilly Media.</li>
+                            <li>Documentación Oficial de Pandas: <a href="https://pandas.pydata.org/docs/" target="_blank" style="color: var(--cyber-accent);">pandas.pydata.org</a></li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 13: Cierre Automático (Typed.js) -->
             <section>
                 <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
                 <div class="box-glass" style="min-height: 150px;">
@@ -471,8 +531,8 @@ print(brics)
         // Typed.js setup
         var typedInstance = null;
         Reveal.on('slidechanged', event => {
-            // El slide final es el index 9
-            if (event.indexh === 9) {
+            // El slide final es el index 14
+            if (event.indexh === 14) {
                 if(typedInstance) { typedInstance.destroy(); }
                 typedInstance = new Typed('#typed-output', {
                     strings: [
