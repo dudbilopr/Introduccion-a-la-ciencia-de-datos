@@ -1,0 +1,80 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{fancyhdr}
+
+\definecolor{unabblue}{HTML}{003865}
+\definecolor{unaborange}{HTML}{E85C0B}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeorange}{rgb}{0.8,0.3,0.0}
+
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{unabblue}{\textbf{Ciencia de Datos - UNAB}}}
+\fancyhead[R]{\textcolor{unaborange}{\textbf{Taller Semana 3}}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+\begin{center}
+    {\huge \textcolor{unabblue}{\textbf{Taller 3: Estructuras, Ciclos y Pandas}}} \\[0.5cm]
+    {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
+    \rule{\textwidth}{1pt}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{\textcolor{unabblue}{1. Objetivo del Taller}}
+Integrar el conocimiento de control de flujo (ciclos iterativos y condicionales) con el análisis de grandes volúmenes de datos utilizando la librería Pandas.
+
+\section*{\textcolor{unabblue}{2. Instrucciones}}
+Cree un nuevo cuaderno en Google Colab para desarrollar este taller. Todo el código debe estar comentado y los resultados deben ser claros. Suba el archivo a su repositorio al finalizar.
+
+\vspace{0.5cm}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        \textbf{\textcolor{unabblue}{Misión Analítica: Recursos Humanos}}\\[0.2cm]
+        El departamento de RRHH de una startup tecnológica le ha entregado datos desorganizados de sus empleados. Usted debe automatizar la limpieza y el análisis de estos datos.
+    }%
+}
+\vspace{0.5cm}
+
+\subsection*{Reto 1: Limpieza con Ciclos (30\%)}
+Usted recibe la siguiente lista de nombres, los cuales fueron ingresados erróneamente por un sistema antiguo (con mayúsculas, minúsculas y espacios extra):
+
+\begin{verbatim}
+empleados_sucios = ["   aNa perEz  ", "CARLOS Gomez", " lucia fernandez "]
+\end{verbatim}
+
+Utilizando un \textbf{ciclo for} y funciones de texto en Python (como \texttt{strip()} y \texttt{title()}), genere una nueva lista llamada \texttt{empleados\_limpios} que contenga los nombres formateados correctamente (Ej. "Ana Perez").
+
+\subsection*{Reto 2: Construcción del DataFrame (30\%)}
+Utilizando la lista \texttt{empleados\_limpios} del Reto 1, y la siguiente información adicional, construya un DataFrame de Pandas:
+\begin{itemize}
+    \item \textbf{Salario:} [3500, 4200, 2800]
+    \item \textbf{Departamento:} ['Ventas', 'TI', 'Ventas']
+\end{itemize}
+Imprima el DataFrame resultante en pantalla.
+
+\subsection*{Reto 3: Lógica y Filtrado (40\%)}
+Con el DataFrame construido en el Reto 2, escriba código en Pandas para responder a las siguientes preguntas:
+\begin{enumerate}
+    \item ¿Cuál es el salario promedio de la empresa?
+    \item Filtre el DataFrame para mostrar \textbf{solo} a los empleados que trabajan en el departamento de "Ventas".
+    \item (Bonus) Escriba un código condicional (\texttt{if}) que verifique si el salario promedio es mayor a 3000, imprimiendo "Salario competitivo" en caso afirmativo, y "Revisar tabulador" en caso negativo.
+\end{enumerate}
+
+\vspace{1cm}
+\begin{center}
+    \textit{\textcolor{gray}{"Automatizar lo repetitivo para enfocarnos en lo creativo."}}
+\end{center}
+
+\end{document}

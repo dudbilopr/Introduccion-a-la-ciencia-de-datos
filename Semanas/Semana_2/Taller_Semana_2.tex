@@ -1,0 +1,87 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{fancyhdr}
+
+\definecolor{unabblue}{HTML}{003865}
+\definecolor{unaborange}{HTML}{E85C0B}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeorange}{rgb}{0.8,0.3,0.0}
+
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{unabblue}{\textbf{Ciencia de Datos - UNAB}}}
+\fancyhead[R]{\textcolor{unaborange}{\textbf{Taller Semana 2}}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+\begin{center}
+    {\huge \textcolor{unabblue}{\textbf{Taller 2: Fundamentos de Python}}} \\[0.5cm]
+    {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
+    \rule{\textwidth}{1pt}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{\textcolor{unabblue}{1. Objetivo del Taller}}
+Afianzar los conocimientos en estructuras básicas de Python, declaración de variables, operadores y uso de librerías esenciales (Pandas) mediante la resolución de un problema práctico de negocio.
+
+\section*{\textcolor{unabblue}{2. Instrucciones}}
+Deberá resolver los siguientes ejercicios utilizando \textbf{Google Colab}. Una vez finalizado, descargue su archivo \texttt{.ipynb} y súbalo a su repositorio de GitHub. 
+
+\vspace{0.5cm}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        \textbf{\textcolor{unabblue}{Ejercicio Práctico: Inventario Estelar}}\\[0.2cm]
+        Usted es el encargado del inventario de una tienda de tecnología. Su base de datos local se ha corrompido, pero logró rescatar algunos datos en bruto en forma de código Python.
+    }%
+}
+\vspace{0.5cm}
+
+\subsection*{Parte A: Tipos de Datos (25\%)}
+Declare las siguientes variables en Python y utilice la función \texttt{type()} para imprimir el tipo de dato de cada una:
+\begin{itemize}
+    \item \texttt{producto = "Laptop Gamer"}
+    \item \texttt{precio = 1250.50}
+    \item \texttt{cantidad = 15}
+    \item \texttt{en\_stock = True}
+\end{itemize}
+
+\subsection*{Parte B: Colecciones (25\%)}
+Cree una \textbf{lista} llamada \texttt{ventas\_semana} que contenga las siguientes cantidades: \texttt{5, 12, 8, 20, 3}.
+Luego, utilizando funciones nativas de Python (como \texttt{sum()}, \texttt{max()}, \texttt{min()}):
+\begin{enumerate}
+    \item Calcule e imprima el total de ventas de la semana.
+    \item Calcule e imprima el día de mayor y menor venta.
+\end{enumerate}
+
+\subsection*{Parte C: Introducción a Pandas (50\%)}
+A partir del siguiente diccionario en Python, conviértalo en un \textbf{DataFrame} utilizando Pandas y expórtelo como un archivo CSV llamado \texttt{inventario.csv}.
+
+\begin{verbatim}
+import pandas as pd
+
+datos = {
+    'Producto': ['Mouse', 'Teclado', 'Monitor', 'Cable HDMI'],
+    'Precio': [15.0, 45.0, 200.0, 5.0],
+    'Stock': [100, 50, 20, 200]
+}
+\end{verbatim}
+
+Una vez convertido a DataFrame, calcule en una nueva columna el valor total del inventario por producto (Multiplicando Precio x Stock).
+
+\vspace{1cm}
+\begin{center}
+    \textit{\textcolor{gray}{"El código limpio siempre parece que fue escrito por alguien a quien le importa."}}
+\end{center}
+
+\end{document}
