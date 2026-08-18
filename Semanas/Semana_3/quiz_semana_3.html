@@ -131,38 +131,40 @@
     <div class="progress" id="progressText">Question 1 of 3</div>
     
     <div id="quiz-block">
-        <div class="question" id="questionText">Which Python data structure stores key-value pairs?</div>
+        <div class="question" id="questionText">Loading...</div>
         <ul class="options" id="optionsList">
-            <li onclick="selectOption(this)">List</li>
-            <li onclick="selectOption(this)">Tuple</li>
-            <li onclick="selectOption(this)">Dictionary</li>
-            <li onclick="selectOption(this)">Set</li>
+            <!-- Opciones generadas por JS -->
         </ul>
+        <div id="explanationBox" style="display: none; padding: 15px; margin-top: 15px; border-radius: 8px; background-color: #e9ecef; border-left: 5px solid var(--unab-blue);">
+            <strong>Explicación:</strong> <span id="explanationText"></span>
+        </div>
     </div>
 
-    <button id="submit-btn" onclick="checkAnswer()">Submit Answer</button>
+    <button id="submit-btn" onclick="checkAnswer()" style="display: none;">Submit Answer</button>
     
     <div id="result"></div>
 </div>
 
+<script src="../recursos/banco_preguntas.js"></script>
 <script>
-    const questions = [
-        {
-            question: "Which Python data structure stores key-value pairs?",
-            options: ["List", "Tuple", "Dictionary", "Set"],
-            answer: 2 // Dictionary
-        },
-        {
-            question: "What is the primary purpose of a 'for loop'?",
-            options: ["To store data permanently", "To iterate over a sequence of elements", "To handle application errors", "To declare a new function"],
-            answer: 1 // Iterate
-        },
-        {
-            question: "In Pandas, what is a DataFrame?",
-            options: ["A 1D array of data", "A 2D tabular data structure", "A function that cleans data", "A type of loop"],
-            answer: 1 // Tabular
+    // 1. Inicializar banco de preguntas (obtener 5 aleatorias del pool)
+    let allQuestions = window.QuizBank ? window.QuizBank["ciencia_datos"] : [];
+    
+    // Función para barajar array
+    function shuffleArray(array) {
+        let curId = array.length;
+        while (0 !== curId) {
+            let randId = Math.floor(Math.random() * curId);
+            curId -= 1;
+            let tmp = array[curId];
+            array[curId] = array[randId];
+            array[randId] = tmp;
         }
-    ];
+        return array;
+    }
+
+    // Seleccionamos solo 5 preguntas al azar para esta sesión (o todas si hay menos de 5)
+    let questions = shuffleArray([...allQuestions]).slice(0, 5);
 
     let currentQuestion = 0;
     let score = 0;
@@ -174,15 +176,25 @@
     const submitBtn = document.getElementById("submit-btn");
     const resultDiv = document.getElementById("result");
     const quizBlock = document.getElementById("quiz-block");
+    const explanationBox = document.getElementById("explanationBox");
+    const explanationText = document.getElementById("explanationText");
 
     function loadQuestion() {
+        if(questions.length === 0) {
+            questionText.textContent = "Error: El banco de preguntas no se pudo cargar. Asegúrese de que banco_preguntas.js existe.";
+            return;
+        }
+
         selectedOptionIndex = -1;
+        explanationBox.style.display = "none"; // Ocultar explicación al cambiar pregunta
+        
         const q = questions[currentQuestion];
-        questionText.textContent = q.question;
+        // Mostrar tema y pregunta
+        questionText.innerHTML = `<span style="font-size:0.8rem; color:#666; display:block; margin-bottom:5px;">[${q.tema}]</span>${q.pregunta}`;
         progressText.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
         
         optionsList.innerHTML = "";
-        q.options.forEach((opt, index) => {
+        q.opciones.forEach((opt, index) => {
             const li = document.createElement("li");
             li.textContent = opt;
             li.onclick = () => selectOption(li, index);
@@ -190,6 +202,7 @@
         });
         
         submitBtn.textContent = "Submit Answer";
+        submitBtn.style.display = "block";
     }
 
     function selectOption(element, index) {
@@ -212,6 +225,7 @@
         const q = questions[currentQuestion];
         const options = optionsList.children;
 
+        // Si ya respondimos y dimos clic en "Siguiente"
         if (submitBtn.textContent === "Next Question" || submitBtn.textContent === "Show Results") {
             currentQuestion++;
             if (currentQuestion < questions.length) {
@@ -222,23 +236,27 @@
             return;
         }
 
-        // Evaluate answer
-        if (selectedOptionIndex === q.answer) {
+        // Evaluar respuesta
+        if (selectedOptionIndex === q.respuestaCorrecta) {
             options[selectedOptionIndex].classList.add("correct");
             score++;
         } else {
             options[selectedOptionIndex].classList.add("incorrect");
-            options[q.answer].classList.add("correct");
+            options[q.respuestaCorrecta].classList.add("correct");
         }
 
-        // Update button text
+        // Mostrar Explicación Guiada
+        explanationText.textContent = q.explicacion;
+        explanationBox.style.display = "block";
+
+        // Actualizar botón
         if (currentQuestion < questions.length - 1) {
             submitBtn.textContent = "Next Question";
         } else {
             submitBtn.textContent = "Show Results";
         }
         
-        // Disable further clicks
+        // Bloquear opciones
         for (let i = 0; i < options.length; i++) {
             options[i].onclick = null;
             options[i].style.cursor = "default";
@@ -251,11 +269,16 @@
         progressText.style.display = "none";
         
         resultDiv.style.display = "block";
-        resultDiv.innerHTML = `Quiz Completed!<br><span style="color:var(--unab-orange); font-size:2.5rem;">${score} / ${questions.length}</span><br>Great job utilizing English in Data Science!`;
+        resultDiv.innerHTML = \`Quiz Completed!<br><span style="color:var(--unab-orange); font-size:2.5rem;">\${score} / \${questions.length}</span><br>Great job!<br><br>
+        <button onclick="location.reload()" style="background:var(--unab-blue); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:1rem;">Retry (New Random Questions)</button>\`;
+
+        // Enviar resultados al Parent LMS (index.html)
+        const notaEscalada = Math.round((score / questions.length) * 100);
+        window.parent.postMessage({ type: 'QUIZ_COMPLETO', score: notaEscalada, week: 3 }, '*');
     }
 
     // Initialize
-    loadQuestion();
+    window.onload = loadQuestion;
 
 </script>
 </body>
