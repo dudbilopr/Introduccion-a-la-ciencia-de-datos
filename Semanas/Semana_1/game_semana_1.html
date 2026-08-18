@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Gamificado | Semana 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { neon: '#00f3ff', neonbg: '#001a1a' } } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        h1, h2, .timer-font { font-family: 'Orbitron', sans-serif; }
+        
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+        .dropzone {
+            min-height: 80px;
+            border: 2px dashed #475569;
+            transition: all 0.3s;
+        }
+        .dropzone.dragover {
+            background-color: rgba(0, 243, 255, 0.1);
+            border-color: #00f3ff;
+            border-style: solid;
+        }
+        .correct {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 overflow-x-hidden">
+
+    <div class="max-w-4xl w-full text-center mb-8">
+        <h1 class="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon to-blue-500 mb-2">Misión: Ciclo de Vida de los Datos</h1>
+        <p class="text-slate-400">Arrastra cada fase al contenedor correcto en el menor tiempo posible.</p>
+    </div>
+
+    <!-- Panel de Control -->
+    <div class="w-full max-w-4xl flex justify-between items-center bg-slate-800/50 rounded-xl p-4 border border-slate-700 mb-8 backdrop-blur-md">
+        <div class="text-xl timer-font font-bold flex items-center">
+            <i class="fas fa-stopwatch text-neon mr-2"></i> Tiempo: <span id="time" class="text-white ml-2">00:00</span>
+        </div>
+        <div>
+            <button id="startBtn" class="bg-gradient-to-r from-blue-600 to-neon text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(0,243,255,0.4)] hover:scale-105 transition">INICIAR MISIÓN</button>
+        </div>
+    </div>
+
+    <!-- Tablero de Juego -->
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50 pointer-events-none transition-opacity duration-500" id="gameBoard">
+        
+        <!-- Zona de Origen -->
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <h2 class="text-xl text-slate-300 mb-4 border-b border-slate-700 pb-2"><i class="fas fa-layer-group mr-2"></i>Fases Desordenadas</h2>
+            <div id="sourceZone" class="space-y-3 min-h-[400px]">
+                <!-- Fases generadas por JS -->
+            </div>
+        </div>
+
+        <!-- Zona de Destino (Orden) -->
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <h2 class="text-xl text-slate-300 mb-4 border-b border-slate-700 pb-2"><i class="fas fa-sort-numeric-down mr-2"></i>Orden Correcto</h2>
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">1</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="1">Soltar aquí</div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">2</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="2">Soltar aquí</div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">3</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="3">Soltar aquí</div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">4</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="4">Soltar aquí</div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">5</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="5">Soltar aquí</div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-neon shrink-0">6</div>
+                    <div class="dropzone rounded-lg w-full flex items-center justify-center text-slate-500 text-sm" data-step="6">Soltar aquí</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Victoria -->
+    <div id="winModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="bg-slate-800 border border-neon rounded-2xl p-8 max-w-md text-center shadow-[0_0_50px_rgba(0,243,255,0.3)]">
+            <i class="fas fa-trophy text-6xl text-yellow-400 mb-4"></i>
+            <h2 class="text-3xl font-bold mb-2">¡MISIÓN CUMPLIDA!</h2>
+            <p class="text-slate-300 mb-6">Has estructurado correctamente el Ciclo de Vida de los Datos.</p>
+            <div class="bg-slate-900 rounded-lg p-4 mb-6">
+                <div class="text-sm text-slate-400">Tiempo Final</div>
+                <div id="finalTime" class="text-3xl timer-font text-neon">00:00</div>
+            </div>
+            <button onclick="location.reload()" class="bg-neon text-black font-bold py-3 px-8 rounded-full hover:scale-105 transition">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <script>
+        const phases = [
+            { id: 'p1', step: '1', text: 'Recolección y Adquisición', icon: 'fa-database' },
+            { id: 'p2', step: '2', text: 'Limpieza y Preprocesamiento', icon: 'fa-broom' },
+            { id: 'p3', step: '3', text: 'Análisis Exploratorio (EDA)', icon: 'fa-chart-pie' },
+            { id: 'p4', step: '4', text: 'Modelado Machine Learning', icon: 'fa-brain' },
+            { id: 'p5', step: '5', text: 'Evaluación y Validación', icon: 'fa-check-double' },
+            { id: 'p6', step: '6', text: 'Despliegue y Comunicación', icon: 'fa-rocket' }
+        ];
+
+        let draggedItem = null;
+        let timerInterval;
+        let seconds = 0;
+        let isPlaying = false;
+        let correctCount = 0;
+
+        // Shuffle
+        const shuffled = [...phases].sort(() => Math.random() - 0.5);
+        
+        const sourceZone = document.getElementById('sourceZone');
+        shuffled.forEach(p => {
+            const el = document.createElement('div');
+            el.className = 'draggable bg-slate-700 hover:bg-slate-600 border border-slate-600 p-4 rounded-lg flex items-center font-medium shadow-md cursor-grab';
+            el.draggable = true;
+            el.id = p.id;
+            el.dataset.step = p.step;
+            el.innerHTML = `<i class="fas ${p.icon} w-8 text-neon"></i> <span>${p.text}</span>`;
+            
+            el.addEventListener('dragstart', function(e) {
+                if(!isPlaying) return e.preventDefault();
+                draggedItem = this;
+                setTimeout(() => this.classList.add('opacity-50'), 0);
+            });
+            
+            el.addEventListener('dragend', function() {
+                setTimeout(() => {
+                    this.classList.remove('opacity-50');
+                    draggedItem = null;
+                }, 0);
+            });
+            
+            sourceZone.appendChild(el);
+        });
+
+        // Dropzones
+        const dropzones = document.querySelectorAll('.dropzone');
+        dropzones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                if(!zone.hasChildNodes() || zone.innerText === 'Soltar aquí') {
+                    zone.classList.add('dragover');
+                }
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                if (draggedItem && (!this.hasChildNodes() || this.innerText === 'Soltar aquí' || this.children.length === 0)) {
+                    // Check logic
+                    const requiredStep = this.dataset.step;
+                    const itemStep = draggedItem.dataset.step;
+                    
+                    if (requiredStep === itemStep) {
+                        this.innerHTML = '';
+                        this.appendChild(draggedItem);
+                        this.classList.add('correct');
+                        draggedItem.draggable = false;
+                        draggedItem.classList.remove('draggable');
+                        draggedItem.classList.add('bg-slate-800', 'border-green-500');
+                        draggedItem.classList.remove('cursor-grab');
+                        
+                        correctCount++;
+                        checkWin();
+                    } else {
+                        // Shake effect for wrong drop
+                        draggedItem.classList.add('animate-bounce');
+                        setTimeout(() => draggedItem.classList.remove('animate-bounce'), 500);
+                    }
+                }
+            });
+        });
+
+        document.getElementById('startBtn').addEventListener('click', function() {
+            document.getElementById('gameBoard').classList.remove('opacity-50', 'pointer-events-none');
+            this.style.display = 'none';
+            isPlaying = true;
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const s = String(seconds % 60).padStart(2, '0');
+                document.getElementById('time').innerText = `${m}:${s}`;
+            }, 1000);
+        });
+
+        function checkWin() {
+            if (correctCount === 6) {
+                clearInterval(timerInterval);
+                document.getElementById('finalTime').innerText = document.getElementById('time').innerText;
+                document.getElementById('winModal').classList.remove('hidden');
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00f3ff', '#10b981', '#ffffff']
+                });
+            }
+        }
+    </script>
+</body>
+</html>
