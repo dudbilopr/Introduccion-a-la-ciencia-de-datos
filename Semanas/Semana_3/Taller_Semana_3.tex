@@ -51,7 +51,12 @@ Cree un nuevo cuaderno en Google Colab para desarrollar este taller. Todo el có
 Usted recibe la siguiente lista de nombres, los cuales fueron ingresados erróneamente por un sistema antiguo (con mayúsculas, minúsculas y espacios extra):
 
 \begin{verbatim}
-empleados_sucios = ["   aNa perEz  ", "CARLOS Gomez", " lucia fernandez "]
+empleados_sucios = [
+    "   aNa perEz  ", "CARLOS Gomez", " lucia fernandez ", 
+    "mArIo RoDrIgUeZ ", "   jUaN pAbLo ", "SOFIA martinez   ",
+    "   ALBERTO fRAnCO", " david gonzalez ", " mArIa jOsE  ",
+    " PABLO  escobar", "ANDRES felipe   ", "  cArMeN sAlInAs "
+]
 \end{verbatim}
 
 Utilizando un \textbf{ciclo for} y funciones de texto en Python (como \texttt{strip()} y \texttt{title()}), genere una nueva lista llamada \texttt{empleados\_limpios} que contenga los nombres formateados correctamente (Ej. "Ana Perez").
@@ -59,8 +64,10 @@ Utilizando un \textbf{ciclo for} y funciones de texto en Python (como \texttt{st
 \subsection*{Reto 2: Construcción del DataFrame (30\%)}
 Utilizando la lista \texttt{empleados\_limpios} del Reto 1, y la siguiente información adicional, construya un DataFrame de Pandas:
 \begin{itemize}
-    \item \textbf{Salario:} [3500, 4200, 2800]
-    \item \textbf{Departamento:} ['Ventas', 'TI', 'Ventas']
+    \item \begin{verbatim}
+salarios = [2500, 3200, 1800, 4500, 2100, 3600, 2900, 1500, 4100, 3000, 2800, 3500]
+\end{verbatim} 
+    \item \textbf{Departamento:} ['Ventas', 'TI', 'Ventas', 'Finanzas', 'TI', 'Ventas', 'Finanzas', 'TI', 'Ventas', 'TI', 'Finanzas', 'Ventas']
 \end{itemize}
 Imprima el DataFrame resultante en pantalla.
 

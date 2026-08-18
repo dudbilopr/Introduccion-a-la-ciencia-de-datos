@@ -320,8 +320,26 @@ brics = pd.read_csv("brics.csv", index_col=0)
                     </table>
                 </section>
                 <section>
-                    <h2><i class="fa-solid fa-sync"></i> iterrows()</h2>
-                    <p>Itera sobre un DataFrame devolviendo el índice y la serie (fila).</p>
+                    <h2><i class="fa-solid fa-bug"></i> El primer intento</h2>
+                    <p>Si usamos un <code>for</code> normal, iteramos sobre los nombres de las <strong>columnas</strong>.</p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+for val in brics:
+    print(val)
+                        </code></pre>
+                    </div>
+                    <div class="fragment box-glass" style="margin-top:10px; font-size:0.8rem; border-left: 5px solid #ff4444;">
+                        <pre><code class="plaintext" data-trim data-noescape>
+country
+capital
+area
+population
+                        </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-sync"></i> La solución: iterrows()</h2>
+                    <p>Devuelve el índice y la serie completa (fila).</p>
                     <div class="box-glass">
                         <pre><code class="python" data-trim data-noescape>
 for lab, row in brics.iterrows():
@@ -339,6 +357,58 @@ population       200.4
 Name: BR, dtype: object
 ...
                         </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-crosshairs"></i> Impresión Selectiva</h2>
+                    <p>Podemos acceder a columnas específicas dentro del ciclo.</p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+for lab, row in brics.iterrows():
+    print(lab + ": " + row["capital"])
+                        </code></pre>
+                    </div>
+                    <div class="fragment box-glass" style="margin-top:10px; font-size: 0.9rem; border-left: 5px solid #28a745;">
+                        <pre><code class="plaintext" data-trim data-noescape>
+BR: Brasilia
+RU: Moscow
+IN: New Delhi
+CH: Beijing
+SA: Pretoria
+                        </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-plus"></i> Añadir columnas iterando</h2>
+                    <p>Creamos una serie en cada iteración usando <span class="accent">.loc</span></p>
+                    <div class="box-glass" style="font-size: 0.85em;">
+                        <pre><code class="python" data-trim data-noescape>
+for lab, row in brics.iterrows():
+    brics.loc[lab, "name_length"] = len(row["country"])
+
+print(brics)
+                        </code></pre>
+                    </div>
+                    <table class="fragment" style="color: white; font-size: 0.7rem; margin-top: 10px;">
+                        <thead><tr><th></th><th>country</th><th>capital</th><th>area</th><th>...</th><th>name_length</th></tr></thead>
+                        <tbody>
+                            <tr><th>BR</th><td>Brazil</td><td>Brasilia</td><td>8.516</td><td>...</td><td>6</td></tr>
+                            <tr><th>RU</th><td>Russia</td><td>Moscow</td><td>17.100</td><td>...</td><td>6</td></tr>
+                            <tr><th>IN</th><td>India</td><td>New Delhi</td><td>3.286</td><td>...</td><td>5</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-rocket"></i> Nivel Pro: <span class="accent">apply()</span></h2>
+                    <p>Iterar filas puede ser lento. Es mejor usar funciones vectorizadas.</p>
+                    <div class="box-glass">
+                        <pre><code class="python" data-trim data-noescape>
+brics["name_length"] = brics["country"].apply(len)
+print(brics)
+                        </code></pre>
+                    </div>
+                    <div class="fragment box-glass" style="margin-top: 20px;">
+                        <p style="font-size: 1rem; margin:0;"><i class="fa-solid fa-bolt accent-unab"></i> <span class="accent-unab">Pro-Tip:</span> ¡apply() es significativamente más rápido que iterrows() en datasets gigantes!</p>
                     </div>
                 </section>
             </section>
