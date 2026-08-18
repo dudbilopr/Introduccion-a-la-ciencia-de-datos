@@ -45,7 +45,16 @@ El curso está estructurado en 16 semanas. El material interactivo se irá publi
   - [Guía del Docente](./Semanas/Semana_2/Guia_Clase2.md)
   - [Presentación Interactiva Web](./Semanas/Semana_2/diapositivas_semana_2.html)
   - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_2/quiz_semana_2.html)
+  - [Fundamentos de Python (.ipynb)](./Semanas/Semana_2/Fundamentos_Python_Semana2.ipynb)
   - [Colab Guiado (.ipynb)](./Semanas/Semana_2/Colab_Guiado_Semana2.ipynb)
+
+### [Semana 3: Estructuras, Control y Pandas](./Semanas/Semana_3)
+- **Conceptos:** Listas, Diccionarios, Ciclos For/While, DataFrames.
+- **Actividad Central:** Pair Programming - Analista de Supermercado (Limpieza y Agrupaciones en Pandas).
+- **Recursos Públicos:**
+  - [Presentación Interactiva Web](./Semanas/Semana_3/diapositivas_semana_3.html)
+  - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_3/quiz_semana_3.html)
+  - [Colab Guiado (.ipynb)](./Semanas/Semana_3/Colab_Guiado_Semana3.ipynb)
 
 *(Las siguientes semanas se habilitarán progresivamente).*
 

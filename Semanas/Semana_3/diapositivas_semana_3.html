@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Ciencia de Datos - Semana 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --cyber-bg: #050510;
+            --cyber-accent: #00ffcc;
+            --unab-orange: #E85C0B;
+            --text-light: #e0e0e0;
+        }
+
+        /* Dark Theme Override for Simple Theme */
+        .reveal {
+            background-color: var(--cyber-bg);
+            color: var(--text-light);
+            font-family: 'Inter', 'Roboto', sans-serif;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--text-light);
+            text-transform: none;
+            font-weight: 700;
+        }
+
+        .reveal h2 {
+            border-bottom: 2px solid var(--cyber-accent);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .accent {
+            color: var(--cyber-accent);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        
+        .accent-unab {
+            color: var(--unab-orange);
+        }
+
+        .reveal .controls, .reveal .progress {
+            color: var(--cyber-accent);
+        }
+
+        .icon-container {
+            font-size: 4rem;
+            color: var(--cyber-accent);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px var(--cyber-accent));
+        }
+        
+        /* Glassmorphism Box */
+        .box-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 5px solid var(--cyber-accent);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        /* Interactive Modals */
+        .clickable-concept {
+            cursor: pointer;
+            color: var(--cyber-accent);
+            font-weight: bold;
+            border-bottom: 1px dashed var(--cyber-accent);
+            transition: all 0.3s ease;
+        }
+
+        .clickable-concept:hover {
+            color: var(--unab-orange);
+            border-bottom-color: var(--unab-orange);
+            text-shadow: 0 0 8px var(--unab-orange);
+        }
+
+        .concept-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid var(--cyber-accent);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+            z-index: 1000;
+            width: 80%;
+            max-width: 600px;
+            text-align: left;
+            font-size: 1.2rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            color: #ff4444;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        /* Decluttering / Overflow fix */
+        .scrollable-slide {
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        
+        .split-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .split-layout > div {
+            width: 48%;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Título Impacto Cyber -->
+            <section>
+                <div class="icon-container">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h1>Ciencia de Datos</h1>
+                <h3>Semana 3: Estructuras, Control de Flujo y <span class="accent">Pandas Avanzado</span></h3>
+                <p>
+                    <small>Docente: Dudbil Olvasada Pabon Riaño | UNAB</small>
+                </p>
+            </section>
+
+            <!-- Slide 2: Reglas -->
+            <section>
+                <h2><i class="fa-solid fa-terminal"></i> Terminal Rules</h2>
+                <div class="box-glass">
+                    <ul>
+                        <li class="fragment">Iniciamos <strong>7:00 AM</strong>.</li>
+                        <li class="fragment">Activar el Copiloto de IA (<span class="accent">ChatGPT / LLM</span>).</li>
+                        <li class="fragment">Hoy hay Pair Programming Intensivo.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 3: EMI Space -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-language"></i> EMI Space (10 Min)</h2>
+                    <h3 class="accent">Loops & Data Structures</h3>
+                    <p class="fragment">Time to switch to English.</p>
+                </section>
+                <section>
+                    <h2>Terminology Challenge</h2>
+                    <div class="split-layout">
+                        <div>
+                            <ul>
+                                <li class="fragment"><strong>Array / List:</strong> Ordered sequence of elements.</li>
+                                <li class="fragment"><strong>Dictionary:</strong> Key-Value pairs.</li>
+                                <li class="fragment"><strong>Loop:</strong> A sequence of instructions that is continually repeated.</li>
+                            </ul>
+                        </div>
+                        <div class="fragment box-glass">
+                            <p><i class="fa-solid fa-bolt accent-unab"></i> Pro-Tip:</p>
+                            <p>In Python, <span class="clickable-concept" onclick="openModal('dictModal')">Dictionaries</span> are extremely fast for looking up data.</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 4: Control de Flujo -->
+            <section>
+                <h2><i class="fa-solid fa-code-branch"></i> Ciclos y Control</h2>
+                <p>¿Cómo hacemos que la máquina trabaje por nosotros?</p>
+                <ul>
+                    <li class="fragment">Usando <span class="accent">FOR loops</span> (Ciclos definidos).</li>
+                    <li class="fragment">Iterando a través de listas enormes en milisegundos.</li>
+                </ul>
+                <div class="box-glass fragment">
+                    <pre><code class="python" style="color:#00ffcc; background:transparent;">for cliente in lista_clientes:
+    enviar_correo(cliente)</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 5: Pandas Profundo -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-table"></i> Dominando Pandas</h2>
+                    <p>La navaja suiza del Científico de Datos en Python.</p>
+                    <p class="fragment">Es hora de conocer el concepto de <span class="clickable-concept" onclick="openModal('dfModal')">DataFrame</span>.</p>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-filter"></i> Manipulación de Datos</h2>
+                    <ul>
+                        <li class="fragment"><strong>Filtrado:</strong> ¿Qué ventas fueron mayores a $1,000?</li>
+                        <li class="fragment"><strong>Agrupación:</strong> Ventas totales por categoría.</li>
+                        <li class="fragment"><strong>Limpieza:</strong> ¿Qué hacemos con los datos faltantes (NaN)?</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Slide 6: Pair Programming -->
+            <section>
+                <h2><i class="fa-solid fa-user-astronaut"></i> Pair Programming</h2>
+                <div class="box-glass">
+                    <h3 class="accent">Misión: El Analista de Supermercado</h3>
+                    <p>Hoy trabajaremos con un dataset más grande (más de 1,000 registros). Aplicaremos ciclos para limpiar textos y Pandas para extraer Insights de negocio.</p>
+                    <p><i class="fa-solid fa-arrow-right"></i> Abran su Google Colab.</p>
+                </div>
+            </section>
+
+            <!-- Slide 7: Cierre Automático (Typed.js) -->
+            <section>
+                <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
+                <div class="box-glass" style="min-height: 150px;">
+                    <span id="typed-output" style="font-family: monospace; font-size: 1.2rem; color: var(--cyber-accent);"></span>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal-overlay" id="overlay" onclick="closeModals()"></div>
+    
+    <div class="concept-modal" id="dictModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h3 class="accent">Dictionaries (Diccionarios)</h3>
+        <p>A dictionary in Python is a collection of key-value pairs. Unlike lists, which are indexed by a range of numbers, dictionaries are indexed by keys, which can be any immutable type (like strings and numbers).</p>
+        <pre><code style="color:#00ffcc;">user = {"name": "Ada", "role": "Data Scientist"}</code></pre>
+    </div>
+
+    <div class="concept-modal" id="dfModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h3 class="accent">DataFrame</h3>
+        <p>Es una estructura de datos tabular bidimensional, mutable en tamaño y potencialmente heterogénea (con filas y columnas etiquetadas). Es el equivalente a una hoja de cálculo de Excel dentro del código de Python.</p>
+        <p>Se construye combinando múltiples <em>Series</em> (columnas).</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'fade', // Efecto cyber/fade
+            controls: true,
+            progress: true,
+            width: "100%", 
+            height: "100%", 
+            margin: 0, 
+            minScale: 1, 
+            maxScale: 1
+        });
+
+        // Typed.js setup
+        var typedInstance = null;
+        Reveal.on('slidechanged', event => {
+            // El slide 6 es el último (index 6, 0-based)
+            if (event.indexh === 6) {
+                if(typedInstance) { typedInstance.destroy(); }
+                typedInstance = new Typed('#typed-output', {
+                    strings: [
+                        "> Analizando progreso de la sesión...",
+                        "> Competencias adquiridas: Ciclos FOR, DataFrames, Data Cleaning.",
+                        "> [OK] Sesión finalizada exitosamente.",
+                        "> TAREA: Hacer PUSH al repositorio de GitHub."
+                    ],
+                    typeSpeed: 40,
+                    backSpeed: 20,
+                    loop: false,
+                    showCursor: true,
+                    cursorChar: '█'
+                });
+            }
+        });
+
+        // Modal Logic
+        function openModal(id) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closeModals() {
+            document.getElementById('overlay').style.display = 'none';
+            var modals = document.getElementsByClassName('concept-modal');
+            for(var i=0; i<modals.length; i++){
+                modals[i].style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
