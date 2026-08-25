@@ -17,53 +17,62 @@
             --data-orange: #E85C0B;
             --cyber-dark: #050510;
             --neon-cyan: #00ffcc;
+            --neon-pink: #ff007f;
         }
 
-        .reveal {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            color: #333;
-            background-color: #fff;
-        }
+        body { font-family: 'Inter', sans-serif; }
 
         .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
             color: var(--data-blue);
             text-transform: none;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .reveal h2 {
-            border-bottom: 2px solid var(--data-orange);
+            border-bottom: 3px solid var(--data-orange);
             display: inline-block;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 30px;
         }
 
-        .accent {
-            color: var(--data-orange) !important;
-        }
+        .accent { color: var(--data-orange) !important; font-weight: bold; }
+        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
 
-        .cyber-accent {
-            color: var(--neon-cyan) !important;
-        }
-
-        .reveal .controls, .reveal .progress {
-            color: var(--data-orange);
-        }
+        .reveal .controls, .reveal .progress { color: var(--data-orange); }
 
         .icon-container {
-            font-size: 4rem;
+            font-size: 5rem;
             color: var(--data-orange);
             margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
         
         .box-glass {
-            background: #f8f9fa;
+            background: rgba(240, 244, 248, 0.9);
             border-left: 6px solid var(--data-orange);
-            padding: 20px;
-            border-radius: 4px;
+            padding: 25px;
+            border-radius: 8px;
             text-align: left;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             margin-top: 15px;
             color: #333;
+            font-size: 0.9em;
+        }
+
+        .callout-tip {
+            background: #e6f7ff;
+            border-left: 5px solid #1890ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 0.85em;
         }
 
         /* Dark Mode / Cyber Mode slides */
@@ -72,96 +81,71 @@
             background-image: radial-gradient(circle at center, #111122 0%, var(--cyber-dark) 100%);
         }
 
-        .cyber-mode h1, .cyber-mode h2, .cyber-mode h3, .cyber-mode p, .cyber-mode ul {
+        .cyber-mode h1, .cyber-mode h2, .cyber-mode h3, .cyber-mode p, .cyber-mode ul, .cyber-mode li {
             color: #fff !important;
         }
 
-        .cyber-mode h2 {
-            border-bottom: 2px solid var(--neon-cyan);
-        }
+        .cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
 
         .cyber-mode .box-glass {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border-left: 6px solid var(--neon-cyan);
-            color: #fff;
             border-right: 1px solid rgba(255,255,255,0.1);
             border-top: 1px solid rgba(255,255,255,0.1);
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
         }
 
         .clickable-concept {
             cursor: pointer;
             color: var(--data-blue);
             font-weight: bold;
-            border-bottom: 1px dashed var(--data-orange);
+            border-bottom: 2px dashed var(--data-orange);
             transition: all 0.3s ease;
+            display: inline-block;
         }
 
         .cyber-mode .clickable-concept {
             color: var(--neon-cyan);
-            border-bottom: 1px dashed var(--neon-cyan);
+            border-bottom: 2px dashed var(--neon-cyan);
         }
 
         .clickable-concept:hover {
             color: var(--data-orange);
-        }
-
-        .cyber-mode .clickable-concept:hover {
-            color: #fff;
+            transform: translateY(-2px);
         }
 
         .concept-modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            color: #333;
-            padding: 30px;
-            border-radius: 8px;
-            border: 2px solid var(--data-blue);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            width: 80%;
-            max-width: 600px;
-            text-align: left;
-            font-size: 1.2rem;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; color: #333;
+            padding: 40px; border-radius: 12px;
+            border: 3px solid var(--data-blue);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            z-index: 1000; width: 85%; max-width: 700px;
+            text-align: left; font-size: 1.1rem;
         }
 
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 999;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(8px);
         }
 
         .close-modal {
-            float: right;
-            cursor: pointer;
-            color: #ff4444;
-            font-weight: bold;
-            font-size: 1.5rem;
+            float: right; cursor: pointer; color: #ff4444;
+            font-weight: bold; font-size: 2rem; line-height: 1; transition: 0.2s;
         }
+        .close-modal:hover { color: #cc0000; transform: scale(1.1); }
 
         .split-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; gap: 30px; align-items: stretch;
         }
-        .split-layout > div {
-            width: 48%;
-        }
+        .split-layout > div { flex: 1; }
 
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
+        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
     </style>
 </head>
 
@@ -169,16 +153,14 @@
     <div class="reveal">
         <div class="slides">
 
-            <!-- Slide 1: Título Impacto Cyber -->
-            <section data-state="cyber-mode">
-                <div class="icon-container" style="color: var(--neon-cyan);">
-                    <i class="fa-solid fa-chart-pie"></i>
+            <!-- Slide 1: Título -->
+            <section>
+                <div class="icon-container">
+                    <i class="fa-solid fa-chart-line"></i>
                 </div>
                 <h1>Ciencia de Datos</h1>
-                <h3>Semana 4: Pandas Avanzado y <span class="cyber-accent">Visualización de Datos</span></h3>
-                <p>
-                    <small style="color:#aaa;">Docente: Dudbil Olvasada Pabon Riaño | Data10.easy</small>
-                </p>
+                <h3>Semana 4: <span class="accent">Limpieza y Visualización de Datos</span></h3>
+                <p><small>Programa de Ciencia de Datos - Data10.easy</small></p>
             </section>
 
             <!-- Slide 2: Introducción y RAE -->
@@ -186,237 +168,164 @@
                 <section>
                     <h2><i class="fa-solid fa-door-open"></i> Introducción</h2>
                     <div class="box-glass">
-                        <p>Tras dominar las estructuras básicas de Pandas, hoy daremos el siguiente paso: <strong>la limpieza profunda de datos y su representación visual</strong>.</p>
-                        <p>El cerebro humano procesa imágenes 60,000 veces más rápido que texto. Un buen análisis no sirve si no sabemos visualizarlo para comunicarlo a los directivos.</p>
+                        <p>Los datos en el mundo real nunca vienen listos para analizar. Vienen sucios, incompletos y ruidosos.</p>
+                        <p>Hoy aprenderemos a transformar un conjunto de datos crudo en una <strong>historia visual convincente</strong>. Pasaremos del caos a la claridad mediante la limpieza profunda con Pandas y la visualización interactiva.</p>
                     </div>
                 </section>
                 <section>
                     <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje (RAE)</h2>
                     <div class="box-glass">
                         <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Ejecutar limpieza profunda de datos con Pandas (tratamiento de nulos, duplicados y outliers).</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Diseñar visualizaciones estáticas profesionales utilizando Matplotlib y Seaborn.</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Construir dashboards interactivos de alto impacto empleando Plotly.</li>
+                            <li class="fragment"><strong>RAE 1:</strong> Identificar y tratar valores nulos (NaN) y duplicados en conjuntos de datos reales.</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Aplicar principios de Gestalt y Decluttering en la construcción de gráficos con Matplotlib y Seaborn.</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Construir visualizaciones interactivas listas para la web utilizando Plotly.</li>
                         </ul>
                     </div>
                 </section>
             </section>
 
-            <!-- Slide 3: Reglas -->
+            <!-- Slide 3: Agenda -->
             <section>
-                <h2><i class="fa-solid fa-terminal"></i> Reglas de Vuelo</h2>
-                <div class="box-glass">
-                    <ul>
-                        <li class="fragment">Mantendremos el rigor estadístico: cada gráfico debe tener título, ejes marcados y leyenda.</li>
-                        <li class="fragment">Evitaremos el <span class="clickable-concept" onclick="openModal('chartjunkModal')">Chartjunk</span>. Menos es más.</li>
-                        <li class="fragment">A los 45 minutos haremos una pausa activa (Modo Difuso) para consolidar la memoria.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Slide 4: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-book-open-reader"></i> Glosario de Términos</h2>
+                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
                 <div class="split-layout">
-                    <div class="box-glass" style="font-size: 0.9rem;">
-                        <p><strong class="accent">Outlier:</strong> Valor atípico que se aleja significativamente de las demás observaciones.</p>
-                        <p><strong class="accent">Imputación:</strong> Proceso de sustituir valores faltantes en un dataset por valores estimados.</p>
+                    <div>
+                        <ul>
+                            <li class="fragment">Limpieza de Datos (Pandas)</li>
+                            <li class="fragment">Principios del Diseño Visual</li>
+                            <li class="fragment">Matplotlib vs Seaborn</li>
+                            <li class="fragment">Plotly: Interactividad Web</li>
+                            <li class="fragment">Taller Práctico con Colab</li>
+                        </ul>
                     </div>
-                    <div class="box-glass fragment" style="font-size: 0.9rem;">
-                        <p><strong class="accent">Seaborn:</strong> Librería estadística de Python construida sobre Matplotlib con estética superior.</p>
-                        <p><strong class="accent">Plotly:</strong> Librería para gráficos interactivos (zoom, hover) ideal para presentaciones y web.</p>
+                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
+                        <i class="fa-solid fa-laptop-code text-gray-300" style="font-size:8rem;"></i>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 5: EMI Space -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-language"></i> EMI Space (10 Min)</h2>
-                    <h3 class="cyber-accent">Data Storytelling</h3>
-                    <p class="fragment">Let's switch our brains to English.</p>
-                </section>
-                <section>
-                    <h2>Visual Vocabulary</h2>
-                    <div class="split-layout">
-                        <div>
-                            <ul>
-                                <li class="fragment"><strong>Scatter Plot:</strong> Shows relationship between two numerical variables.</li>
-                                <li class="fragment"><strong>Bar Chart:</strong> Compares categorical data.</li>
-                                <li class="fragment"><strong>Box Plot:</strong> Displays distribution and outliers.</li>
-                            </ul>
-                        </div>
-                        <div class="fragment box-glass">
-                            <p><i class="fa-solid fa-bolt cyber-accent"></i> Pro-Tip:</p>
-                            <p>Never use pie charts for more than 3 categories. Humans are bad at estimating angles.</p>
-                        </div>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 6: Repaso de Pandas Avanzado (Limpieza) -->
+            <!-- Slide 4: Limpieza de Datos -->
             <section>
                 <section>
-                    <h2><i class="fa-solid fa-broom"></i> Pandas: El Arte de Limpiar</h2>
-                    <p>Antes de graficar, los datos deben ser puros.</p>
-                    <div class="box-glass fragment">
+                    <h2><i class="fa-solid fa-broom"></i> Limpieza de Datos</h2>
+                    <p>El 80% del tiempo de un Científico de Datos se invierte aquí.</p>
+                    <div class="box-glass">
+                        <p>Haz clic en el concepto para explorar:</p>
+                        <ul>
+                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('imputacionModal')">Imputación de Datos Faltantes (NaN)</span></li>
+                            <li><span class="clickable-concept" onclick="openModal('outliersModal')">Detección de Valores Atípicos (Outliers)</span></li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <h2>Limpieza en Acción (Pandas)</h2>
+                    <div class="box-glass" style="font-size: 0.8em;">
                         <pre><code class="python" data-trim data-noescape>
 import pandas as pd
-df = pd.read_csv("datos_salud.csv")
+import numpy as np
 
-# ¿Cuántos datos nulos tenemos por columna?
+# Cargar dataset de Kaggle (Ejemplo: Titanic)
+df = pd.read_csv("titanic.csv")
+
+# 1. Identificar nulos
 print(df.isnull().sum())
-                        </code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-truck-medical"></i> Tratamiento de Nulos (NaN)</h2>
-                    <div class="box-glass">
-                        <pre><code class="python" data-trim data-noescape>
-# Opción 1: Eliminar las filas con nulos (Peligroso si pierdes mucha data)
-df_limpio = df.dropna()
 
-# Opción 2: Imputar usando la mediana (Robusto contra outliers)
-mediana_edad = df['edad'].median()
-df['edad'] = df['edad'].fillna(mediana_edad)
+# 2. Imputar nulos en la Edad con la mediana
+mediana_edad = df['Age'].median()
+df['Age'].fillna(mediana_edad, inplace=True)
+
+# 3. Eliminar duplicados absolutos
+df.drop_duplicates(inplace=True)
                         </code></pre>
                     </div>
-                    <div class="fragment box-glass" style="border-left: 5px solid #28a745; margin-top: 10px;">
-                        <p><i class="fa-solid fa-brain accent"></i> <strong>Nota del Científico:</strong> Siempre prefiere la mediana sobre la media si la variable está muy sesgada (distribución asimétrica).</p>
+                    <div class="callout-tip fragment">
+                        <i class="fa-solid fa-lightbulb accent"></i> <strong>Pro-Tip:</strong> Nunca elimines datos con <code>dropna()</code> a menos que sean menos del 5% del total de tu dataset. ¡Estás perdiendo información valiosa!
                     </div>
                 </section>
             </section>
 
-            <!-- Slide 7: Matplotlib y Seaborn -->
+            <!-- Slide 5: Visualización y Gestalt -->
             <section>
                 <section>
-                    <h2><i class="fa-solid fa-palette"></i> Matplotlib & Seaborn</h2>
-                    <p>La base visual de Python.</p>
+                    <h2><i class="fa-solid fa-eye"></i> Principios de Visualización</h2>
                     <div class="box-glass">
-                        <pre><code class="python" data-trim data-noescape>
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set_theme(style="whitegrid") # Diseño limpio profesional
-                        </code></pre>
+                        <p>Un gráfico no es solo una imagen, es un <strong>argumento lógico</strong>.</p>
+                        <p>Evita el <span class="clickable-concept" onclick="openModal('chartjunkModal')">Chartjunk (Basura Gráfica)</span>. Aplica los principios de Gestalt para guiar el ojo del usuario directamente a la información que importa.</p>
                     </div>
                 </section>
                 <section>
-                    <h2><i class="fa-solid fa-chart-column"></i> Gráficos de Distribución</h2>
+                    <h2><i class="fa-solid fa-chart-pie"></i> El poder del Decluttering</h2>
                     <div class="split-layout">
-                        <div class="box-glass" style="font-size:0.7em;">
-                            <pre><code class="python" data-trim data-noescape>
-plt.figure(figsize=(8,5))
-sns.histplot(data=df, x="ingresos", 
-             kde=True, color="#003865")
-plt.title("Distribución de Ingresos")
-plt.xlabel("Dólares")
-plt.ylabel("Frecuencia")
-plt.show()
+                        <div style="text-align: center;">
+                            <h4 style="color: #cc0000; font-size: 1.1rem;"><i class="fa-solid fa-xmark"></i> Malo (Con Chartjunk)</h4>
+                            <div style="background:#fff; padding:10px; height: 300px; display:flex; align-items:center; justify-content:center; border: 1px solid #ddd;">
+                                <canvas id="badChart" width="300" height="250"></canvas>
+                            </div>
+                        </div>
+                        <div class="fragment" style="text-align: center;">
+                            <h4 style="color: #008800; font-size: 1.1rem;"><i class="fa-solid fa-check"></i> Bueno (Decluttering)</h4>
+                            <div style="background:#fff; padding:10px; height: 300px; display:flex; align-items:center; justify-content:center; border: 1px solid #ddd;">
+                                <canvas id="goodChart" width="300" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 6: Librerías Visuales -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-palette"></i> Ecosistema Visual</h2>
+                    <div class="split-layout">
+                        <div class="box-glass">
+                            <h3 class="accent"><i class="fa-solid fa-chart-bar"></i> Seaborn</h3>
+                            <p>Ideal para reportes estadísticos, PDFs y análisis exploratorio interno.</p>
+                            <pre><code class="python" data-trim>
+import seaborn as sns
+sns.boxplot(x="Clase", y="Tarifa", data=df)
                             </code></pre>
                         </div>
-                        <div class="fragment box-glass" style="text-align: center;">
-                            <p class="accent font-bold" style="font-size: 0.9em;">Visualiza cómo se concentran los datos.</p>
-                            <i class="fa-solid fa-chart-area text-6xl text-gray-400"></i>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-ruler-combined"></i> Identificando Outliers (Boxplot)</h2>
-                    <div class="box-glass">
-                        <pre><code class="python" data-trim data-noescape>
-plt.figure(figsize=(10,4))
-sns.boxplot(x=df["salario"], color="#E85C0B")
-plt.title("Detección de Valores Atípicos")
-plt.show()
-                        </code></pre>
-                    </div>
-                    <p class="fragment" style="margin-top: 20px;"><i class="fa-solid fa-lightbulb accent"></i> Todo punto más allá de los bigotes del Boxplot es matemáticamente un outlier (1.5 * IQR).</p>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-chart-pie"></i> Gráfico "Malo" vs "Bueno"</h2>
-                    <div class="split-layout">
-                        <div style="text-align: center;">
-                            <h4 style="color: red;">Desordenado y Confuso</h4>
-                            <div style="background:#f0f0f0; padding:10px; height: 250px; display:flex; align-items:center; justify-content:center;">
-                                <canvas id="badChart" width="300" height="200"></canvas>
-                            </div>
-                        </div>
-                        <div style="text-align: center;">
-                            <h4 style="color: green;">Gestalt y Decluttering</h4>
-                            <div style="background:#f0f0f0; padding:10px; height: 250px; display:flex; align-items:center; justify-content:center;">
-                                <canvas id="goodChart" width="300" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 8: Plotly interactivo -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-hand-pointer"></i> Plotly Express</h2>
-                    <p>Eleva tus gráficos estáticos a dashboards interactivos profesionales.</p>
-                    <div class="box-glass fragment">
-                        <pre><code class="python" data-trim data-noescape>
+                        <div class="box-glass fragment">
+                            <h3 class="accent"><i class="fa-solid fa-hand-pointer"></i> Plotly</h3>
+                            <p>Ideal para Dashboards web, interactividad (zoom, hover) y presentaciones.</p>
+                            <pre><code class="python" data-trim>
 import plotly.express as px
-
-fig = px.scatter(df, x="gdp", y="life_expectancy", 
-                 color="continent", hover_name="country",
-                 log_x=True, size_max=60)
+fig = px.scatter(df, x="Edad", y="Tarifa")
 fig.show()
-                        </code></pre>
+                            </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <h2>¿Por qué usar Plotly?</h2>
-                    <ul>
-                        <li class="fragment">Soporta <span class="cyber-accent">tooltips (Hover)</span>, revelando los datos detrás de cada punto.</li>
-                        <li class="fragment">Pan, Zoom y selecciones (Lasso) nativos.</li>
-                        <li class="fragment">Se exporta fácilmente como un archivo HTML independiente para incrustarlo en la web.</li>
-                    </ul>
                 </section>
             </section>
 
-            <!-- Slide 9: Pair Programming -->
+            <!-- Slide 7: Datasets Reales -->
             <section>
-                <h2><i class="fa-solid fa-user-astronaut"></i> Pair Programming</h2>
+                <h2><i class="fa-solid fa-database"></i> Fuentes de Datos Reales</h2>
                 <div class="box-glass">
-                    <h3 class="accent">Misión: El Explorador de Datos</h3>
-                    <p>Cargaremos un dataset real (Kaggle). Tu misión es limpiar los datos faltantes y crear un panel visual con Seaborn y Plotly que responda a una pregunta de negocio crítica.</p>
-                    <p><i class="fa-solid fa-arrow-right"></i> Ingresa al Jupyter Notebook de la Semana 4.</p>
+                    <p>Para aprender Ciencia de Datos, debemos usar datos del mundo real. Aquí tienes los repositorios más importantes:</p>
+                    <ul>
+                        <li><a href="https://www.kaggle.com/datasets" target="_blank" class="accent"><i class="fa-solid fa-link"></i> Kaggle Datasets:</a> La comunidad más grande de Machine Learning.</li>
+                        <li><a href="https://datasetsearch.research.google.com/" target="_blank" class="accent"><i class="fa-solid fa-link"></i> Google Dataset Search:</a> El buscador universal de datos.</li>
+                        <li><a href="https://data.worldbank.org/" target="_blank" class="accent"><i class="fa-solid fa-link"></i> Banco Mundial:</a> Datos macroeconómicos globales.</li>
+                        <li><a href="https://www.datos.gov.co/" target="_blank" class="accent"><i class="fa-solid fa-link"></i> Datos Abiertos Colombia:</a> Información oficial gubernamental.</li>
+                    </ul>
                 </div>
             </section>
 
-            <!-- Slide 10: Conclusiones -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-flag-checkered"></i> Conclusiones</h2>
-                    <div class="box-glass">
-                        <ul>
-                            <li class="fragment">El preprocesamiento (limpieza e imputación) define el 80% del éxito de un modelo predictivo posterior.</li>
-                            <li class="fragment"><strong>Matplotlib/Seaborn</strong> son esenciales para el análisis descriptivo rápido y reportes en PDF.</li>
-                            <li class="fragment"><strong>Plotly</strong> es el estándar para presentaciones web interactivas y retención de la atención de los *stakeholders*.</li>
-                        </ul>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-book"></i> Bibliografía</h2>
-                    <div class="box-glass" style="font-size: 0.9rem;">
-                        <ul>
-                            <li>Waskom, M. L. (2021). Seaborn: statistical data visualization. Journal of Open Source Software.</li>
-                            <li>Knaflic, C. N. (2015). <em>Storytelling with Data</em>. John Wiley & Sons.</li>
-                            <li>Plotly Express Documentation: <a href="https://plotly.com/python/plotly-express/" target="_blank" style="color: var(--data-orange);">plotly.com/python</a></li>
-                        </ul>
-                    </div>
-                </section>
+            <!-- Slide 8: Pair Programming -->
+            <section data-state="cyber-mode">
+                <h2><i class="fa-solid fa-user-astronaut"></i> Pair Programming</h2>
+                <div class="box-glass">
+                    <h3 class="cyber-accent">Misión: El Explorador de Datos</h3>
+                    <p>Ingresaremos a Colab. Cargaremos el dataset del Titanic desde Kaggle. Limpiaremos los datos faltantes de "Edad" y "Cabina", y crearemos un gráfico interactivo con Plotly para determinar si el género influyó en la supervivencia.</p>
+                    <p><i class="fa-solid fa-bolt text-yellow-400"></i> ¡Abran sus entornos de Google Colab!</p>
+                </div>
             </section>
 
-            <!-- Slide 11: Cierre Automático (Typed.js) -->
+            <!-- Slide 9: Cyber Status -->
             <section data-state="cyber-mode">
                 <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
-                <div class="box-glass" style="min-height: 150px;">
-                    <span id="typed-output" style="font-family: monospace; font-size: 1.2rem; color: var(--neon-cyan);"></span>
+                <div class="box-glass" style="min-height: 200px;">
+                    <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
                 </div>
             </section>
 
@@ -426,20 +335,46 @@ fig.show()
     <!-- Modales -->
     <div class="modal-overlay" id="overlay" onclick="closeModals()"></div>
     
+    <div class="concept-modal" id="imputacionModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h2 class="accent"><i class="fa-solid fa-syringe"></i> Imputación de Datos</h2>
+        <p>La imputación es el proceso de reemplazar los datos faltantes (NaN) con valores estadísticamente plausibles para no perder la fila entera.</p>
+        <ul style="margin-top: 15px;">
+            <li><strong>Media:</strong> Usada para variables numéricas con distribución normal (sin sesgo).</li>
+            <li><strong>Mediana:</strong> Usada para variables numéricas con valores extremos (outliers).</li>
+            <li><strong>Moda:</strong> Usada para variables categóricas (ej. Género, Ciudad).</li>
+        </ul>
+        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; font-size:0.9em;">
+            df['salario'].fillna(df['salario'].median(), inplace=True)
+        </div>
+    </div>
+
+    <div class="concept-modal" id="outliersModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h2 class="accent"><i class="fa-solid fa-circle-exclamation"></i> Outliers (Valores Atípicos)</h2>
+        <p>Son observaciones que se desvían drásticamente de las demás observaciones. Pueden indicar variabilidad natural, errores de medición, o novedades.</p>
+        <p>La forma más eficiente de detectarlos visualmente es mediante un <strong>Gráfico de Cajas y Bigotes (Boxplot)</strong>.</p>
+        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; font-size:0.9em;">
+            sns.boxplot(x=df["ingresos"])<br>plt.show()
+        </div>
+    </div>
+
     <div class="concept-modal" id="chartjunkModal">
         <span class="close-modal" onclick="closeModals()">&times;</span>
-        <h3 class="accent">Chartjunk (Basura Gráfica)</h3>
-        <p>Término acuñado por Edward Tufte que se refiere a todos los elementos visuales en gráficos informativos que no son necesarios para comprender los datos o que distraen al espectador (ej. fondos complejos, 3D innecesario, colores extremos).</p>
+        <h2 class="accent"><i class="fa-solid fa-trash-can"></i> Chartjunk (Basura Gráfica)</h2>
+        <p>Término acuñado por Edward Tufte que se refiere a todos los elementos visuales en gráficos que NO son necesarios para comprender los datos (ej. fondos complejos, 3D falso, cuadrículas pesadas, colores extremos).</p>
+        <p><strong>Regla de Oro:</strong> Maximizar la proporción de "Tinta de Datos" (Data-Ink ratio). Borra todo lo que no represente un dato.</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
         Reveal.initialize({
             hash: true,
-            transition: 'fade', 
+            transition: 'slide', 
             controls: true,
             progress: true,
             width: "100%", 
@@ -450,84 +385,7 @@ fig.show()
             plugins: [ RevealHighlight ]
         });
 
-        // Evento para inicializar animaciones y gráficas en el slide correcto
-        var typedInstance = null;
-        var badChartInstance = null;
-        var goodChartInstance = null;
-
-        Reveal.on('slidechanged', event => {
-            // Activar Typed.js en el último slide
-            if (event.indexh === 10) {
-                if(typedInstance) { typedInstance.destroy(); }
-                typedInstance = new Typed('#typed-output', {
-                    strings: [
-                        "> Inicializando protocolo de evaluación...",
-                        "> Competencias analizadas: Matplotlib, Seaborn, Plotly.",
-                        "> [INFO] El alumno ahora es capaz de limpiar y visualizar.",
-                        "> TAREA: Completar el reto en Colab y pushear a GitHub."
-                    ],
-                    typeSpeed: 40,
-                    backSpeed: 20,
-                    loop: false,
-                    showCursor: true,
-                    cursorChar: '█'
-                });
-            }
-
-            // Activar Chart.js en el slide 7.3
-            if (event.indexh === 6 && event.indexv === 3) {
-                const badCtx = document.getElementById('badChart').getContext('2d');
-                const goodCtx = document.getElementById('goodChart').getContext('2d');
-
-                if (badChartInstance) badChartInstance.destroy();
-                if (goodChartInstance) goodChartInstance.destroy();
-
-                // "Bad" Chart: Colores al azar, etiquetas innecesarias, grilla fuerte
-                badChartInstance = new Chart(badCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['A', 'B', 'C', 'D'],
-                        datasets: [{
-                            label: 'Ventas 2024 (USD miles)',
-                            data: [12, 19, 3, 5],
-                            backgroundColor: ['red', 'yellow', 'purple', 'green'],
-                            borderWidth: 2,
-                            borderColor: 'black'
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: { grid: { color: 'black' } },
-                            x: { grid: { color: 'black' } }
-                        }
-                    }
-                });
-
-                // "Good" Chart: Colores UNAB, diseño limpio, sin grilla innecesaria
-                goodChartInstance = new Chart(goodCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['A', 'B', 'C', 'D'],
-                        datasets: [{
-                            label: 'Ventas 2024',
-                            data: [12, 19, 3, 5],
-                            backgroundColor: '#003865',
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: { grid: { display: false }, border: { display: false } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
-        });
-
-        // Modal Logic
+        // Lógica de Modales
         function openModal(id) {
             document.getElementById('overlay').style.display = 'block';
             document.getElementById(id).style.display = 'block';
@@ -540,6 +398,93 @@ fig.show()
                 modals[i].style.display = 'none';
             }
         }
+
+        // Eventos dinámicos por Slide
+        var typedInstance = null;
+        var badChartInstance = null;
+        var goodChartInstance = null;
+
+        Reveal.on('slidechanged', event => {
+            
+            // Activar Typed.js en el último slide Cyber
+            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
+                if(typedInstance) { typedInstance.destroy(); }
+                typedInstance = new Typed('#typed-output', {
+                    strings: [
+                        "> Inicializando Motor Analítico de Datos...",
+                        "> Librerías validadas: [Pandas=OK] [Seaborn=OK] [Plotly=OK]",
+                        "> Ejecutando limpieza de nulos y atípicos en memoria RAM.",
+                        "> SISTEMA LISTO.",
+                        "> [TAREA ASIGNADA]: Completar el reto de Colab y actualizar Repositorio."
+                    ],
+                    typeSpeed: 30,
+                    backSpeed: 10,
+                    loop: false,
+                    showCursor: true,
+                    cursorChar: '█'
+                });
+            } else if (typedInstance) {
+                typedInstance.destroy();
+                document.getElementById('typed-output').innerHTML = '';
+            }
+
+            // Activar Chart.js en el slide de Chartjunk (indexh == 4, indexv == 1)
+            if (event.indexh === 4 && event.indexv === 1) {
+                const badCtx = document.getElementById('badChart');
+                const goodCtx = document.getElementById('goodChart');
+
+                if (badCtx && !badChartInstance) {
+                    badChartInstance = new Chart(badCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Sur', 'Norte', 'Este', 'Oeste'],
+                            datasets: [{
+                                label: 'Ventas 2024 (Millones)',
+                                data: [12, 19, 3, 5],
+                                backgroundColor: ['red', 'yellow', 'purple', 'green'],
+                                borderWidth: 3,
+                                borderColor: 'black'
+                            }]
+                        },
+                        options: {
+                            animation: { duration: 2000 },
+                            scales: {
+                                y: { grid: { color: 'black', lineWidth: 2 } },
+                                x: { grid: { color: 'black', lineWidth: 2 } }
+                            },
+                            plugins: {
+                                legend: { display: true, position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+
+                if (goodCtx && !goodChartInstance) {
+                    goodChartInstance = new Chart(goodCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Norte', 'Sur', 'Oeste', 'Este'], // Ordenado por tamaño
+                            datasets: [{
+                                label: 'Ventas',
+                                data: [19, 12, 5, 3],
+                                backgroundColor: '#003865',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            animation: { duration: 2000, delay: 500 },
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { grid: { display: false }, border: { display: false } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>
