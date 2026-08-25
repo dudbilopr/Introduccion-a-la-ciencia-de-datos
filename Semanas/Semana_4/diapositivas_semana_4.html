@@ -404,85 +404,110 @@ fig.show()
         var badChartInstance = null;
         var goodChartInstance = null;
 
-        Reveal.on('slidechanged', event => {
-            
-            // Activar Typed.js en el último slide Cyber
-            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
-                if(typedInstance) { typedInstance.destroy(); }
-                typedInstance = new Typed('#typed-output', {
-                    strings: [
-                        "> Inicializando Motor Analítico de Datos...",
-                        "> Librerías validadas: [Pandas=OK] [Seaborn=OK] [Plotly=OK]",
-                        "> Ejecutando limpieza de nulos y atípicos en memoria RAM.",
-                        "> SISTEMA LISTO.",
-                        "> [TAREA ASIGNADA]: Completar el reto de Colab y actualizar Repositorio."
-                    ],
-                    typeSpeed: 30,
-                    backSpeed: 10,
-                    loop: false,
-                    showCursor: true,
-                    cursorChar: '█'
+        function drawBadChart() {
+            const badCtx = document.getElementById('badChart');
+            if (badCtx) {
+                if (badChartInstance) badChartInstance.destroy();
+                badChartInstance = new Chart(badCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sur', 'Norte', 'Este', 'Oeste'],
+                        datasets: [{
+                            label: 'Ventas 2024',
+                            data: [12, 19, 3, 5],
+                            backgroundColor: ['red', 'yellow', 'purple', 'green'],
+                            borderWidth: 3,
+                            borderColor: 'black'
+                        }]
+                    },
+                    options: {
+                        animation: { duration: 1500 },
+                        scales: {
+                            y: { grid: { color: 'black', lineWidth: 2 } },
+                            x: { grid: { color: 'black', lineWidth: 2 } }
+                        },
+                        plugins: { legend: { display: true, position: 'bottom' } }
+                    }
                 });
+            }
+        }
+
+        function drawGoodChart() {
+            const goodCtx = document.getElementById('goodChart');
+            if (goodCtx) {
+                if (goodChartInstance) goodChartInstance.destroy();
+                goodChartInstance = new Chart(goodCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Norte', 'Sur', 'Oeste', 'Este'],
+                        datasets: [{
+                            label: 'Ventas',
+                            data: [19, 12, 5, 3],
+                            backgroundColor: '#003865',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        animation: { duration: 1500 },
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { display: false }, border: { display: false } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        Reveal.on('slidechanged', event => {
+            // Typed.js
+            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
+                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
+                setTimeout(() => {
+                    typedInstance = new Typed('#typed-output', {
+                        strings: [
+                            "> Inicializando Motor Analítico de Datos...",
+                            "> Librerías validadas: [Pandas=OK] [Seaborn=OK] [Plotly=OK]",
+                            "> Ejecutando limpieza de nulos y atípicos en memoria RAM.",
+                            "> SISTEMA LISTO.",
+                            "> [TAREA ASIGNADA]: Completar el reto de Colab y actualizar Repositorio."
+                        ],
+                        typeSpeed: 30,
+                        backSpeed: 10,
+                        loop: false,
+                        showCursor: true,
+                        cursorChar: '█'
+                    });
+                }, 500);
             } else if (typedInstance) {
                 typedInstance.destroy();
                 document.getElementById('typed-output').innerHTML = '';
             }
 
-            // Activar Chart.js en el slide de Chartjunk (indexh == 4, indexv == 1)
+            // Chartjunk (Slide 5 -> indexh: 4, indexv: 1)
             if (event.indexh === 4 && event.indexv === 1) {
-                const badCtx = document.getElementById('badChart');
-                const goodCtx = document.getElementById('goodChart');
-
-                if (badCtx && !badChartInstance) {
-                    badChartInstance = new Chart(badCtx.getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Sur', 'Norte', 'Este', 'Oeste'],
-                            datasets: [{
-                                label: 'Ventas 2024 (Millones)',
-                                data: [12, 19, 3, 5],
-                                backgroundColor: ['red', 'yellow', 'purple', 'green'],
-                                borderWidth: 3,
-                                borderColor: 'black'
-                            }]
-                        },
-                        options: {
-                            animation: { duration: 2000 },
-                            scales: {
-                                y: { grid: { color: 'black', lineWidth: 2 } },
-                                x: { grid: { color: 'black', lineWidth: 2 } }
-                            },
-                            plugins: {
-                                legend: { display: true, position: 'bottom' }
-                            }
-                        }
-                    });
+                drawBadChart();
+                // Si el fragmento ya está visible (ej. yendo hacia atrás)
+                if (event.currentSlide.querySelector('.fragment.visible')) {
+                    drawGoodChart();
                 }
+            } else {
+                if (badChartInstance) badChartInstance.destroy();
+                if (goodChartInstance) goodChartInstance.destroy();
+            }
+        });
 
-                if (goodCtx && !goodChartInstance) {
-                    goodChartInstance = new Chart(goodCtx.getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Norte', 'Sur', 'Oeste', 'Este'], // Ordenado por tamaño
-                            datasets: [{
-                                label: 'Ventas',
-                                data: [19, 12, 5, 3],
-                                backgroundColor: '#003865',
-                                borderRadius: 4
-                            }]
-                        },
-                        options: {
-                            animation: { duration: 2000, delay: 500 },
-                            plugins: {
-                                legend: { display: false }
-                            },
-                            scales: {
-                                y: { grid: { display: false }, border: { display: false } },
-                                x: { grid: { display: false } }
-                            }
-                        }
-                    });
-                }
+        // Evento para Fragments (El "Good" chart aparece como fragmento)
+        Reveal.on('fragmentshown', event => {
+            if (event.fragment.querySelector('#goodChart') || event.fragment.id === 'goodChart-container') {
+                drawGoodChart();
+            } else if (event.fragment.querySelector('canvas#goodChart')) {
+                 drawGoodChart();
+            } else {
+                 // Fallback genérico por si el fragment envuelve al canvas
+                 if (event.fragment.contains(document.getElementById('goodChart'))) {
+                     drawGoodChart();
+                 }
             }
         });
     </script>
