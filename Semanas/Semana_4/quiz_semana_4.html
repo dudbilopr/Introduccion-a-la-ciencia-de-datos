@@ -1,282 +1,191 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMI Challenge - Week 4</title>
+    <title>Quiz Semana 4: Exploratory Data Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003865', /* UNAB Blue */
+                        secondary: '#E85C0B' /* UNAB Orange */
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #003865;
-            --secondary: #E85C0B;
-            --bg-color: #f8f9fa;
-            --text-color: #333;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .quiz-container {
-            background-color: #fff;
-            border-top: 5px solid var(--secondary);
-            border-radius: 8px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        h1 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: var(--secondary);
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            font-weight: 600;
-            text-align: left;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .quiz-container { max-w-3xl mx-auto my-10 bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary; }
         .option-btn {
-            background-color: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            color: var(--primary);
-            padding: 15px;
-            font-size: 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-weight: 500;
+            display: block; width: 100%; text-align: left; padding: 12px 20px;
+            margin-bottom: 10px; border: 2px solid #e2e8f0; border-radius: 8px;
+            transition: all 0.2s; cursor: pointer; background: white;
+            color: #334155; font-weight: 500;
         }
-
-        .option-btn:hover {
-            background-color: #e2e8f0;
-            border-color: var(--primary);
-        }
-
-        .option-btn.correct {
-            background-color: #dcfce7;
-            border-color: #22c55e;
-            color: #166534;
-        }
-
-        .option-btn.wrong {
-            background-color: #fee2e2;
-            border-color: #ef4444;
-            color: #991b1b;
-        }
-
-        .feedback {
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-height: 30px;
-        }
-
-        .feedback.success { color: #166534; }
-        .feedback.error { color: #991b1b; }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background-color: #e2e8f0;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--secondary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .next-btn {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: bold;
-            display: none;
-            transition: background-color 0.3s;
-        }
-
-        .next-btn:hover { background-color: #c44d09; }
-
-        .score-container {
-            display: none;
-        }
-
-        .score-container i {
-            font-size: 4rem;
-            color: #f59e0b;
-            margin-bottom: 15px;
-        }
+        .option-btn:hover:not(:disabled) { border-color: #003865; background-color: #f0f4f8; }
+        .option-btn.correct { border-color: #22c55e; background-color: #dcfce7; color: #166534; }
+        .option-btn.incorrect { border-color: #ef4444; background-color: #fee2e2; color: #991b1b; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
     </style>
 </head>
-<body>
+<body class="p-6">
 
-    <div class="quiz-container" id="quizContainer">
-        <h1>EMI Challenge</h1>
-        <div class="subtitle">Data Visualization & Preprocessing</div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary relative overflow-hidden">
+        <!-- EMI Tag -->
+        <div class="absolute top-0 right-0 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+            EMI Activity
         </div>
 
-        <div id="questionArea">
-            <div class="question-text" id="questionText">Loading question...</div>
-            <div class="options-grid" id="optionsGrid">
-                <!-- Options injected by JS -->
-            </div>
-            <div class="feedback" id="feedbackMsg"></div>
-            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
+        <h1 class="text-3xl font-bold text-primary mb-2"><i class="fas fa-clipboard-check mr-2 text-secondary"></i> Knowledge Check</h1>
+        <p class="text-gray-600 mb-8 border-b pb-4">Test your understanding of Exploratory Data Analysis (EDA) and Visualization techniques.</p>
+
+        <div id="quiz-container">
+            <!-- Question template will be injected here -->
         </div>
 
-        <div class="score-container" id="scoreContainer">
-            <i class="fas fa-trophy"></i>
-            <h2 style="color: var(--primary);">Challenge Completed!</h2>
-            <p class="question-text" style="text-align: center;">Your score: <span id="finalScore" style="color: var(--secondary); font-size: 1.5em;">0</span> / 4</p>
-            <p>Dopamine level: <strong style="color:#22c55e;">Maximum</strong></p>
-            <button class="next-btn" style="display:inline-block;" onclick="location.reload()">Retry Challenge</button>
+        <div id="results-container" class="hidden text-center py-8">
+            <i class="fas fa-award text-6xl text-secondary mb-4"></i>
+            <h2 class="text-2xl font-bold text-primary mb-2">Quiz Completed!</h2>
+            <p class="text-lg text-gray-700 mb-6">Your Score: <span id="score" class="font-bold text-2xl text-secondary"></span> / <span id="total"></span></p>
+            <button onclick="location.reload()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition"><i class="fas fa-redo mr-2"></i>Try Again</button>
         </div>
     </div>
 
     <script>
         const questions = [
             {
-                question: "Which Pandas method is commonly used to remove rows containing missing values (NaN)?",
-                options: ["df.remove_nan()", "df.dropna()", "df.delete_null()", "df.clean()"],
-                correct: 1
-            },
-            {
-                question: "What is the primary purpose of a 'Scatter Plot' in data visualization?",
+                question: "What is the primary goal of Exploratory Data Analysis (EDA)?",
                 options: [
-                    "To show the relationship or correlation between two numerical variables.",
-                    "To compare the total sales across different categories.",
-                    "To display the distribution of a single variable.",
-                    "To show the percentage of a whole (like a pie chart)."
+                    "To train a machine learning model as fast as possible.",
+                    "To discover patterns, spot anomalies, and check assumptions with summary statistics and graphical representations.",
+                    "To deploy a dashboard to production.",
+                    "To write complex SQL queries."
                 ],
-                correct: 0
+                correct: 1,
+                feedback: "Excellent! EDA is all about understanding your data before applying any complex modeling."
             },
             {
-                question: "Which Python library is best known for creating interactive, web-ready dashboards with zoom and hover capabilities?",
-                options: ["Matplotlib", "Seaborn", "Plotly", "Numpy"],
-                correct: 2
-            },
-            {
-                question: "What does the term 'Outlier' mean in data science?",
+                question: "Which Pandas method is best for checking the number of non-null values and data types in a DataFrame?",
                 options: [
-                    "A variable that is stored outside the main database.",
-                    "A data point that differs significantly from other observations.",
-                    "A function used to export data to a CSV file.",
-                    "A specific type of machine learning algorithm."
+                    "df.describe()",
+                    "df.head()",
+                    "df.info()",
+                    "df.shape()"
                 ],
-                correct: 1
+                correct: 2,
+                feedback: "Correct! df.info() provides a concise summary of the DataFrame including Dtypes and non-null counts."
+            },
+            {
+                question: "In the context of dealing with missing data, what does 'imputation' mean?",
+                options: [
+                    "Deleting the entire row that contains a missing value.",
+                    "Replacing missing values with a substituted value (like the mean or median).",
+                    "Creating a new dataframe without missing values.",
+                    "Ignoring the missing values during calculation."
+                ],
+                correct: 1,
+                feedback: "Exactly. Imputation allows you to keep valuable rows by estimating the missing values."
+            },
+            {
+                question: "Which library is best suited for creating interactive, web-based dashboards with hover effects?",
+                options: [
+                    "Matplotlib",
+                    "Seaborn",
+                    "Plotly",
+                    "Pandas"
+                ],
+                correct: 2,
+                feedback: "Spot on! Plotly is designed for interactivity (zoom, hover, pan) in web browsers."
+            },
+            {
+                question: "What is the main purpose of a Boxplot in statistical analysis?",
+                options: [
+                    "To show the correlation between two continuous variables.",
+                    "To display the distribution of data based on a five-number summary and identify outliers.",
+                    "To plot a time series.",
+                    "To represent categorical data as proportions of a whole."
+                ],
+                correct: 1,
+                feedback: "Perfect! Boxplots are the gold standard for visualizing distribution and spotting outliers."
             }
         ];
 
         let currentQuestion = 0;
         let score = 0;
 
-        const questionText = document.getElementById('questionText');
-        const optionsGrid = document.getElementById('optionsGrid');
-        const feedbackMsg = document.getElementById('feedbackMsg');
-        const nextBtn = document.getElementById('nextBtn');
-        const progressFill = document.getElementById('progressFill');
+        function renderQuestion() {
+            if (currentQuestion >= questions.length) {
+                document.getElementById('quiz-container').classList.add('hidden');
+                document.getElementById('results-container').classList.remove('hidden');
+                document.getElementById('score').innerText = score;
+                document.getElementById('total').innerText = questions.length;
+                return;
+            }
 
-        function loadQuestion() {
-            feedbackMsg.innerHTML = '';
-            feedbackMsg.className = 'feedback';
-            nextBtn.style.display = 'none';
-            
             const q = questions[currentQuestion];
-            questionText.innerHTML = `<i class="fas fa-question-circle" style="color: var(--secondary); margin-right:8px;"></i> ${q.question}`;
-            
-            optionsGrid.innerHTML = '';
+            let html = `
+                <div class="mb-4">
+                    <span class="text-sm font-bold text-gray-500 uppercase tracking-wide">Question ${currentQuestion + 1} of ${questions.length}</span>
+                    <h2 class="text-xl font-semibold text-gray-800 mt-2">${q.question}</h2>
+                </div>
+                <div class="space-y-3">
+            `;
+
             q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = opt;
-                btn.onclick = () => checkAnswer(index, btn);
-                optionsGrid.appendChild(btn);
+                html += `<button class="option-btn" onclick="checkAnswer(${index}, this)">${opt}</button>`;
             });
 
-            progressFill.style.width = `${(currentQuestion / questions.length) * 100}%`;
+            html += `
+                </div>
+                <div id="feedback" class="mt-6 hidden p-4 rounded-lg"></div>
+                <button id="next-btn" onclick="nextQuestion()" class="mt-6 bg-secondary text-white px-6 py-2 rounded-lg font-bold hidden hover:bg-orange-700 transition">Next Question <i class="fas fa-arrow-right ml-2"></i></button>
+            `;
+
+            document.getElementById('quiz-container').innerHTML = html;
         }
 
-        function checkAnswer(selectedIndex, btnElement) {
-            // Disable all buttons
-            const allBtns = document.querySelectorAll('.option-btn');
-            allBtns.forEach(b => b.style.pointerEvents = 'none');
+        window.checkAnswer = function(selectedIndex, btn) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((b, i) => {
+                b.disabled = true;
+                if (i === q.correct) {
+                    b.classList.add('correct');
+                    b.innerHTML += ' <i class="fas fa-check-circle float-right mt-1"></i>';
+                } else if (i === selectedIndex) {
+                    b.classList.add('incorrect');
+                    b.innerHTML += ' <i class="fas fa-times-circle float-right mt-1"></i>';
+                }
+            });
 
-            const correctIndex = questions[currentQuestion].correct;
-
-            if (selectedIndex === correctIndex) {
-                btnElement.classList.add('correct');
-                feedbackMsg.innerHTML = '<i class="fas fa-check-circle"></i> Excellent! That is correct.';
-                feedbackMsg.className = 'feedback success';
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.classList.remove('hidden');
+            
+            if (selectedIndex === q.correct) {
                 score++;
+                feedbackDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
+                feedbackDiv.innerHTML = `<strong><i class="fas fa-thumbs-up mr-2"></i> Correct!</strong> ${q.feedback}`;
             } else {
-                btnElement.classList.add('wrong');
-                allBtns[correctIndex].classList.add('correct');
-                feedbackMsg.innerHTML = '<i class="fas fa-times-circle"></i> Incorrect. Review the concepts!';
-                feedbackMsg.className = 'feedback error';
+                feedbackDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
+                feedbackDiv.innerHTML = `<strong><i class="fas fa-exclamation-triangle mr-2"></i> Incorrect.</strong> The correct answer was option ${q.correct + 1}.`;
             }
 
-            nextBtn.style.display = 'inline-block';
+            document.getElementById('next-btn').classList.remove('hidden');
         }
 
-        function nextQuestion() {
+        window.nextQuestion = function() {
             currentQuestion++;
-            if (currentQuestion < questions.length) {
-                loadQuestion();
-            } else {
-                showScore();
-            }
-        }
-
-        function showScore() {
-            document.getElementById('questionArea').style.display = 'none';
-            document.getElementById('progressFill').style.width = '100%';
-            document.getElementById('scoreContainer').style.display = 'block';
-            document.getElementById('finalScore').innerText = score;
+            renderQuestion();
         }
 
         // Initialize
-        loadQuestion();
+        renderQuestion();
     </script>
 </body>
 </html>

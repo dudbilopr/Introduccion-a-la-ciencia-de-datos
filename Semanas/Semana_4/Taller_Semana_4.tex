@@ -1,0 +1,97 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{booktabs}
+
+\definecolor{unabblue}{HTML}{003865}
+\definecolor{unaborange}{HTML}{E85C0B}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{unaborange}\bfseries,
+    stringstyle=\color{unabblue},
+    commentstyle=\color{gray},
+    frame=single,
+    backgroundcolor=\color{white},
+    showstringspaces=false
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{unabblue}{\textbf{Ciencia de Datos - UNAB}}}
+\fancyhead[R]{\textcolor{unaborange}{\textbf{Taller Semana 4}}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+\begin{center}
+    {\huge \textcolor{unabblue}{\textbf{Taller 4: Análisis Exploratorio y Visualización}}} \\[0.5cm]
+    {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
+    \rule{\textwidth}{1pt}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{\textcolor{unabblue}{1. Objetivo del Taller}}
+Aplicar de manera sistemática los 8 pasos del Procesamiento Exhaustivo de Datos (EDA) utilizando la librería Pandas. Aprender a limpiar, transformar y visualizar datos complejos del mundo real utilizando estándares de alto impacto (Seaborn, Plotly).
+
+\section*{\textcolor{unabblue}{2. Caso de Estudio: Análisis Clínico Cardiovascular}}
+Usted ha sido contratado como Científico de Datos Junior en la clínica "UNAB-Salud". Le han proporcionado un extracto de registros médicos (sobre los cuales debe aplicar un diagnóstico de la calidad de la información) antes de entrenar un modelo predictivo de riesgo cardíaco.
+
+\vspace{0.3cm}
+\noindent\textbf{Muestra del Dataset:}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lrlclcr@{}}
+\toprule
+\textbf{Paciente\_ID} & \textbf{Edad} & \textbf{Género} & \textbf{Colesterol} & \textbf{Fumador} & \textbf{Glucosa} & \textbf{Riesgo} \\ \midrule
+P001                 & 54            & M               & 220                 & Sí               & 110              & 1               \\
+P002                 & NaN           & F               & 180                 & No               & 95               & 0               \\
+P003                 & 62            & M               & 280                 & NaN              & 130              & 1               \\
+P004                 & 45            & F               & 195                 & No               & NaN              & 0               \\
+P005                 & 70            & M               & 310                 & Sí               & 160              & 1               \\
+P006                 & 38            & F               & 150                 & No               & 85               & 0               \\
+P007                 & 54            & M               & 220                 & Sí               & 110              & 1               \\
+P008                 & 91            & F               & 160                 & No               & 92               & 0               \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section*{\textcolor{unabblue}{3. Desarrollo del Taller}}
+
+\subsection*{Parte A: Identificación y Limpieza (Steps 2 y 3)}
+Observe la tabla superior, que corresponde a los primeros 8 registros de una base de datos de 15,000 pacientes.
+\begin{enumerate}
+    \item Identifique un problema grave de calidad de datos en la fila de \textbf{P007} con respecto a otra fila de la tabla. Describa qué método de Pandas utilizaría para solucionar este error de forma automatizada y evitar duplicidad en el modelo.
+    \item Describa la estrategia de imputación que utilizaría para tratar los valores \texttt{NaN} en las columnas \texttt{Edad} (numérica), \texttt{Fumador} (categórica) y \texttt{Glucosa} (numérica). Justifique médicamente o estadísticamente su elección de medida de tendencia central (media, mediana o moda).
+\end{enumerate}
+
+\subsection*{Parte B: Visualización de Alto Impacto (Step 5)}
+El Director Médico solicita un reporte sobre los datos atípicos de la variable "Colesterol". 
+\begin{enumerate}
+    \item Redacte el fragmento de código (script en Python) utilizando Seaborn para generar un gráfico de tipo \textbf{Boxplot} que asocie el Colesterol (eje Y) según el Género (eje X).
+    \item Explique por qué un Boxplot es superior a un gráfico de barras tradicional para detectar "Outliers" en un análisis clínico.
+\end{enumerate}
+
+\subsection*{Parte C: Práctica Autónoma (Reto Colab)}
+\begin{itemize}
+    \item Ingrese a \textbf{Google Colab}.
+    \item Descargue el dataset completo "Heart Disease" desde Kaggle.
+    \item Aplique una limpieza completa (elimine nulos y duplicados).
+    \item Genere un gráfico interactivo utilizando la librería \texttt{plotly.express} comparando la edad vs. colesterol, y envíe el enlace del Notebook generado al docente a través del LMS institucional.
+\end{itemize}
+
+\vspace{1cm}
+\begin{center}
+    \textit{\textcolor{gray}{"El propósito de la visualización es el entendimiento, no las imágenes." \\ - Ben Shneiderman}}
+\end{center}
+
+\end{document}
