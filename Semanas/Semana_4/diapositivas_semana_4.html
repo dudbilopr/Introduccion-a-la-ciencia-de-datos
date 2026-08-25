@@ -204,6 +204,90 @@
                 </div>
             </section>
 
+            <!-- Slide 3.5: Flujo de Trabajo EDA (Infografía Escalera) -->
+            <section>
+                <h2><i class="fa-solid fa-route"></i> Procesamiento Exhaustivo (EDA)</h2>
+                <p>El ciclo de vida del Análisis Exploratorio de Datos</p>
+                
+                <style>
+                    .staircase-container {
+                        display: flex;
+                        align-items: flex-end;
+                        justify-content: center;
+                        height: 350px;
+                        gap: 5px;
+                        margin-top: 40px;
+                        border-bottom: 3px solid var(--data-blue);
+                    }
+                    .stair-step {
+                        background: rgba(255, 255, 255, 0.8);
+                        border: 2px solid var(--data-blue);
+                        border-bottom: none;
+                        width: 12%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: flex-start;
+                        padding-top: 15px;
+                        border-radius: 8px 8px 0 0;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                        box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+                    }
+                    .stair-step:hover {
+                        background: var(--data-blue);
+                        transform: scaleY(1.05);
+                        transform-origin: bottom;
+                    }
+                    .stair-step i {
+                        font-size: 1.8rem;
+                        margin-bottom: 10px;
+                        color: var(--data-orange);
+                    }
+                    .stair-step span {
+                        font-size: 0.65rem;
+                        text-align: center;
+                        font-weight: bold;
+                        color: var(--data-blue);
+                        padding: 0 5px;
+                        line-height: 1.1;
+                    }
+                    .stair-step:hover i {
+                        color: #fff;
+                    }
+                    .stair-step:hover span {
+                        color: #fff;
+                    }
+                </style>
+                
+                <div class="staircase-container">
+                    <div class="stair-step fragment fade-up" style="height: 20%;" onclick="openModal('paso1Modal')">
+                        <i class="fa-solid fa-database"></i><span>Carga de<br>Datos</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 30%;" onclick="openModal('paso2Modal')">
+                        <i class="fa-solid fa-table-columns"></i><span>Inspección<br>Básica</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 40%;" onclick="openModal('paso3Modal')">
+                        <i class="fa-solid fa-broom"></i><span>Limpieza de<br>Datos</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 50%;" onclick="openModal('paso4Modal')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i><span>Transfor-<br>mación</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 60%;" onclick="openModal('paso5Modal')">
+                        <i class="fa-solid fa-chart-column"></i><span>Visualiza-<br>ción</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 70%;" onclick="openModal('paso6Modal')">
+                        <i class="fa-solid fa-calculator"></i><span>Análisis<br>Estadístico</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 80%;" onclick="openModal('paso7Modal')">
+                        <i class="fa-solid fa-filter"></i><span>Indexación y<br>Selección</span>
+                    </div>
+                    <div class="stair-step fragment fade-up" style="height: 90%;" onclick="openModal('paso8Modal')">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i><span>Técnicas de<br>Exploración</span>
+                    </div>
+                </div>
+            </section>
+
             <!-- Slide 4: Limpieza de Datos -->
             <section>
                 <section>

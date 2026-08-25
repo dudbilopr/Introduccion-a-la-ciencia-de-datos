@@ -340,7 +340,7 @@
                     currentBlock = item.b;
                 }
                 
-                const isLocked = !currentUser && index > 0;
+                const isLocked = false; // Auth check removed temporarily
                 
                 let icon = item.type === 'exam' ? 'fa-pen-nib text-secondary' : 'fa-play-circle text-primary dark:text-blue-400';
                 if (isLocked) icon = 'fa-lock text-gray-300 dark:text-gray-600';
@@ -383,7 +383,6 @@
         }
 
         window.loadContent = function(index) {
-            if (!currentUser && index > 0) return alert("Por favor inicia sesión para acceder al resto del contenido del curso.");
             const data = syllabus[index];
             const mainView = document.getElementById('mainContent');
             
