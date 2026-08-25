@@ -489,6 +489,37 @@
         document.getElementById('closeLoginBtn').onclick = () => loginModal.classList.add('hidden');
         document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
+        // Firebase Auth Triggers
+        document.getElementById('googleLoginBtn').onclick = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error("Google Login Error:", error);
+                alert("Error al iniciar sesión con Google.");
+            }
+        };
+
+        document.getElementById('emailLoginBtn').onclick = async () => {
+            const email = document.getElementById('emailInput').value;
+            const pass = document.getElementById('passInput').value;
+            if (!email || !pass) return alert("Ingresa correo y contraseña.");
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                // If user doesn't exist, try to create one for demo purposes
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, pass);
+                        alert("Cuenta institucional creada exitosamente.");
+                    } catch (createError) {
+                        alert("Error: Verifica tus credenciales.");
+                    }
+                } else {
+                    alert("Error: " + error.message);
+                }
+            }
+        };
+
         function updateProgressUI() {
             const percent = Math.round((userProgress.length / 16) * 100);
             document.getElementById('progressText').innerText = percent + "%";
