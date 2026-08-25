@@ -76,18 +76,19 @@
         }
 
         /* Dark Mode / Cyber Mode slides */
-        .reveal .slide-background-content.cyber-mode {
+        .reveal.cyber-mode,
+        .reveal.cyber-mode .slide-background,
+        .reveal.cyber-mode .slide-background-content {
             background-color: var(--cyber-dark) !important;
-            background-image: radial-gradient(circle at center, #111122 0%, var(--cyber-dark) 100%);
         }
 
-        .cyber-mode h1, .cyber-mode h2, .cyber-mode h3, .cyber-mode p, .cyber-mode ul, .cyber-mode li {
+        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
             color: #fff !important;
         }
 
-        .cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
+        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
 
-        .cyber-mode .box-glass {
+        .reveal.cyber-mode .box-glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(12px);
             border-left: 6px solid var(--neon-cyan);
