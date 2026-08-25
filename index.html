@@ -222,6 +222,20 @@
         </div>
     </div>
 
+    <!-- MODAL DE ALERTA PROFESIONAL -->
+    <div id="customAlertModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex justify-center items-center transition-all duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-xl p-6 shadow-2xl transform transition-transform scale-95" id="customAlertBox">
+            <div class="flex flex-col items-center text-center">
+                <div id="customAlertIcon" class="w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-3xl text-white"></i>
+                </div>
+                <h3 id="customAlertTitle" class="text-xl font-bold text-gray-900 dark:text-white mb-2">Atención</h3>
+                <p id="customAlertMessage" class="text-gray-600 dark:text-gray-300 mb-6 text-sm">Mensaje de alerta</p>
+                <button onclick="closeCustomAlert()" class="w-full py-2.5 rounded-lg font-bold text-white transition-colors" id="customAlertBtn">Entendido</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CERTIFICADO -->
     <div id="certModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[70] hidden flex justify-center items-center">
         <div class="bg-white w-full max-w-3xl rounded-xl p-1 relative m-4 shadow-2xl border-[10px] border-double border-primary">
@@ -335,7 +349,7 @@
                 const borderActive = 'border-l-4 border-transparent hover:border-primary';
                 
                 html += `
-                    <button onclick="${isLocked ? `alert('Debes iniciar sesión para acceder a este contenido.')` : `loadContent(${index})`}" 
+                    <button onclick="${isLocked ? `showCustomAlert('Debes iniciar sesión para acceder a este contenido.<br><br><small>💡 Tip: Si iniciar con Google falla, prueba con correo y contraseña.</small>', 'warning')` : `loadContent(${index})`}" 
                             class="w-full text-left p-3 rounded-r-lg ${borderActive} ${bgHover} transition-all flex items-center gap-3 mb-1 group">
                         <i class="fas ${icon} text-lg opacity-80 group-hover:opacity-100"></i>
                         <div class="flex-1">
@@ -348,7 +362,7 @@
             menuContainer.innerHTML = html;
         }
         window.markLessonCompleted = function(week) {
-            if (!currentUser) return alert("Debes iniciar sesión para guardar tu progreso.");
+            if (!currentUser) return showCustomAlert("Debes iniciar sesión para guardar tu progreso.", "warning");
             if (!userProgress.includes(week)) {
                 userProgress.push(week);
                 set(ref(db, `users/${currentUser.uid}/progress_data10`), userProgress);
@@ -480,6 +494,43 @@
             if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
         };
 
+        // Custom Alert Logic
+        window.showCustomAlert = function(message, type = 'warning') {
+            const modal = document.getElementById('customAlertModal');
+            const box = document.getElementById('customAlertBox');
+            const iconContainer = document.getElementById('customAlertIcon');
+            const btn = document.getElementById('customAlertBtn');
+            const title = document.getElementById('customAlertTitle');
+
+            document.getElementById('customAlertMessage').innerHTML = message;
+            
+            iconContainer.className = 'w-16 h-16 rounded-full flex items-center justify-center mb-4 ';
+            btn.className = 'w-full py-2.5 rounded-lg font-bold text-white transition-colors ';
+            
+            if(type === 'warning' || type === 'error') {
+                iconContainer.classList.add('bg-secondary');
+                iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle text-3xl text-white"></i>';
+                btn.classList.add('bg-secondary', 'hover:bg-orange-700');
+                title.innerText = type === 'error' ? 'Error' : 'Atención';
+            } else {
+                iconContainer.classList.add('bg-green-500');
+                iconContainer.innerHTML = '<i class="fas fa-check text-3xl text-white"></i>';
+                btn.classList.add('bg-green-500', 'hover:bg-green-600');
+                title.innerText = 'Éxito';
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => { box.classList.remove('scale-95'); box.classList.add('scale-100'); }, 10);
+        };
+
+        window.closeCustomAlert = function() {
+            const modal = document.getElementById('customAlertModal');
+            const box = document.getElementById('customAlertBox');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        };
+
         // UI Auth Logic
         const loginModal = document.getElementById('loginModal');
         const authArea = document.getElementById('authArea');
@@ -502,7 +553,7 @@
         document.getElementById('emailLoginBtn').onclick = async () => {
             const email = document.getElementById('emailInput').value;
             const pass = document.getElementById('passInput').value;
-            if (!email || !pass) return alert("Ingresa correo y contraseña.");
+            if (!email || !pass) return showCustomAlert("Ingresa correo y contraseña.", "warning");
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (error) {
@@ -510,12 +561,12 @@
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
                     try {
                         await createUserWithEmailAndPassword(auth, email, pass);
-                        alert("Cuenta institucional creada exitosamente.");
+                        showCustomAlert("Cuenta institucional creada exitosamente.", "success");
                     } catch (createError) {
-                        alert("Error: Verifica tus credenciales.");
+                        showCustomAlert("Error: Verifica tus credenciales.", "error");
                     }
                 } else {
-                    alert("Error: " + error.message);
+                    showCustomAlert("Error: " + error.message, "error");
                 }
             }
         };
