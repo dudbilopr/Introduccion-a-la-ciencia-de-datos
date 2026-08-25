@@ -6,8 +6,8 @@
     <title>EMI Activity - Six Data Types</title>
     <style>
         :root {
-            --unab-blue: #003865;
-            --unab-orange: #E85C0B;
+            --data-blue: #003865;
+            --data-orange: #E85C0B;
             --bg-color: #f4f4f4;
             --text-color: #333333;
         }
@@ -30,12 +30,12 @@
             width: 100%;
         }
         h1 {
-            color: var(--unab-blue);
+            color: var(--data-blue);
             text-align: center;
             margin-bottom: 10px;
         }
         h3 {
-            color: var(--unab-orange);
+            color: var(--data-orange);
             text-align: center;
             margin-top: 0;
             margin-bottom: 30px;
@@ -44,7 +44,7 @@
         .instructions {
             background-color: rgba(0, 56, 101, 0.05);
             padding: 15px;
-            border-left: 5px solid var(--unab-blue);
+            border-left: 5px solid var(--data-blue);
             border-radius: 4px;
             margin-bottom: 30px;
             font-size: 0.95em;
@@ -63,10 +63,10 @@
             outline: none;
             transition: all 0.3s;
             font-weight: bold;
-            color: var(--unab-blue);
+            color: var(--data-blue);
         }
         input.blank:focus {
-            border-color: var(--unab-orange);
+            border-color: var(--data-orange);
             box-shadow: 0 0 5px rgba(232, 92, 11, 0.3);
         }
         .correct {
@@ -84,7 +84,7 @@
             margin-top: 40px;
         }
         button {
-            background-color: var(--unab-orange);
+            background-color: var(--data-orange);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -146,7 +146,7 @@
 
         <div class="btn-container">
             <button onclick="checkAnswers()">Check Answers</button>
-            <button onclick="showAnswers()" style="background-color: var(--unab-blue); margin-left: 10px;">Show All Answers</button>
+            <button onclick="showAnswers()" style="background-color: var(--data-blue); margin-left: 10px;">Show All Answers</button>
         </div>
         
         <div id="result-message"></div>
@@ -177,7 +177,7 @@
                 resultMessage.style.color = "#4CAF50";
                 resultMessage.textContent = "Excellent! All answers are correct.";
             } else {
-                resultMessage.style.color = "var(--unab-orange)";
+                resultMessage.style.color = "var(--data-orange)";
                 resultMessage.textContent = `You got ${correctCount} out of ${inputs.length} correct. Keep trying!`;
             }
         }

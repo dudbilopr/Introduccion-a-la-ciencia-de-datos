@@ -6,8 +6,8 @@
     <title>EMI Quiz - Data Structures & Loops</title>
     <style>
         :root {
-            --unab-blue: #003865;
-            --unab-orange: #E85C0B;
+            --data-blue: #003865;
+            --data-orange: #E85C0B;
             --bg-color: #f4f7f6;
             --text-color: #333;
         }
@@ -31,11 +31,11 @@
             padding: 40px;
             max-width: 600px;
             width: 100%;
-            border-top: 8px solid var(--unab-orange);
+            border-top: 8px solid var(--data-orange);
         }
 
         h1 {
-            color: var(--unab-blue);
+            color: var(--data-blue);
             text-align: center;
             margin-bottom: 5px;
         }
@@ -51,7 +51,7 @@
             font-size: 1.2rem;
             margin-bottom: 20px;
             font-weight: 600;
-            color: var(--unab-blue);
+            color: var(--data-blue);
         }
 
         .options {
@@ -72,7 +72,7 @@
 
         .options li:hover {
             background-color: #e6f0fa;
-            border-color: var(--unab-blue);
+            border-color: var(--data-blue);
         }
 
         .options li.correct {
@@ -88,7 +88,7 @@
         }
 
         #submit-btn {
-            background-color: var(--unab-orange);
+            background-color: var(--data-orange);
             color: white;
             border: none;
             border-radius: 8px;
@@ -110,7 +110,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             margin-top: 20px;
-            color: var(--unab-blue);
+            color: var(--data-blue);
             display: none;
         }
         
@@ -135,7 +135,7 @@
         <ul class="options" id="optionsList">
             <!-- Opciones generadas por JS -->
         </ul>
-        <div id="explanationBox" style="display: none; padding: 15px; margin-top: 15px; border-radius: 8px; background-color: #e9ecef; border-left: 5px solid var(--unab-blue);">
+        <div id="explanationBox" style="display: none; padding: 15px; margin-top: 15px; border-radius: 8px; background-color: #e9ecef; border-left: 5px solid var(--data-blue);">
             <strong>Explicación:</strong> <span id="explanationText"></span>
         </div>
     </div>
@@ -211,7 +211,7 @@
             options[i].style.borderColor = "#e0e0e0";
             options[i].style.backgroundColor = "#f9f9f9";
         }
-        element.style.borderColor = "var(--unab-blue)";
+        element.style.borderColor = "var(--data-blue)";
         element.style.backgroundColor = "#e6f0fa";
         selectedOptionIndex = index;
     }
@@ -269,8 +269,8 @@
         progressText.style.display = "none";
         
         resultDiv.style.display = "block";
-        resultDiv.innerHTML = \`Quiz Completed!<br><span style="color:var(--unab-orange); font-size:2.5rem;">\${score} / \${questions.length}</span><br>Great job!<br><br>
-        <button onclick="location.reload()" style="background:var(--unab-blue); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:1rem;">Retry (New Random Questions)</button>\`;
+        resultDiv.innerHTML = \`Quiz Completed!<br><span style="color:var(--data-orange); font-size:2.5rem;">\${score} / \${questions.length}</span><br>Great job!<br><br>
+        <button onclick="location.reload()" style="background:var(--data-blue); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:1rem;">Retry (New Random Questions)</button>\`;
 
         // Enviar resultados al Parent LMS (index.html)
         const notaEscalada = Math.round((score / questions.length) * 100);

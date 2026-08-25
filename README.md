@@ -56,6 +56,15 @@ El curso está estructurado en 16 semanas. El material interactivo se irá publi
   - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_3/quiz_semana_3.html)
   - [Colab Guiado (.ipynb)](./Semanas/Semana_3/Colab_Guiado_Semana3.ipynb)
 
+### [Semana 4: Pandas Avanzado y Visualización de Datos](./Semanas/Semana_4)
+- **Conceptos:** Limpieza (Valores Faltantes, Outliers), Matplotlib, Seaborn, Plotly.
+- **Actividad Central:** Pair Programming - El Explorador de Datos (EDA Visual).
+- **Recursos Públicos:**
+  - [Catálogo de Fuentes de Datos (CSV)](./Semanas/Semana_4/Fuentes_de_Datos.md)
+  - [Presentación Interactiva Web](./Semanas/Semana_4/diapositivas_semana_4.html)
+  - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_4/quiz_semana_4.html)
+  - [Colab Guiado (.ipynb)](./Semanas/Semana_4/Colab_Guiado_Semana_4.ipynb)
+
 *(Las siguientes semanas se habilitarán progresivamente).*
 
 ---

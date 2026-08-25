@@ -137,7 +137,11 @@
                     <div class="flex justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
                         <div class="flex items-center"><i class="fas fa-clock mr-2"></i> 16 Semanas</div>
                         <div class="flex items-center"><i class="fas fa-chart-line mr-2"></i> Nivel: Principiante a Intermedio</div>
-                        <div class="flex items-center"><i class="fas fa-certificate mr-2"></i> Certificado Disponible</div>
+                        <div class="flex items-center" id="certBadge"><i class="fas fa-certificate mr-2"></i> Certificado Disponible al 100%</div>
+                    </div>
+                    
+                    <div class="mt-12 pt-6 border-t border-gray-200 dark:border-slate-800 text-xs text-gray-400 dark:text-gray-500">
+                        <i class="fas fa-robot mr-1"></i> Contenido estructurado y creado con apoyo de Inteligencia Artificial.
                     </div>
                 </div>
             </div>
@@ -150,9 +154,9 @@
             <button id="closeLoginBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
             
             <div class="text-center mb-8">
-                <i class="fas fa-university text-4xl text-primary mb-3"></i>
+                <i class="fas fa-brain text-4xl text-primary mb-3"></i>
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Acceso al LMS</h3>
-                <p class="text-sm text-gray-500 mt-1">Plataforma Académica UNAB</p>
+                <p class="text-sm text-gray-500 mt-1">Plataforma Data10.easy</p>
             </div>
             
             <button id="googleLoginBtn" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 py-2.5 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition mb-6 flex justify-center items-center gap-3 shadow-sm">
@@ -218,9 +222,60 @@
         </div>
     </div>
 
+    <!-- MODAL DE CERTIFICADO -->
+    <div id="certModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[70] hidden flex justify-center items-center">
+        <div class="bg-white w-full max-w-3xl rounded-xl p-1 relative m-4 shadow-2xl border-[10px] border-double border-primary">
+            <button onclick="document.getElementById('certModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"><i class="fas fa-times text-2xl"></i></button>
+            <div class="p-12 text-center bg-gray-50 border border-gray-200">
+                <i class="fas fa-award text-7xl text-yellow-500 mb-4 drop-shadow-md"></i>
+                <h1 class="text-4xl font-extrabold text-primary mb-2 uppercase tracking-widest">Certificado de Finalización</h1>
+                <p class="text-lg text-gray-600 mb-8 italic">Se otorga con orgullo a:</p>
+                
+                <h2 id="certUserName" class="text-4xl font-bold text-gray-800 mb-8 border-b-2 border-primary inline-block px-10 pb-2">Nombre del Estudiante</h2>
+                
+                <p class="text-lg text-gray-700 mb-10 max-w-xl mx-auto">
+                    Por haber completado exitosamente las 16 semanas del programa académico <strong>Introducción a la Ciencia de Datos</strong> en la plataforma Data10.easy.
+                </p>
+                
+                <div class="flex justify-between items-end mt-12 px-10">
+                    <div class="text-center">
+                        <div class="border-b border-gray-400 w-40 mb-2"></div>
+                        <p class="text-sm text-gray-600 font-bold">Data10.easy</p>
+                        <p class="text-xs text-gray-500">Plataforma Inteligente</p>
+                    </div>
+                    
+                    <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center border-2 border-yellow-500 shadow-inner">
+                        <i class="fas fa-certificate text-4xl text-yellow-600"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="border-b border-gray-400 w-40 mb-2"></div>
+                        <p class="text-sm text-gray-600 font-bold">Dudbil Olvasada</p>
+                        <p class="text-xs text-gray-500">Instructor Principal</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -bottom-16 left-0 right-0 flex justify-center gap-4">
+                <button onclick="window.print()" class="bg-primary text-white px-6 py-2 rounded shadow hover:bg-blue-900 font-bold"><i class="fas fa-print mr-2"></i>Imprimir Certificado</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #certModal, #certModal * { visibility: visible; }
+            #certModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex !important; background: white; }
+            #certModal > div { border: none !important; box-shadow: none !important; width: 100% !important; height: 100% !important; max-width: 100% !important; }
+            #certModal button { display: none !important; }
+        }
+    </style>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCI0c7KgnEAn-sV_CrHs0Er1LXL13CvQSA",
@@ -234,16 +289,18 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getDatabase(app);
         const googleProvider = new GoogleAuthProvider();
 
         let currentUser = null;
         let isAdmin = false;
+        let userProgress = [];
         
         const syllabus = [
             { b: "Bloque 1: Fundamentos", w: 1, t: "Introducción a la Ciencia de Datos", d: "Definición, ciclo de vida de los datos, roles.", type: "class" },
             { b: "Bloque 1: Fundamentos", w: 2, t: "Herramientas del Ecosistema", d: "Python o R, Jupyter Notebooks.", type: "class" },
             { b: "Bloque 1: Fundamentos", w: 3, t: "Adquisición de Datos", d: "Datos estructurados vs. no estructurados.", type: "class" },
-            { b: "Bloque 1: Fundamentos", w: 4, t: "Limpieza y Preprocesamiento", d: "Valores faltantes, outliers, normalización.", type: "class" },
+            { b: "Bloque 1: Fundamentos", w: 4, t: "Pandas Avanzado y Visualización de Datos", d: "Limpieza profunda, Matplotlib, Seaborn y Plotly.", type: "class" },
             { b: "Bloque 2: Análisis Estadístico", w: 5, t: "Estadística Descriptiva", d: "Tendencia central, variabilidad, percentiles.", type: "class" },
             { b: "Bloque 2: Análisis Estadístico", w: 6, t: "Visualización de Datos", d: "Histogramas, boxplots, dispersión.", type: "class" },
             { b: "Bloque 2: Análisis Estadístico", w: 7, t: "Análisis Exploratorio (EDA)", d: "Hipótesis y relaciones entre variables.", type: "class" },
@@ -290,7 +347,19 @@
             });
             menuContainer.innerHTML = html;
         }
+        window.markLessonCompleted = function(week) {
+            if (!currentUser) return alert("Debes iniciar sesión para guardar tu progreso.");
+            if (!userProgress.includes(week)) {
+                userProgress.push(week);
+                set(ref(db, `users/${currentUser.uid}/progress_data10`), userProgress);
+            }
+        };
 
+        window.descargarCertificado = function() {
+            if (!currentUser) return;
+            document.getElementById('certUserName').innerText = currentUser.displayName || currentUser.email.split('@')[0];
+            document.getElementById('certModal').classList.remove('hidden');
+        };
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -300,20 +369,36 @@
         }
 
         window.loadContent = function(index) {
+            if (!currentUser && index > 0) return alert("Por favor inicia sesión para acceder al resto del contenido del curso.");
             const data = syllabus[index];
             const mainView = document.getElementById('mainContent');
             
-            const prog = Math.round(((index + 1) / syllabus.length) * 100);
-            document.getElementById('progressBar').style.width = prog + '%';
-            document.getElementById('progressText').innerText = prog + '%';
+            let btnCompletadoHTML = '';
+            if (currentUser) {
+                if (userProgress.includes(data.w)) {
+                    btnCompletadoHTML = `<button disabled class="bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm shadow-sm opacity-80 border border-green-200"><i class="fas fa-check-circle mr-2"></i>Completada</button>`;
+                } else {
+                    btnCompletadoHTML = `<button onclick="markLessonCompleted(${data.w}); this.outerHTML='<button disabled class=\\'bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm shadow-sm opacity-80 border border-green-200\\'><i class=\\'fas fa-check-circle mr-2\\'></i>Completada</button>'" class="bg-primary text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-blue-900 transition shadow-sm"><i class="fas fa-check mr-2"></i>Marcar como Completada</button>`;
+                }
+            }
 
             if (data.type === 'class') {
                 mainView.innerHTML = `
-                    <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 pb-20">
-                        <div class="mb-6">
-                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Semana ${data.w}: ${data.t}</h2>
-                            <p class="text-gray-600 dark:text-gray-400">${data.d}</p>
+                    <div class="h-full flex flex-col">
+                        <div class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 shadow-sm z-10 flex justify-between items-center flex-wrap gap-4">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-secondary mb-1 block">Semana ${data.w}</span>
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">${data.t}</h2>
+                            </div>
+                            <div>
+                                ${btnCompletadoHTML}
+                            </div>
                         </div>
+
+                        <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 pb-20">
+                            <div class="mb-6">
+                                <p class="text-gray-600 dark:text-gray-400">${data.d}</p>
+                            </div>
 
                         <!-- TABS NAVIGATION (Coursera Style) -->
                         <div class="flex border-b border-gray-200 dark:border-slate-700 mb-6 overflow-x-auto hide-scroll">
@@ -404,6 +489,21 @@
         document.getElementById('closeLoginBtn').onclick = () => loginModal.classList.add('hidden');
         document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
+        function updateProgressUI() {
+            const percent = Math.round((userProgress.length / 16) * 100);
+            document.getElementById('progressText').innerText = percent + "%";
+            document.getElementById('progressBar').style.width = percent + "%";
+            
+            const certBadge = document.getElementById('certBadge');
+            if (certBadge) {
+                if (percent === 100) {
+                    certBadge.innerHTML = `<button onclick="descargarCertificado()" class="bg-green-100 text-green-700 px-3 py-1 rounded border border-green-300 font-bold hover:bg-green-200 transition shadow-sm animate-pulse"><i class="fas fa-certificate mr-1"></i> ¡Descargar Certificado!</button>`;
+                } else {
+                    certBadge.innerHTML = `<i class="fas fa-certificate mr-2"></i> Certificado Disponible al 100%`;
+                }
+            }
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -412,11 +512,26 @@
                 userArea.classList.remove('hidden');
                 document.getElementById('userName').innerText = user.displayName || user.email.split('@')[0];
                 if(user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
-                renderSidebar(); 
+                
+                // Read Progress from Firebase
+                const progressRef = ref(db, `users/${user.uid}/progress_data10`);
+                onValue(progressRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        userProgress = data;
+                    } else {
+                        userProgress = [];
+                    }
+                    updateProgressUI();
+                    renderSidebar(); 
+                });
+                
             } else {
                 currentUser = null;
+                userProgress = [];
                 authArea.classList.remove('hidden');
                 userArea.classList.add('hidden');
+                updateProgressUI();
                 renderSidebar();
             }
         });
