@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Ciencia de Datos - Semana 5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
+
+    <style>
+        :root {
+            --data-blue: #003865;
+            --data-orange: #E85C0B;
+            --cyber-dark: #050510;
+            --neon-cyan: #00ffcc;
+            --neon-pink: #ff007f;
+        }
+
+        body { font-family: 'Inter', sans-serif; }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--data-blue);
+            text-transform: none;
+            font-weight: 800;
+        }
+
+        .reveal h2 {
+            border-bottom: 3px solid var(--data-orange);
+            display: inline-block;
+            padding-bottom: 8px;
+            margin-bottom: 30px;
+        }
+
+        .accent { color: var(--data-orange) !important; font-weight: bold; }
+        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
+
+        .reveal .controls, .reveal .progress { color: var(--data-orange); }
+
+        .icon-container {
+            font-size: 5rem;
+            color: var(--data-orange);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .box-glass {
+            background: rgba(240, 244, 248, 0.9);
+            border-left: 6px solid var(--data-orange);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: left;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .callout-tip {
+            background: #e6f7ff;
+            border-left: 5px solid #1890ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 0.85em;
+        }
+
+        /* Dark Mode / Cyber Mode slides */
+        .reveal.cyber-mode,
+        .reveal.cyber-mode .slide-background,
+        .reveal.cyber-mode .slide-background-content {
+            background-color: var(--cyber-dark) !important;
+        }
+
+        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
+            color: #fff !important;
+        }
+
+        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
+
+        .reveal.cyber-mode .box-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-left: 6px solid var(--neon-cyan);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .clickable-concept {
+            cursor: pointer;
+            color: var(--data-blue);
+            font-weight: bold;
+            border-bottom: 2px dashed var(--data-orange);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cyber-mode .clickable-concept {
+            color: var(--neon-cyan);
+            border-bottom: 2px dashed var(--neon-cyan);
+        }
+
+        .clickable-concept:hover {
+            color: var(--data-orange);
+            transform: translateY(-2px);
+        }
+
+        .concept-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; color: #333;
+            padding: 40px; border-radius: 12px;
+            border: 3px solid var(--data-blue);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            z-index: 1000; width: 85%; max-width: 700px;
+            text-align: left; font-size: 1.1rem;
+        }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(8px);
+        }
+
+        .close-modal {
+            float: right; cursor: pointer; color: #ff4444;
+            font-weight: bold; font-size: 2rem; line-height: 1; transition: 0.2s;
+        }
+        .close-modal:hover { color: #cc0000; transform: scale(1.1); }
+
+        .split-layout {
+            display: flex; gap: 30px; align-items: stretch;
+        }
+        .split-layout > div { flex: 1; }
+
+        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Título -->
+            <section>
+                <div class="icon-container">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <h1>Ciencia de Datos</h1>
+                <h3>Semana 5: <span class="accent">Estadística Descriptiva</span></h3>
+                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
+            </section>
+
+            <!-- Slide 2: Introducción y RAE -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-door-open"></i> Introducción</h2>
+                    <div class="box-glass">
+                        <p>Tras haber completado la fase de limpieza y visualización, damos inicio al <strong>Bloque 2: Análisis Estadístico</strong>.</p>
+                        <p>La Estadística Descriptiva es el lenguaje que nos permite resumir y comprender el comportamiento de miles o millones de registros numéricos utilizando unos pocos indicadores clave.</p>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje (RAE)</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li class="fragment"><strong>RAE 1:</strong> Calcular e interpretar medidas de tendencia central (media, mediana, moda).</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Evaluar la dispersión de los datos utilizando varianza, desviación estándar y rangos intercuartílicos.</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Identificar sesgos en distribuciones de datos y seleccionar la métrica adecuada de acuerdo a la morfología de la información.</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 3: Medidas de Tendencia Central -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-crosshairs"></i> Medidas de Tendencia Central</h2>
+                    <p>Métricas que indican el centro geométrico o el punto de equilibrio de los datos.</p>
+                    <div class="box-glass">
+                        <p>Haz clic en los conceptos para expandir la información:</p>
+                        <ul>
+                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('mediaModal')">Media Aritmética (Mean)</span></li>
+                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('medianaModal')">Mediana (Median)</span></li>
+                            <li><span class="clickable-concept" onclick="openModal('modaModal')">Moda (Mode)</span></li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <h2>El Problema del Sesgo</h2>
+                    <div class="box-glass">
+                        <p>¿Qué ocurre si en una sala de 10 personas comunes entra Elon Musk?</p>
+                        <p class="fragment" style="color: var(--data-orange); font-weight: bold;">La media salarial de la sala sube a miles de millones, pero no representa la realidad de las personas comunes.</p>
+                    </div>
+                    <div class="callout-tip fragment">
+                        <i class="fa-solid fa-lightbulb accent"></i> <strong>Pro-Tip:</strong> Cuando hay asimetría pronunciada o valores atípicos (outliers), la <strong>mediana</strong> es una métrica mucho más robusta que la media.
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 4: Medidas de Dispersión -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-arrows-left-right"></i> Medidas de Dispersión</h2>
+                    <p>Saber el promedio no es suficiente. Necesitamos saber qué tan alejados están los datos de ese promedio.</p>
+                    <div class="split-layout">
+                        <div class="box-glass">
+                            <h3 class="accent">Varianza</h3>
+                            <p>Promedio de las diferencias al cuadrado respecto a la media.</p>
+                        </div>
+                        <div class="box-glass fragment">
+                            <h3 class="accent">Desviación Estándar</h3>
+                            <p>La raíz cuadrada de la varianza. Devuelve la unidad de medida a su escala original.</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 5: Percentiles y Cuartiles -->
+            <section>
+                <h2><i class="fa-solid fa-chart-pie"></i> Medidas de Posición (Cuartiles)</h2>
+                <div class="box-glass">
+                    <p>Dividen la distribución ordenada en partes iguales:</p>
+                    <ul>
+                        <li><strong>Q1 (25%):</strong> Primer Cuartil.</li>
+                        <li><strong>Q2 (50%):</strong> Segundo Cuartil (Equivalente a la Mediana).</li>
+                        <li><strong>Q3 (75%):</strong> Tercer Cuartil.</li>
+                    </ul>
+                </div>
+                <div class="callout-tip fragment">
+                    <i class="fa-solid fa-info-circle accent"></i> El <strong>Rango Intercuartílico (IQR)</strong> es la diferencia entre Q3 y Q1. Es la medida de dispersión preferida en presencia de valores atípicos, y es la base matemática para la construcción de los Boxplots analizados la semana pasada.
+                </div>
+            </section>
+
+            <!-- Slide 6: Glosario EMI -->
+            <section>
+                <h2><i class="fa-solid fa-language"></i> Glosario (EMI)</h2>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <ul>
+                            <li><strong>Mean:</strong> Media Aritmética.</li>
+                            <li><strong>Median:</strong> Mediana.</li>
+                            <li><strong>Mode:</strong> Moda.</li>
+                            <li><strong>Standard Deviation:</strong> Desviación Estándar.</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass">
+                        <ul>
+                            <li><strong>Variance:</strong> Varianza.</li>
+                            <li><strong>Outliers:</strong> Valores atípicos.</li>
+                            <li><strong>Skewness:</strong> Asimetría / Sesgo.</li>
+                            <li><strong>Percentile:</strong> Percentil.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 7: Pair Programming -->
+            <section data-state="cyber-mode">
+                <h2><i class="fa-solid fa-user-astronaut"></i> Pair Programming</h2>
+                <div class="box-glass">
+                    <h3 class="cyber-accent">Misión: Análisis Descriptivo en Python</h3>
+                    <p>Accederemos a nuestro entorno de Colab. Utilizaremos la librería <code>pandas</code> para aplicar las funciones <code>.mean()</code>, <code>.median()</code>, y <code>.describe()</code> sobre un conjunto de datos estructurado.</p>
+                    <p><i class="fa-solid fa-bolt text-yellow-400"></i> Por favor, abran la guía de laboratorio correspondiente a la Semana 5 en sus entornos.</p>
+                </div>
+            </section>
+            
+            <!-- Slide 8: Conclusiones y Bibliografía -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li>La estadística descriptiva es el primer paso obligatorio para comprender la distribución subyacente de cualquier dataset.</li>
+                            <li>La elección entre media y mediana depende estrechamente de la asimetría de los datos (Skewness).</li>
+                            <li>No existe análisis riguroso sin acompañar la medida central con una medida de dispersión (desviación estándar o IQR).</li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-book"></i> Bibliografía</h2>
+                    <div class="box-glass" style="font-size: 0.8em;">
+                        <ul>
+                            <li>Bruce, P., Bruce, A., & Gedeck, P. (2020). <em>Practical Statistics for Data Scientists: 50+ Essential Concepts Using R and Python</em>. O'Reilly Media.</li>
+                            <li>Wes McKinney (2017). <em>Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython</em>. O'Reilly Media.</li>
+                            <li>Documentación Oficial de Pandas: <a href="https://pandas.pydata.org/docs/" target="_blank">https://pandas.pydata.org/docs/</a></li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Modales de Conceptos -->
+    <div class="modal-overlay" id="overlay" onclick="closeModals()"></div>
+    
+    <div class="concept-modal" id="mediaModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h2 class="accent"><i class="fa-solid fa-scale-unbalanced"></i> Media Aritmética</h2>
+        <p>Se obtiene sumando todos los valores de un conjunto de datos y dividiendo por el número total de observaciones.</p>
+        <p>Es muy sensible a valores extremos (outliers). Su uso es ideal cuando la distribución de los datos es simétrica (campana de Gauss).</p>
+        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; font-size:0.9em; color:#003865;">
+            df['columna'].mean()
+        </div>
+    </div>
+
+    <div class="concept-modal" id="medianaModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h2 class="accent"><i class="fa-solid fa-align-center"></i> Mediana</h2>
+        <p>Es el valor que ocupa la posición central cuando los datos están ordenados de menor a mayor. Divide el conjunto de datos exactamente por la mitad (50% por debajo, 50% por encima).</p>
+        <p>Es robusta ante valores extremos (outliers). Representa mejor la realidad en distribuciones asimétricas (por ejemplo, salarios, precios de vivienda).</p>
+        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; font-size:0.9em; color:#003865;">
+            df['columna'].median()
+        </div>
+    </div>
+
+    <div class="concept-modal" id="modaModal">
+        <span class="close-modal" onclick="closeModals()">&times;</span>
+        <h2 class="accent"><i class="fa-solid fa-users"></i> Moda</h2>
+        <p>Es el valor (o los valores) que aparece con mayor frecuencia en el conjunto de datos.</p>
+        <p>A diferencia de la media y la mediana, la moda es la única medida de tendencia central que se puede aplicar sobre datos cualitativos o categóricos (ejemplo: El color de automóvil más vendido).</p>
+        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; font-size:0.9em; color:#003865;">
+            df['columna'].mode()
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide', 
+            controls: true,
+            progress: true,
+            width: "100%", 
+            height: "100%", 
+            margin: 0, 
+            minScale: 1, 
+            maxScale: 1,
+            plugins: [ RevealHighlight ]
+        });
+
+        // Lógica de Modales
+        function openModal(id) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closeModals() {
+            document.getElementById('overlay').style.display = 'none';
+            var modals = document.getElementsByClassName('concept-modal');
+            for(var i=0; i<modals.length; i++){
+                modals[i].style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

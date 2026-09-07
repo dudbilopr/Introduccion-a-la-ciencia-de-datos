@@ -65,6 +65,14 @@ El curso está estructurado en 16 semanas. El material interactivo se irá publi
   - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_4/quiz_semana_4.html)
   - [Colab Guiado (.ipynb)](./Semanas/Semana_4/Colab_Guiado_Semana_4.ipynb)
 
+### [Semana 5: Estadística Descriptiva](./Semanas/Semana_5)
+- **Conceptos:** Tendencia Central (Media, Mediana, Moda), Dispersión (Varianza, Desviación Estándar), Posición (Percentiles, Cuartiles).
+- **Actividad Central:** Pair Programming - Análisis Descriptivo en Python.
+- **Recursos Públicos:**
+  - [Presentación Interactiva Web](./Semanas/Semana_5/diapositivas_semana_5.html)
+  - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_5/quiz_semana_5.html)
+  - [Colab Guiado (.ipynb)](./Semanas/Semana_5/Colab_Guiado_Semana_5.ipynb)
+
 *(Las siguientes semanas se habilitarán progresivamente).*
 
 ---
