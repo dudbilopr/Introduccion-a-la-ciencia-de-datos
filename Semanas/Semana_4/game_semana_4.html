@@ -3,154 +3,608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reto Gamificado: Semana 4</title>
+    <title>Laboratorio Gamificado: Data Wrangling Factory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#003865', secondary: '#E85C0B', darkbg: '#0f172a' }
+                    colors: { 
+                        primary: '#003865', 
+                        secondary: '#E85C0B', 
+                        darkbg: '#0f172a',
+                        panel: 'rgba(255, 255, 255, 0.05)'
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body { 
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            user-select: none;
+        }
         .glass-panel {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        .fade-in { animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .tinder-card {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.3s, opacity 0.3s;
-            transform-origin: 50% 100%;
-            will-change: transform, opacity;
-            z-index: 10;
+        .tool-btn {
+            transition: all 0.2s;
+            border: 2px solid transparent;
         }
+        .tool-btn.active {
+            border-color: #E85C0B;
+            background: rgba(232, 92, 11, 0.2);
+            transform: scale(1.05);
+        }
+        .fade-in { animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
-        .swipe-left { transform: translateX(-150%) rotate(-30deg); opacity: 0; }
-        .swipe-right { transform: translateX(150%) rotate(30deg); opacity: 0; }
-        
-        .badge-keep { position: absolute; top: 20px; left: 20px; border: 4px solid #22c55e; color: #22c55e; font-size: 2rem; font-weight: bold; padding: 5px 10px; border-radius: 10px; transform: rotate(-15deg); opacity: 0; transition: opacity 0.2s;}
-        .badge-drop { position: absolute; top: 20px; right: 20px; border: 4px solid #ef4444; color: #ef4444; font-size: 2rem; font-weight: bold; padding: 5px 10px; border-radius: 10px; transform: rotate(15deg); opacity: 0; transition: opacity 0.2s;}
-
+        #gameCanvas {
+            cursor: crosshair;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col items-center justify-center p-6">
+<body class="h-screen w-screen flex flex-col p-4 gap-4">
 
-    <div class="w-full max-w-lg relative h-[600px] flex flex-col">
-        <div class="text-center mb-4 z-0">
-            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-broom text-secondary mr-3"></i>Data Janitor 3000</h1>
-            <p class="text-gray-300 text-sm">Decide rápido: <span class="text-red-400 font-bold">Descartar (Drop)</span> datos basura o <span class="text-green-400 font-bold">Aprobar/Imputar</span> datos salvables.</p>
+    <!-- HEADER: HUD Y MÉTRICAS -->
+    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400">
+                <i class="fas fa-database text-2xl text-blue-200"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Data Wrangling Factory</h1>
+                <p class="text-sm text-gray-400 font-mono">ETL Pipeline Simulation v1.0</p>
+            </div>
         </div>
 
-        <div class="relative flex-1 w-full" id="card-container">
-            <!-- Cards appended here -->
+        <div class="flex gap-8">
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Nivel</p>
+                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Quality Score (R²)</p>
+                <div class="w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
+                    <div id="health-bar" class="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-300" style="width: 100%;"></div>
+                    <span id="health-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold drop-shadow-md">1.00</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Registros</p>
+                <p class="text-2xl font-bold text-white font-mono" id="score-display">0</p>
+            </div>
         </div>
+    </header>
 
-        <div class="flex justify-center gap-8 mt-6 z-0">
-            <button onclick="handleBtnClick('drop')" class="w-16 h-16 rounded-full bg-slate-800 border-2 border-red-500 text-red-500 text-2xl hover:bg-red-500 hover:text-white transition shadow-[0_0_15px_rgba(239,68,68,0.3)]"><i class="fas fa-times"></i></button>
-            <button onclick="handleBtnClick('keep')" class="w-16 h-16 rounded-full bg-slate-800 border-2 border-green-500 text-green-500 text-2xl hover:bg-green-500 hover:text-white transition shadow-[0_0_15px_rgba(34,197,94,0.3)]"><i class="fas fa-check"></i></button>
+    <!-- ÁREA DE JUEGO PRINCIPAL -->
+    <main class="flex-1 flex gap-4 min-h-0 relative">
+        
+        <!-- SIDEBAR DE HERRAMIENTAS -->
+        <aside class="w-64 glass-panel rounded-xl p-4 flex flex-col gap-3 z-10">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-2">Preprocesamiento</h2>
+            
+            <button class="tool-btn active glass-panel p-3 rounded-lg text-left hover:bg-white/5" data-tool="dropna">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="fas fa-trash-can text-red-400"></i>
+                    <span class="font-bold text-white">df.dropna()</span>
+                </div>
+                <p class="text-xs text-gray-400">Elimina registros con valores nulos (NaN).</p>
+            </button>
+
+            <button class="tool-btn glass-panel p-3 rounded-lg text-left hover:bg-white/5" data-tool="fillna">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="fas fa-fill-drip text-yellow-400"></i>
+                    <span class="font-bold text-white">df.fillna(mean)</span>
+                </div>
+                <p class="text-xs text-gray-400">Imputa nulos reemplazándolos con la media.</p>
+            </button>
+
+            <button class="tool-btn glass-panel p-3 rounded-lg text-left hover:bg-white/5" data-tool="astype">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="fas fa-font text-blue-400"></i>
+                    <span class="font-bold text-white">df.astype(float)</span>
+                </div>
+                <p class="text-xs text-gray-400">Convierte cadenas de texto (Strings) a numérico.</p>
+            </button>
+
+            <button class="tool-btn glass-panel p-3 rounded-lg text-left hover:bg-white/5" data-tool="outlier">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="fas fa-cut text-purple-400"></i>
+                    <span class="font-bold text-white">Remove Outliers</span>
+                </div>
+                <p class="text-xs text-gray-400">Recorta valores extremos (fuera del IQR).</p>
+            </button>
+
+            <div class="mt-auto">
+                <div class="bg-blue-900/30 border border-blue-500/30 rounded p-3 text-xs text-blue-200">
+                    <i class="fas fa-info-circle mr-1"></i> Selecciona una herramienta y haz clic en los datos defectuosos que caen para limpiarlos antes de que lleguen al modelo.
+                </div>
+            </div>
+        </aside>
+
+        <!-- CANVAS CONTAINER -->
+        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden flex flex-col" id="canvas-container">
+            <canvas id="gameCanvas" class="w-full h-full block rounded-xl"></canvas>
+            
+            <!-- MODEL BAR (Fondo) -->
+            <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-primary/80 to-transparent border-t border-blue-500/50 flex items-end justify-center pb-2 pointer-events-none">
+                <span class="font-mono font-bold text-blue-200 tracking-widest bg-darkbg/80 px-4 py-1 rounded shadow"><i class="fas fa-cogs mr-2"></i>MODELO DE MACHINE LEARNING</span>
+            </div>
         </div>
+    </main>
 
-        <div id="end-screen" class="absolute inset-0 bg-slate-900/95 backdrop-blur-xl rounded-2xl hidden flex-col items-center justify-center z-50 fade-in">
-            <i class="fas fa-star text-7xl text-yellow-400 mb-6"></i>
-            <h2 class="text-4xl font-bold text-white mb-2">¡Dataset Limpio!</h2>
-            <p class="text-xl text-gray-300 mb-4">Puntuación: <span id="final-score" class="text-blue-400 font-bold">0</span>/5</p>
-            <p class="text-md text-gray-400 mb-8 text-center px-4" id="feedback-msg"></p>
-            <button onclick="location.reload()" class="bg-secondary text-white font-bold px-8 py-3 rounded-lg hover:bg-orange-600 transition shadow-lg">Otra Limpieza</button>
+    <!-- MODAL GATEKEEPER (PREGUNTAS) -->
+    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border border-secondary/50 shadow-[0_0_50px_rgba(232,92,11,0.2)] fade-in">
+            <div class="flex items-center gap-4 mb-6 text-secondary">
+                <i class="fas fa-engine-warning text-4xl"></i>
+                <h2 class="text-2xl font-bold">¡ALERTA DE SOBREAJUSTE (OVERFITTING)!</h2>
+            </div>
+            <p class="text-gray-300 mb-6 text-lg border-l-4 border-secondary pl-4" id="question-text">El modelo está perdiendo precisión drásticamente debido a mala calidad de datos. Responde para calibrarlo:</p>
+            
+            <div class="flex flex-col gap-3" id="options-container">
+                <!-- Opciones inyectadas por JS -->
+            </div>
         </div>
     </div>
 
-    <script>
-        const dataRows = [
-            { id: 1, text: "Edad: 1500 años<br>Salario: $50,000<br>Ocupación: Ingeniero", action: 'drop', reason: "La edad es biológicamente imposible (ruido/basura extremo)." },
-            { id: 2, text: "Edad: 35 años<br>Salario: NaN<br>Ocupación: Médico", action: 'keep', reason: "El salario nulo se puede imputar con la mediana de los médicos." },
-            { id: 3, text: "ID: NaN<br>Nombre: NaN<br>Edad: NaN", action: 'drop', reason: "Fila completamente vacía, no aporta ninguna información." },
-            { id: 4, text: "Edad: 22 años<br>Salario: $25,000<br>Género: N/A", action: 'keep', reason: "El género ausente puede ser imputado con la moda o dejado como 'Desconocido'." },
-            { id: 5, text: "Edad: -5 años<br>Salario: -$10,000<br>Ocupación: NaN", action: 'drop', reason: "Valores numéricos negativos sin sentido para edad y salario." }
-        ].reverse(); // Reverse so we can pop from end (top of visual stack)
-
-        let score = 0;
-        let currentIndex = 5;
-
-        function createCard(data, index) {
-            const card = document.createElement('div');
-            card.className = 'tinder-card glass-panel rounded-2xl bg-slate-800 border-2 border-slate-600 shadow-xl flex flex-col justify-center p-8';
-            card.style.zIndex = index;
-            card.dataset.action = data.action;
-            card.dataset.reason = data.reason;
+    <!-- MODAL END GAME -->
+    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
+            <i class="fas fa-award text-7xl text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Pipeline Completado</h2>
+            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Has dominado la limpieza de datos.</p>
             
-            card.innerHTML = `
-                <div class="badge-keep">APROBAR</div>
-                <div class="badge-drop">DROP</div>
-                <div class="mb-6">
-                    <h3 class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Fila de Datos #${5 - index}</h3>
-                    <div class="w-full h-1 bg-slate-700 rounded-full"></div>
-                </div>
-                <div class="font-mono text-xl text-blue-200 leading-loose">
-                    ${data.text}
-                </div>
-            `;
-            return card;
+            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+            </div>
+
+            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
+                Ejecutar Nuevo Pipeline
+            </button>
+        </div>
+    </div>
+
+<script>
+/**
+ * DATA WRANGLING FACTORY - ENGINE
+ * Arquitectura MVC Adaptada para HTML5 Canvas
+ */
+
+// --- 1. BANCO DE PREGUNTAS (GATEKEEPER) ---
+const gatekeeperQuestions = [
+    { q: "¿Por qué NO siempre es buena idea usar dropna() para eliminar nulos?", opts: ["Porque reducimos el tamaño de la muestra y perdemos información valiosa.", "Porque daña el disco duro.", "Porque Pandas no lo soporta en datasets grandes.", "Porque aumenta artificialmente la varianza."], ans: 0 },
+    { q: "Si tienes un dataset de salarios donde el 99% gana $1,000 y el 1% gana $1,000,000. ¿Con qué imputarías los valores nulos?", opts: ["Con la Media.", "Con la Mediana.", "Con el valor Máximo.", "Con Ceros."], ans: 1 },
+    { q: "Un modelo de regresión arroja error porque la columna 'Edad' contiene valores como 'Veinte'. ¿Qué paso faltó en el Wrangling?", opts: ["Imputación de nulos.", "Normalización Min-Max.", "Transformación de tipos y limpieza de Strings.", "Detección de Outliers con IQR."], ans: 2 },
+    { q: "¿Cuál de estas NO es una técnica común para detectar Outliers (valores atípicos)?", opts: ["Rango Intercuartílico (IQR).", "Z-Score (Desviaciones estándar).", "Gráfico de Caja (Boxplot).", "Matriz de Confusión."], ans: 3 },
+    { q: "Tienes una variable categórica 'Color' (Rojo, Verde, Azul). Para usarla en un modelo de ML numérico, debes aplicar:", opts: ["One-Hot Encoding (Variables Dummy).", "Min-Max Scaler.", "df.dropna().", "StandardScaler."], ans: 0 }
+];
+
+// --- 2. MODELO DE DATOS Y ESTADO DEL JUEGO ---
+const state = {
+    canvas: null, ctx: null,
+    width: 0, height: 0,
+    cubes: [],
+    particles: [],
+    lastTime: 0,
+    spawnTimer: 0,
+    currentTool: 'dropna', // dropna, fillna, astype, outlier
+    
+    // Progresión
+    level: 1,
+    score: 0,
+    processedCount: 0,
+    health: 1.0, // 1.0 a 0.0 (R-squared)
+    isPaused: false,
+    consecutiveMistakes: 0,
+    
+    // Configuración de dificultad por nivel
+    config: {
+        spawnInterval: 2000, // ms
+        fallSpeedBase: 50, // px per second
+        nanProb: 0.3,
+        strProb: 0.0,
+        outProb: 0.0,
+        cubesToNextLevel: 10
+    }
+};
+
+const CUBE_SIZE = 60;
+
+// Definición de tipos de datos sucios
+const DATA_TYPES = {
+    CLEAN: { id: 'clean', color: '#22c55e', text: 'Num' },
+    NAN: { id: 'nan', color: '#ef4444', text: 'NaN' },
+    STRING: { id: 'string', color: '#3b82f6', text: '"Num"' },
+    OUTLIER: { id: 'outlier', color: '#a855f7', text: '999K' }
+};
+
+class Cube {
+    constructor(x, y, speed, type) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.type = type;
+        this.width = CUBE_SIZE;
+        this.height = CUBE_SIZE;
+        
+        // Asignar valor visual
+        if(type === 'clean') this.val = (Math.random() * 100).toFixed(1);
+        else if(type === 'nan') this.val = 'NaN';
+        else if(type === 'string') this.val = `"${Math.floor(Math.random() * 100)}"`;
+        else if(type === 'outlier') this.val = (Math.random() * 10000 + 5000).toFixed(0);
+    }
+
+    draw(ctx) {
+        const typeInfo = Object.values(DATA_TYPES).find(t => t.id === this.type);
+        
+        ctx.fillStyle = typeInfo.color;
+        ctx.globalAlpha = 0.2;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        
+        ctx.globalAlpha = 1.0;
+        ctx.strokeStyle = typeInfo.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        
+        // Etiqueta superior
+        ctx.fillStyle = typeInfo.color;
+        ctx.fillRect(this.x, this.y, this.width, 15);
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(typeInfo.text, this.x + this.width/2, this.y + 11);
+        
+        // Valor central
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(this.val, this.x + this.width/2, this.y + this.height/2 + 8);
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 100;
+        this.vy = (Math.random() - 0.5) * 100;
+        this.life = 1.0;
+    }
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= dt * 2;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, 4, 4);
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+// --- 3. LÓGICA DEL CONTROLADOR (CONTROLLER) ---
+
+function initGame() {
+    state.canvas = document.getElementById('gameCanvas');
+    state.ctx = state.canvas.getContext('2d');
+    
+    // Resize handler
+    const resize = () => {
+        const rect = state.canvas.parentElement.getBoundingClientRect();
+        state.canvas.width = rect.width;
+        state.canvas.height = rect.height;
+        state.width = rect.width;
+        state.height = rect.height;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Input handlers
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            const target = e.currentTarget;
+            target.classList.add('active');
+            state.currentTool = target.dataset.tool;
+        });
+    });
+
+    state.canvas.addEventListener('mousedown', handleCanvasClick);
+
+    // Start Loop
+    state.lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+}
+
+function handleCanvasClick(e) {
+    if (state.isPaused) return;
+    
+    const rect = state.canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    let clickedCubeIndex = -1;
+    for (let i = state.cubes.length - 1; i >= 0; i--) {
+        const c = state.cubes[i];
+        if (mouseX >= c.x && mouseX <= c.x + c.width &&
+            mouseY >= c.y && mouseY <= c.y + c.height) {
+            clickedCubeIndex = i;
+            break;
         }
+    }
 
-        function initCards() {
-            const container = document.getElementById('card-container');
-            dataRows.forEach((data, i) => {
-                container.appendChild(createCard(data, i));
-            });
+    if (clickedCubeIndex > -1) {
+        processCubeClick(clickedCubeIndex);
+    }
+}
+
+function processCubeClick(index) {
+    const cube = state.cubes[index];
+    let success = false;
+    let destroy = false;
+    let transformToClean = false;
+
+    // Lógica de validación de herramienta según el tipo de dato
+    if (state.currentTool === 'dropna') {
+        if (cube.type === 'nan') { success = true; destroy = true; }
+    } else if (state.currentTool === 'fillna') {
+        if (cube.type === 'nan') { success = true; transformToClean = true; cube.val = '42.5'; }
+    } else if (state.currentTool === 'astype') {
+        if (cube.type === 'string') { success = true; transformToClean = true; cube.val = cube.val.replace(/"/g, ''); }
+    } else if (state.currentTool === 'outlier') {
+        if (cube.type === 'outlier') { success = true; destroy = true; }
+    }
+
+    if (success) {
+        createParticles(cube.x + CUBE_SIZE/2, cube.y + CUBE_SIZE/2, '#22c55e');
+        state.consecutiveMistakes = 0;
+        
+        if (destroy) {
+            state.cubes.splice(index, 1);
+            updateScore(10);
+            checkLevelProgress();
+        } else if (transformToClean) {
+            cube.type = 'clean';
+            updateScore(15);
         }
+    } else {
+        // Error del jugador: usar herramienta equivocada
+        createParticles(cube.x + CUBE_SIZE/2, cube.y + CUBE_SIZE/2, '#ef4444');
+        applyDamage(0.05);
+        state.consecutiveMistakes++;
+        
+        // Shake animation
+        state.canvas.style.transform = 'translateX(5px)';
+        setTimeout(() => state.canvas.style.transform = 'translateX(-5px)', 50);
+        setTimeout(() => state.canvas.style.transform = 'translateX(0)', 100);
 
-        function handleBtnClick(userAction) {
-            const container = document.getElementById('card-container');
-            const cards = container.querySelectorAll('.tinder-card:not(.swipe-left):not(.swipe-right)');
-            if (cards.length === 0) return;
-            
-            const topCard = cards[cards.length - 1];
-            const correctAction = topCard.dataset.action;
-            
-            // Show badge
-            if(userAction === 'keep') {
-                topCard.querySelector('.badge-keep').style.opacity = '1';
-                topCard.classList.add('swipe-right');
+        if (state.consecutiveMistakes >= 3) {
+            triggerGatekeeper();
+        }
+    }
+}
+
+function spawnCube() {
+    const x = Math.random() * (state.width - CUBE_SIZE);
+    const y = -CUBE_SIZE;
+    
+    // Determinar tipo basado en probabilidades del nivel
+    const rand = Math.random();
+    let type = 'clean';
+    
+    if (rand < state.config.nanProb) type = 'nan';
+    else if (rand < state.config.nanProb + state.config.strProb) type = 'string';
+    else if (rand < state.config.nanProb + state.config.strProb + state.config.outProb) type = 'outlier';
+
+    const speed = state.config.fallSpeedBase + (Math.random() * 20);
+    state.cubes.push(new Cube(x, y, speed, type));
+}
+
+function createParticles(x, y, color) {
+    for(let i=0; i<10; i++) state.particles.push(new Particle(x, y, color));
+}
+
+function applyDamage(amount) {
+    state.health -= amount;
+    if (state.health < 0) state.health = 0;
+    
+    const bar = document.getElementById('health-bar');
+    const text = document.getElementById('health-text');
+    
+    const pct = state.health * 100;
+    bar.style.width = `${pct}%`;
+    text.innerText = state.health.toFixed(2);
+    
+    if (state.health < 0.3) triggerGatekeeper();
+}
+
+function checkLevelProgress() {
+    state.processedCount++;
+    if (state.processedCount >= state.config.cubesToNextLevel) {
+        levelUp();
+    }
+}
+
+function levelUp() {
+    if (state.level >= 10) {
+        endGame();
+        return;
+    }
+    
+    state.level++;
+    state.processedCount = 0;
+    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
+    
+    // Aumentar dificultad
+    state.config.fallSpeedBase += 15;
+    state.config.spawnInterval = Math.max(800, state.config.spawnInterval - 150);
+    state.config.cubesToNextLevel += 5;
+    
+    // Introducir nuevos conceptos
+    if (state.level === 4) state.config.strProb = 0.2;
+    if (state.level === 7) state.config.outProb = 0.15;
+    
+    // Flash level up
+    state.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    state.ctx.fillRect(0, 0, state.width, state.height);
+}
+
+function updateScore(pts) {
+    state.score += pts;
+    document.getElementById('score-display').innerText = state.score;
+}
+
+// --- 4. MOTOR DE RENDERIZADO (VIEW) ---
+
+function gameLoop(timestamp) {
+    if (!state.isPaused) {
+        const dt = (timestamp - state.lastTime) / 1000; // seconds
+        update(dt);
+        draw();
+    }
+    state.lastTime = timestamp;
+    requestAnimationFrame(gameLoop);
+}
+
+function update(dt) {
+    // Spawn
+    state.spawnTimer += dt * 1000;
+    if (state.spawnTimer >= state.config.spawnInterval) {
+        spawnCube();
+        state.spawnTimer = 0;
+    }
+
+    // Update Cubes
+    for (let i = state.cubes.length - 1; i >= 0; i--) {
+        const c = state.cubes[i];
+        c.y += c.speed * dt;
+        
+        // Colisión con la zona inferior (Modelo)
+        if (c.y + c.height > state.height - 64) { // 64px is footer height
+            if (c.type !== 'clean') {
+                applyDamage(0.15);
+                createParticles(c.x + CUBE_SIZE/2, c.y + CUBE_SIZE, '#ef4444');
+                state.consecutiveMistakes++;
+                if (state.consecutiveMistakes >= 3) triggerGatekeeper();
             } else {
-                topCard.querySelector('.badge-drop').style.opacity = '1';
-                topCard.classList.add('swipe-left');
+                updateScore(5);
+                checkLevelProgress();
+                createParticles(c.x + CUBE_SIZE/2, c.y + CUBE_SIZE, '#22c55e');
             }
+            state.cubes.splice(i, 1);
+        }
+    }
 
-            if(userAction === correctAction) {
-                score++;
+    // Update Particles
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+        state.particles[i].update(dt);
+        if (state.particles[i].life <= 0) state.particles.splice(i, 1);
+    }
+}
+
+function draw() {
+    state.ctx.clearRect(0, 0, state.width, state.height);
+    
+    // Grid background
+    state.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    state.ctx.lineWidth = 1;
+    for(let i=0; i<state.width; i+=40) {
+        state.ctx.beginPath(); state.ctx.moveTo(i, 0); state.ctx.lineTo(i, state.height); state.ctx.stroke();
+    }
+    for(let i=0; i<state.height; i+=40) {
+        state.ctx.beginPath(); state.ctx.moveTo(0, i); state.ctx.lineTo(state.width, i); state.ctx.stroke();
+    }
+
+    // Draw Entities
+    state.cubes.forEach(c => c.draw(state.ctx));
+    state.particles.forEach(p => p.draw(state.ctx));
+}
+
+// --- 5. SISTEMA DE GATEKEEPER Y FINAL ---
+
+function triggerGatekeeper() {
+    state.isPaused = true;
+    state.consecutiveMistakes = 0;
+    const modal = document.getElementById('gatekeeper-modal');
+    const container = document.getElementById('options-container');
+    
+    // Pick random question
+    const qIndex = Math.floor(Math.random() * gatekeeperQuestions.length);
+    const qData = gatekeeperQuestions[qIndex];
+    
+    document.getElementById('question-text').innerText = qData.q;
+    container.innerHTML = '';
+    
+    qData.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-secondary flex items-start gap-3";
+        btn.innerHTML = `<span class="font-bold text-secondary">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
+        btn.onclick = () => {
+            if(idx === qData.ans) {
+                // Correcto: recupera vida y continúa
+                state.health = Math.max(state.health, 0.50);
+                applyDamage(0); // Update UI
+                modal.style.display = 'none';
+                state.lastTime = performance.now(); // reset timer
+                state.isPaused = false;
+            } else {
+                // Incorrecto: Efecto de error y penalización final
+                btn.style.borderColor = '#ef4444';
+                btn.style.backgroundColor = 'rgba(239,68,68,0.2)';
+                setTimeout(() => {
+                    endGame(false);
+                }, 1000);
             }
+        };
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = 'flex';
+}
 
-            setTimeout(() => {
-                topCard.style.display = 'none';
-                currentIndex--;
-                if(currentIndex === 0) {
-                    showEndScreen();
-                }
-            }, 300);
-        }
+function endGame(success = true) {
+    state.isPaused = true;
+    const modal = document.getElementById('end-modal');
+    
+    document.getElementById('end-title').innerText = success ? "Pipeline Completado" : "Modelo Colapsado";
+    document.getElementById('end-title').className = `text-4xl font-bold mb-2 ${success ? 'text-white' : 'text-red-500'}`;
+    
+    document.getElementById('end-subtitle').innerText = success 
+        ? "Has dominado las bases del Data Wrangling." 
+        : "El Overfitting destruyó las predicciones del modelo.";
 
-        function showEndScreen() {
-            document.getElementById('end-screen').style.display = 'flex';
-            document.getElementById('final-score').innerText = score;
-            let msg = "";
-            if(score === 5) msg = "¡Impecable! Eres un verdadero Data Janitor. Sabes distinguir el ruido de los datos útiles.";
-            else if(score >= 3) msg = "Buen trabajo, pero algunos algoritmos podrían envenenarse con las filas que dejaste pasar.";
-            else msg = "Cuidado. Eliminar datos útiles o aprobar basura destruye cualquier modelo de Machine Learning.";
-            document.getElementById('feedback-msg').innerText = msg;
-        }
+    // Calcular estrellas basadas en R^2 (health)
+    const starsContainer = document.getElementById('stars-container');
+    starsContainer.innerHTML = '';
+    let stars = 0;
+    if(success) {
+        if(state.health >= 0.8) stars = 3;
+        else if(state.health >= 0.5) stars = 2;
+        else stars = 1;
+    }
+    
+    for(let i=0; i<3; i++) {
+        const color = i < stars ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]' : 'text-gray-700';
+        starsContainer.innerHTML += `<i class="fas fa-star ${color}"></i>`;
+    }
 
-        initCards();
-    </script>
+    modal.style.display = 'flex';
+}
+
+// Iniciar aplicación
+window.onload = initGame;
+</script>
 </body>
 </html>

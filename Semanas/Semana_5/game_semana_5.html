@@ -3,99 +3,610 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reto Gamificado: Semana 5</title>
+    <title>Laboratorio Gamificado: Galton Board & Distribuciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#003865', secondary: '#E85C0B', darkbg: '#0f172a' }
+                    colors: { 
+                        primary: '#003865', 
+                        secondary: '#E85C0B', 
+                        darkbg: '#0f172a',
+                        panel: 'rgba(255, 255, 255, 0.05)'
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        body { 
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            user-select: none;
+        }
         .glass-panel {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        .stat-btn { transition: all 0.2s; }
-        .stat-btn:hover { transform: scale(1.05); }
-        .fade-in { animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #E85C0B;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(232, 92, 11, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        .fade-in { animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-<body class="h-screen flex flex-col items-center justify-center p-6">
+<body class="h-screen w-screen flex flex-col p-4 gap-4">
 
-    <div class="glass-panel w-full max-w-4xl rounded-2xl p-8 relative">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-calculator text-secondary mr-3"></i>Reto: Detective Estadístico</h1>
-            <p class="text-gray-300">Descubre la métrica estadística correcta según la pista del detective.</p>
-        </div>
-
-        <div class="flex items-start gap-6 mb-10">
-            <div class="w-24 h-24 rounded-full bg-blue-900 flex items-center justify-center border-4 border-blue-400 flex-shrink-0 shadow-[0_0_15px_rgba(96,165,250,0.5)]">
-                <i class="fas fa-user-secret text-4xl text-blue-200"></i>
+    <!-- HEADER: HUD Y MÉTRICAS -->
+    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400">
+                <i class="fas fa-chart-area text-2xl text-blue-200"></i>
             </div>
-            <div class="glass-panel p-6 rounded-xl rounded-tl-none flex-1 relative fade-in" id="dialogue-box">
-                <h3 class="text-sm font-bold text-secondary uppercase tracking-wider mb-2">Pista del Caso</h3>
-                <p class="text-xl text-gray-200" id="clue-text">"Necesito saber cuál es el valor que parte mis datos exactamente por la mitad, sin importar que hayan millonarios extremos distorsionando la realidad."</p>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Máquina de Galton</h1>
+                <p class="text-sm text-gray-400 font-mono">Estadística Descriptiva y Distribuciones</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="buttons-container">
-            <button onclick="checkAnswer('media')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-blue-500 hover:bg-white/10">Media</button>
-            <button onclick="checkAnswer('mediana')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-green-500 hover:bg-white/10">Mediana</button>
-            <button onclick="checkAnswer('moda')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-yellow-500 hover:bg-white/10">Moda</button>
-            <button onclick="checkAnswer('desviacion')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-purple-500 hover:bg-white/10">Desv. Estándar</button>
+        <div class="flex gap-8 items-center">
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Nivel</p>
+                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Precisión (MSE)</p>
+                <div class="w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
+                    <div id="accuracy-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%;"></div>
+                    <span id="accuracy-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold drop-shadow-md">0%</span>
+                </div>
+            </div>
+            <button id="btn-fire" class="bg-secondary hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg transition shadow-[0_0_15px_rgba(232,92,11,0.5)]">
+                <i class="fas fa-play mr-2"></i> Lanzar Muestra (N=200)
+            </button>
         </div>
+    </header>
 
-        <div id="end-screen" class="absolute inset-0 bg-slate-900/95 backdrop-blur-xl rounded-2xl hidden flex-col items-center justify-center z-10 fade-in">
-            <i class="fas fa-search-dollar text-7xl text-blue-400 mb-6"></i>
-            <h2 class="text-4xl font-bold text-white mb-2">¡Caso Cerrado!</h2>
-            <p class="text-xl text-gray-300 mb-8">Dominas el lenguaje de la Estadística Descriptiva.</p>
-            <button onclick="location.reload()" class="bg-secondary text-white font-bold px-8 py-3 rounded-lg hover:bg-orange-600 transition shadow-lg">Jugar de Nuevo</button>
+    <!-- ÁREA DE JUEGO PRINCIPAL -->
+    <main class="flex-1 flex gap-4 min-h-0 relative">
+        
+        <!-- SIDEBAR DE CONTROLES -->
+        <aside class="w-72 glass-panel rounded-xl p-6 flex flex-col gap-6 z-10">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest border-b border-gray-700 pb-2"><i class="fas fa-sliders mr-2"></i>Parámetros</h2>
+            
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between">
+                    <label class="font-bold text-blue-300">Media (μ)</label>
+                    <span id="val-mean" class="text-white font-mono">0</span>
+                </div>
+                <input type="range" id="slider-mean" min="-100" max="100" value="0">
+                <p class="text-xs text-gray-400 mt-1">Desplaza el centro de gravedad de la distribución.</p>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between">
+                    <label class="font-bold text-yellow-300">Desv. Estándar (σ)</label>
+                    <span id="val-std" class="text-white font-mono">1.0</span>
+                </div>
+                <input type="range" id="slider-std" min="0.5" max="5.0" step="0.1" value="1.0">
+                <p class="text-xs text-gray-400 mt-1">Controla la dispersión (varianza) de los datos.</p>
+            </div>
+
+            <div id="wind-panel" class="hidden flex-col gap-2 mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+                <div class="flex items-center gap-2 text-red-400 font-bold mb-1">
+                    <i class="fas fa-wind"></i> <span>Sesgo Ambiental</span>
+                </div>
+                <p class="text-xs text-gray-300" id="wind-text">Una fuerza externa está empujando los datos hacia la derecha (Sesgo Positivo).</p>
+            </div>
+
+            <div class="mt-auto">
+                <div class="bg-blue-900/30 border border-blue-500/30 rounded p-4 text-sm text-blue-200">
+                    <i class="fas fa-bullseye mb-2 text-xl block"></i> 
+                    <strong>Misión:</strong> Ajusta los parámetros ($\mu, \sigma$) para que los datos caigan exactamente sobre la distribución fantasma (línea blanca).
+                </div>
+            </div>
+        </aside>
+
+        <!-- CANVAS CONTAINER -->
+        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden flex flex-col" id="canvas-container">
+            <canvas id="gameCanvas" class="w-full h-full block rounded-xl"></canvas>
+            
+            <!-- CAÑON VISUAL -->
+            <div id="cannon-indicator" class="absolute top-0 w-8 h-8 -ml-4 border-b-[16px] border-l-[16px] border-r-[16px] border-b-secondary border-l-transparent border-r-transparent rotate-180 transition-all drop-shadow-[0_0_10px_rgba(232,92,11,0.8)]" style="left: 50%;"></div>
+        </div>
+    </main>
+
+    <!-- MODAL GATEKEEPER -->
+    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border border-secondary/50 shadow-[0_0_50px_rgba(232,92,11,0.2)] fade-in">
+            <div class="flex items-center gap-4 mb-6 text-secondary">
+                <i class="fas fa-brain text-4xl"></i>
+                <h2 class="text-2xl font-bold">¡ALERTA DE ERROR ESTADÍSTICO!</h2>
+            </div>
+            <p class="text-gray-300 mb-6 text-lg border-l-4 border-secondary pl-4" id="question-text">Tu distribución no coincide con el objetivo. Responde correctamente para recalibrar los sensores:</p>
+            
+            <div class="flex flex-col gap-3" id="options-container">
+                <!-- Inyectado via JS -->
+            </div>
         </div>
     </div>
 
-    <script>
-        const clues = [
-            { text: '"Necesito saber cuál es el valor que parte mis datos exactamente por la mitad, es muy robusto contra los datos atípicos (outliers)."', ans: 'mediana' },
-            { text: '"Quiero saber cuál fue el producto más vendido en nuestra tienda. Simplemente el que más se repite en la base de datos."', ans: 'moda' },
-            { text: '"Quiero un número que me diga, en promedio, qué tan alejados están los datos del centro. Si es grande, hay mucha variabilidad."', ans: 'desviacion' },
-            { text: '"Es el centro de gravedad numérico. Si sumas todo y lo divides entre la cantidad de datos, lo obtienes, pero ¡cuidado con los outliers!"', ans: 'media' }
-        ];
+    <!-- MODAL END GAME -->
+    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
+            <i class="fas fa-chart-bar text-7xl text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Distribución Dominada</h2>
+            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Has comprendido la esencia de la Estadística Descriptiva.</p>
+            
+            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+            </div>
 
-        let currentClue = 0;
+            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
+                Nuevo Experimento
+            </button>
+        </div>
+    </div>
 
-        function renderClue() {
-            if(currentClue >= clues.length) {
-                document.getElementById('end-screen').style.display = 'flex';
-                return;
-            }
-            const el = document.getElementById('clue-text');
-            el.innerText = clues[currentClue].text;
-            document.getElementById('dialogue-box').classList.remove('fade-in');
-            void document.getElementById('dialogue-box').offsetWidth;
-            document.getElementById('dialogue-box').classList.add('fade-in');
+<script>
+/**
+ * GALTON BOARD ENGINE (PHYSICS & STATS)
+ */
+
+// Banco de Preguntas (Gatekeeper)
+const questions = [
+    { q: "Si la Desviación Estándar (σ) aumenta, ¿Qué sucede con la curva de la Distribución Normal?", opts: ["Se vuelve más ancha y plana (mayor dispersión).", "Se vuelve más estrecha y alta (menor dispersión).", "Se desplaza hacia la derecha.", "Se desplaza hacia la izquierda."], ans: 0 },
+    { q: "En una distribución perfectamente Normal, ¿Cuál es la relación entre Media, Mediana y Moda?", opts: ["La Media es mayor a la Mediana.", "Las tres son exactamente iguales.", "La Moda es siempre cero.", "La Mediana es mayor a la Media."], ans: 1 },
+    { q: "¿Qué indica un 'Sesgo Positivo' (Positive Skewness) en tus datos?", opts: ["Que la cola de la distribución se extiende hacia la derecha (valores altos atípicos).", "Que todos los datos son positivos.", "Que la curva es perfectamente simétrica.", "Que la cola se extiende hacia la izquierda."], ans: 0 },
+    { q: "Según la Regla Empírica (68-95-99.7), ¿Qué porcentaje de los datos cae a ±1 Desviación Estándar de la Media?", opts: ["~50%", "~68%", "~95%", "~99.7%"], ans: 1 },
+    { q: "Si quieres desplazar toda la gráfica de distribución hacia la izquierda en el eje X, debes modificar:", opts: ["La Varianza.", "La Desviación Estándar.", "La Media (μ).", "El Rango Intercuartílico."], ans: 2 }
+];
+
+// Estado del Motor Físico y Juego
+const state = {
+    canvas: null, ctx: null,
+    w: 0, h: 0,
+    balls: [],
+    pegs: [],
+    bins: [],
+    binWidth: 0,
+    numBins: 25,
+    lastTime: 0,
+    
+    // Parámetros Jugador
+    mean: 0, // -100 to 100
+    stdDev: 1.0, // 0.5 to 5.0
+    
+    // Fase de Disparo
+    isShooting: false,
+    ballsToShoot: 0,
+    ballsShot: 0,
+    shootTimer: 0,
+    
+    // Progresión
+    level: 1,
+    targetDistribution: [],
+    windForce: 0, // Fuerza lateral para sesgo
+    accuracy: 0,
+    consecutiveFails: 0
+};
+
+// Physics Constants
+const G = 500; // Gravity
+const BALL_R = 4;
+const PEG_R = 3;
+const RESTITUTION = 0.5; // Bounciness
+const DAMPING = 0.99;
+
+class Ball {
+    constructor(x, y, vx, vy) {
+        this.x = x; this.y = y;
+        this.vx = vx; this.vy = vy;
+        this.active = true;
+    }
+}
+
+function initGame() {
+    state.canvas = document.getElementById('gameCanvas');
+    state.ctx = state.canvas.getContext('2d');
+    
+    // Resize & Build Board
+    window.addEventListener('resize', buildBoard);
+    buildBoard();
+    
+    // Inputs
+    const sliderMean = document.getElementById('slider-mean');
+    const sliderStd = document.getElementById('slider-std');
+    
+    sliderMean.addEventListener('input', (e) => {
+        state.mean = parseFloat(e.target.value);
+        document.getElementById('val-mean').innerText = state.mean;
+        updateCannonUI();
+    });
+    
+    sliderStd.addEventListener('input', (e) => {
+        state.stdDev = parseFloat(e.target.value);
+        document.getElementById('val-std').innerText = state.stdDev.toFixed(1);
+    });
+    
+    document.getElementById('btn-fire').addEventListener('click', startShooting);
+    
+    generateLevel();
+    
+    state.lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+}
+
+function buildBoard() {
+    const rect = state.canvas.parentElement.getBoundingClientRect();
+    state.canvas.width = rect.width;
+    state.canvas.height = rect.height;
+    state.w = rect.width;
+    state.h = rect.height;
+    
+    state.pegs = [];
+    
+    // Generar malla hexagonal/triangular de clavos
+    const startY = 80;
+    const endY = state.h - 150; // Dejar espacio para contenedores
+    const rows = 12;
+    const spacingY = (endY - startY) / rows;
+    const spacingX = 35;
+    
+    for (let r = 0; r < rows; r++) {
+        let cols = Math.floor(state.w / spacingX) + 2;
+        let offsetX = (r % 2 === 0) ? 0 : spacingX / 2;
+        
+        for (let c = -1; c < cols; c++) {
+            state.pegs.push({
+                x: c * spacingX + offsetX,
+                y: startY + r * spacingY
+            });
         }
+    }
+    
+    // Generar Bins (Contenedores)
+    state.binWidth = state.w / state.numBins;
+    state.bins = new Array(state.numBins).fill(0);
+    
+    updateCannonUI();
+    if(state.targetDistribution.length === 0) generateTargetDistribution();
+}
 
-        function checkAnswer(ans) {
-            if(ans === clues[currentClue].ans) {
-                currentClue++;
-                renderClue();
-            } else {
-                const box = document.getElementById('dialogue-box');
-                box.style.borderColor = '#ef4444';
-                setTimeout(() => box.style.borderColor = 'rgba(255,255,255,0.1)', 300);
+function updateCannonUI() {
+    const cannon = document.getElementById('cannon-indicator');
+    // Map mean (-100 to 100) to visual position (10% to 90%)
+    const pct = 50 + (state.mean / 2.5); // (-100 -> 10%, 0 -> 50%, 100 -> 90%)
+    cannon.style.left = `clamp(10%, ${pct}%, 90%)`;
+}
+
+function getCannonX() {
+    const pct = 0.5 + (state.mean / 250); // Scale logic for logic world
+    return state.w * Math.max(0.1, Math.min(0.9, pct));
+}
+
+// Normal Distribution random generator (Box-Muller)
+function randomNormal(mean = 0, stdDev = 1) {
+    let u1 = Math.random();
+    let u2 = Math.random();
+    let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+    return z0 * stdDev + mean;
+}
+
+function startShooting() {
+    if (state.isShooting) return;
+    
+    // Reset estado
+    state.balls = [];
+    state.bins.fill(0);
+    state.isShooting = true;
+    state.ballsToShoot = 200; // Número de muestras
+    state.ballsShot = 0;
+    document.getElementById('btn-fire').disabled = true;
+    document.getElementById('btn-fire').classList.add('opacity-50', 'cursor-not-allowed');
+}
+
+// --- LEVEL DESIGN ---
+function generateLevel() {
+    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
+    
+    state.windForce = 0;
+    document.getElementById('wind-panel').classList.add('hidden');
+    
+    // Ajustar dificultad
+    if(state.level >= 4 && state.level <= 6) {
+        // Targets requieren stdDev específica
+    } else if (state.level >= 7) {
+        // Introducir Viento (Sesgo)
+        state.windForce = (Math.random() > 0.5 ? 1 : -1) * (100 + state.level * 10);
+        document.getElementById('wind-panel').classList.remove('hidden');
+        document.getElementById('wind-text').innerText = state.windForce > 0 
+            ? "Viento fuerte hacia la DERECHA (Necesitas compensar moviendo la media a la izquierda)."
+            : "Viento fuerte hacia la IZQUIERDA (Necesitas compensar moviendo la media a la derecha).";
+    }
+    
+    generateTargetDistribution();
+}
+
+function generateTargetDistribution() {
+    state.targetDistribution = new Array(state.numBins).fill(0);
+    
+    // Simular lanzamiento perfecto matemáticamente
+    // Determinar parámetros objetivo aleatorios según el nivel
+    let targetMeanIdx = Math.floor(state.numBins / 2);
+    let targetStd = 2.0;
+    
+    if (state.level >= 2) targetMeanIdx = Math.floor(Math.random() * (state.numBins - 10)) + 5; // Mover media
+    if (state.level >= 4) targetStd = (Math.random() * 3) + 1.0; // Cambiar dispersión
+    
+    const samples = 200;
+    for(let i=0; i<samples; i++) {
+        let val = randomNormal(targetMeanIdx, targetStd);
+        let bin = Math.floor(val);
+        if(bin >= 0 && bin < state.numBins) {
+            state.targetDistribution[bin]++;
+        }
+    }
+}
+
+// --- PHYSICS ENGINE ---
+function gameLoop(timestamp) {
+    const dt = Math.min((timestamp - state.lastTime) / 1000, 0.05); // Cap at 50ms to prevent tunnelling
+    state.lastTime = timestamp;
+    
+    update(dt);
+    draw();
+    
+    requestAnimationFrame(gameLoop);
+}
+
+function update(dt) {
+    if (state.isShooting) {
+        state.shootTimer -= dt;
+        if (state.shootTimer <= 0 && state.ballsShot < state.ballsToShoot) {
+            // Spawn Ball
+            const x = getCannonX();
+            // stdDev afecta la velocidad inicial X (dispersión al salir)
+            const vx = randomNormal(0, state.stdDev * 50);
+            state.balls.push(new Ball(x, 10, vx, 50));
+            state.ballsShot++;
+            state.shootTimer = 0.02; // Spawn delay
+        }
+    }
+
+    let activeBalls = 0;
+    const binTop = state.h - 100;
+
+    for (let b of state.balls) {
+        if (!b.active) continue;
+        activeBalls++;
+        
+        // Físicas básicas
+        b.vy += G * dt;
+        b.vx += state.windForce * dt; // Sesgo
+        
+        b.vx *= DAMPING;
+        b.vy *= DAMPING;
+        
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        
+        // Bordes de pantalla
+        if (b.x < BALL_R) { b.x = BALL_R; b.vx *= -RESTITUTION; }
+        if (b.x > state.w - BALL_R) { b.x = state.w - BALL_R; b.vx *= -RESTITUTION; }
+        
+        // Colisión con Clavos
+        for (let p of state.pegs) {
+            let dx = b.x - p.x;
+            let dy = b.y - p.y;
+            let distSq = dx*dx + dy*dy;
+            let minDist = BALL_R + PEG_R;
+            
+            if (distSq < minDist*minDist) {
+                let dist = Math.sqrt(distSq);
+                // Resolver solapamiento
+                let overlap = minDist - dist;
+                let nx = dx / dist;
+                let ny = dy / dist;
+                
+                b.x += nx * overlap;
+                b.y += ny * overlap;
+                
+                // Rebotar (Dot product)
+                let dot = b.vx * nx + b.vy * ny;
+                b.vx = b.vx - (1 + RESTITUTION) * dot * nx;
+                b.vy = b.vy - (1 + RESTITUTION) * dot * ny;
+                
+                // Jitter aleatorio para evitar apilamientos verticales perfectos
+                b.vx += (Math.random() - 0.5) * 20;
             }
         }
         
-        renderClue();
-    </script>
+        // Entrar en Contenedor (Bin)
+        if (b.y > binTop) {
+            let binIdx = Math.floor(b.x / state.binWidth);
+            if (binIdx >= 0 && binIdx < state.numBins) {
+                state.bins[binIdx]++;
+            }
+            b.active = false;
+        }
+    }
+    
+    // Check end of round
+    if (state.isShooting && state.ballsShot >= state.ballsToShoot && activeBalls === 0) {
+        endRound();
+    }
+}
+
+function draw() {
+    state.ctx.clearRect(0, 0, state.w, state.h);
+    
+    // Draw Pegs
+    state.ctx.fillStyle = '#64748b';
+    for (let p of state.pegs) {
+        state.ctx.beginPath();
+        state.ctx.arc(p.x, p.y, PEG_R, 0, Math.PI * 2);
+        state.ctx.fill();
+    }
+    
+    const binTop = state.h - 100;
+    
+    // Draw Target Ghost Distribution
+    state.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    state.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    state.ctx.lineWidth = 2;
+    
+    // Calculate max to scale bars
+    const maxTarget = Math.max(...state.targetDistribution, 1);
+    
+    state.ctx.beginPath();
+    state.ctx.moveTo(0, state.h);
+    for(let i=0; i<state.numBins; i++) {
+        let barH = (state.targetDistribution[i] / maxTarget) * 100;
+        let x = i * state.binWidth;
+        let y = state.h - barH;
+        state.ctx.lineTo(x + state.binWidth/2, y);
+    }
+    state.ctx.stroke();
+
+    // Draw Bins Actual
+    for(let i=0; i<state.numBins; i++) {
+        let x = i * state.binWidth;
+        // Separators
+        state.ctx.strokeStyle = '#334155';
+        state.ctx.lineWidth = 1;
+        state.ctx.beginPath(); state.ctx.moveTo(x, binTop); state.ctx.lineTo(x, state.h); state.ctx.stroke();
+        
+        // Bars
+        if(state.bins[i] > 0) {
+            let barH = (state.bins[i] / maxTarget) * 100; // Scaled to target max
+            state.ctx.fillStyle = '#E85C0B';
+            state.ctx.fillRect(x + 2, state.h - barH, state.binWidth - 4, barH);
+        }
+    }
+    
+    // Draw Balls
+    for (let b of state.balls) {
+        if (!b.active) continue;
+        state.ctx.fillStyle = '#38bdf8';
+        state.ctx.beginPath();
+        state.ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
+        state.ctx.fill();
+    }
+}
+
+function endRound() {
+    state.isShooting = false;
+    document.getElementById('btn-fire').disabled = false;
+    document.getElementById('btn-fire').classList.remove('opacity-50', 'cursor-not-allowed');
+    
+    // Calcular Error Cuadrático Medio (MSE)
+    let mse = 0;
+    for(let i=0; i<state.numBins; i++) {
+        let diff = state.bins[i] - state.targetDistribution[i];
+        mse += diff * diff;
+    }
+    mse = mse / state.numBins;
+    
+    // Map MSE to Accuracy %
+    let accuracy = Math.max(0, 100 - (mse * 2));
+    if(accuracy > 99) accuracy = 100;
+    
+    state.accuracy = accuracy;
+    
+    // UI Update
+    const bar = document.getElementById('accuracy-bar');
+    bar.style.width = `${accuracy}%`;
+    document.getElementById('accuracy-text').innerText = `${accuracy.toFixed(1)}%`;
+    
+    if (accuracy >= 75) {
+        // Success
+        bar.className = "h-full bg-green-500 transition-all duration-300";
+        state.consecutiveFails = 0;
+        setTimeout(levelUp, 1500);
+    } else {
+        // Fail
+        bar.className = "h-full bg-red-500 transition-all duration-300";
+        state.consecutiveFails++;
+        
+        if(state.consecutiveFails >= 2) {
+            setTimeout(triggerGatekeeper, 1000);
+        }
+    }
+}
+
+function levelUp() {
+    if (state.level >= 10) {
+        document.getElementById('end-modal').style.display = 'flex';
+        return;
+    }
+    state.level++;
+    generateLevel();
+    // Reset bars
+    state.bins.fill(0);
+    document.getElementById('accuracy-bar').style.width = '0%';
+    document.getElementById('accuracy-text').innerText = '0%';
+}
+
+// --- GATEKEEPER ---
+function triggerGatekeeper() {
+    state.consecutiveFails = 0;
+    const modal = document.getElementById('gatekeeper-modal');
+    const container = document.getElementById('options-container');
+    
+    const qIndex = Math.floor(Math.random() * questions.length);
+    const qData = questions[qIndex];
+    
+    document.getElementById('question-text').innerText = qData.q;
+    container.innerHTML = '';
+    
+    qData.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-secondary flex items-start gap-3";
+        btn.innerHTML = `<span class="font-bold text-secondary">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
+        btn.onclick = () => {
+            if(idx === qData.ans) {
+                modal.style.display = 'none';
+                state.bins.fill(0); // Clear current fail
+            } else {
+                btn.style.borderColor = '#ef4444';
+                btn.style.backgroundColor = 'rgba(239,68,68,0.2)';
+            }
+        };
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = 'flex';
+}
+
+window.onload = initGame;
+</script>
 </body>
 </html>
