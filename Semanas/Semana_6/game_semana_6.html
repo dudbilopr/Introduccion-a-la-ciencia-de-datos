@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Gamificado: Scatter Plot Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#003865', 
+                        secondary: '#E85C0B', 
+                        darkbg: '#0f172a',
+                        radar: 'rgba(0, 56, 101, 0.4)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            user-select: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #E85C0B;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 15px rgba(232, 92, 11, 0.9);
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: linear-gradient(to right, #ef4444, #94a3b8, #22c55e);
+            border-radius: 2px;
+        }
+        .fade-in { animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        #radar-overlay {
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+        
+        .scan-line {
+            position: absolute;
+            width: 200%;
+            height: 2px;
+            background: rgba(96, 165, 250, 0.5);
+            top: 50%; left: -50%;
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+            transform-origin: center;
+        }
+        @keyframes scan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col p-4 gap-4 relative">
+
+    <!-- HEADER: HUD Y MÉTRICAS -->
+    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.8)]">
+                <i class="fas fa-satellite-dish text-2xl text-blue-200"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Scatter Plot Navigator</h1>
+                <p class="text-sm text-gray-400 font-mono">Análisis Exploratorio de Datos (EDA) & Correlación</p>
+            </div>
+        </div>
+
+        <div class="flex gap-8 items-center">
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Sector (Nivel)</p>
+                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Integridad del Escudo</p>
+                <div class="w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
+                    <div id="health-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 100%;"></div>
+                    <span id="health-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold drop-shadow-md">100%</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA DE JUEGO PRINCIPAL -->
+    <main class="flex-1 flex flex-col gap-4 min-h-0 relative z-10">
+        
+        <!-- CANVAS CONTAINER -->
+        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden bg-[#020617] flex items-center justify-center border border-blue-900/50" id="canvas-container">
+            <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+            
+            <div id="radar-overlay" class="absolute inset-0"></div>
+            <div class="scan-line"></div>
+            
+            <!-- Target UI -->
+            <div class="absolute top-4 left-4 glass-panel p-3 rounded text-xs font-mono text-blue-300">
+                <div>Eje X: <span class="text-white">Variable Independiente (Feature)</span></div>
+                <div>Eje Y: <span class="text-white">Variable Dependiente (Target)</span></div>
+                <div class="mt-2 text-gray-400">Escaneo de Nube de Puntos detectado...</div>
+                <div id="margin-display" class="mt-1 text-secondary font-bold">Margen de Error Permitido: ±0.15</div>
+            </div>
+        </div>
+
+        <!-- CONSOLA DE MANDO -->
+        <div class="glass-panel w-full p-6 rounded-xl flex items-center gap-8 border-t-4 border-secondary">
+            
+            <div class="flex-1">
+                <div class="flex justify-between items-end mb-2">
+                    <div>
+                        <h3 class="text-lg font-bold text-white"><i class="fas fa-crosshairs text-secondary mr-2"></i>Calibrar Coeficiente de Correlación de Pearson ($r$)</h3>
+                        <p class="text-xs text-gray-400">Estima visualmente la relación lineal de la nube de datos (De -1.0 Inversa a 1.0 Directa).</p>
+                    </div>
+                    <div class="text-3xl font-mono font-bold text-white" id="r-value">0.00</div>
+                </div>
+                
+                <div class="relative pt-4 pb-2">
+                    <div class="flex justify-between text-xs font-bold text-gray-500 absolute w-full top-0">
+                        <span>-1.0 (Inversa Perfecta)</span>
+                        <span>0.0 (Sin Correlación)</span>
+                        <span>1.0 (Directa Perfecta)</span>
+                    </div>
+                    <input type="range" id="slider-r" min="-1.00" max="1.00" step="0.01" value="0.00">
+                </div>
+            </div>
+
+            <button id="btn-fire" class="bg-secondary hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-[0_0_20px_rgba(232,92,11,0.6)] flex items-center gap-3 text-xl border-2 border-orange-400 group">
+                <i class="fas fa-bolt text-yellow-300 group-hover:animate-pulse"></i> DISPARAR LÁSER
+            </button>
+        </div>
+    </main>
+
+    <!-- MODAL GATEKEEPER -->
+    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)] fade-in">
+            <div class="flex items-center gap-4 mb-6 text-red-500">
+                <i class="fas fa-radiation text-5xl animate-spin-slow"></i>
+                <h2 class="text-2xl font-bold">¡SISTEMAS CRÍTICOS: SESGO DETECTADO!</h2>
+            </div>
+            <p class="text-gray-300 mb-6 text-lg border-l-4 border-red-500 pl-4" id="question-text">El fallo al estimar la correlación ha dañado los escudos. Responde para reiniciar los sistemas:</p>
+            
+            <div class="flex flex-col gap-3" id="options-container">
+                <!-- Inyectado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL END GAME -->
+    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
+            <i class="fas fa-globe text-7xl text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Sector Asegurado</h2>
+            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Tienes una intuición experta para el Análisis Exploratorio (EDA).</p>
+            
+            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+            </div>
+
+            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
+                Nuevo Patrullaje
+            </button>
+        </div>
+    </div>
+
+<script>
+/**
+ * SCATTER PLOT NAVIGATOR ENGINE
+ */
+
+// Banco de Preguntas (Gatekeeper)
+const questions = [
+    { q: "El axioma de oro en Ciencia de Datos es: 'Correlación NO implica...'", opts: ["Varianza.", "Causalidad.", "Regresión.", "Normalidad."], ans: 1 },
+    { q: "Un Coeficiente de Correlación de Pearson (r) de -0.9 indica que:", opts: ["No hay ninguna relación entre las variables.", "A medida que X aumenta, Y disminuye fuertemente.", "El modelo tiene un error del 90%.", "A medida que X aumenta, Y aumenta fuertemente."], ans: 1 },
+    { q: "¿Qué sucede con el coeficiente de correlación de Pearson si hay un valor atípico (Outlier) extremo en los datos?", opts: ["Nada, Pearson es completamente robusto a outliers.", "Se transforma en Correlación de Spearman.", "Puede alterarse drásticamente (sesgarse), engañando al analista.", "Siempre se vuelve 0.0."], ans: 2 },
+    { q: "Si los puntos forman un patrón de parábola (U) perfecta en el Scatter Plot, el coeficiente de correlación lineal de Pearson (r) será cercano a:", opts: ["1.0", "-1.0", "0.0, porque mide relación LINEAL, no curvas.", "0.5"], ans: 2 },
+    { q: "Para variables categóricas u ordinales que no cumplen supuestos de normalidad, en lugar de Pearson, usamos:", opts: ["Correlación de Spearman.", "Transformación Box-Cox.", "Z-Score.", "Regresión Lineal Simple."], ans: 0 }
+];
+
+// Estado
+const state = {
+    canvas: null, ctx: null,
+    w: 0, h: 0,
+    points: [],
+    particles: [],
+    
+    // Nivel y Lógica
+    level: 1,
+    trueR: 0, // Correlación real generada
+    guessR: 0, // Estimación del jugador
+    errorMargin: 0.15,
+    health: 100,
+    
+    // Animación Láser
+    isFiring: false,
+    fireTimer: 0,
+    fireSuccess: false,
+    
+    lastTime: 0,
+    cameraScale: 1
+};
+
+class DataPoint {
+    constructor(x, y, isOutlier=false) {
+        this.nx = x; // Normalized X (-1 to 1)
+        this.ny = y; // Normalized Y (-1 to 1)
+        this.isOutlier = isOutlier;
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.destroyed = false;
+    }
+    
+    // Convert to screen coordinates
+    getScreenCoords(cw, ch) {
+        const scale = Math.min(cw, ch) * 0.4;
+        return {
+            x: cw/2 + this.nx * scale,
+            y: ch/2 - this.ny * scale // Y is inverted on screen
+        };
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 500;
+        this.vy = (Math.random() - 0.5) * 500;
+        this.life = 1.0;
+    }
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= dt * 2;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, 4, 4);
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+function initGame() {
+    state.canvas = document.getElementById('gameCanvas');
+    state.ctx = state.canvas.getContext('2d');
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    // Controles
+    const sliderR = document.getElementById('slider-r');
+    sliderR.addEventListener('input', (e) => {
+        state.guessR = parseFloat(e.target.value);
+        let displayStr = state.guessR.toFixed(2);
+        if(state.guessR > 0) displayStr = "+" + displayStr;
+        
+        const valElem = document.getElementById('r-value');
+        valElem.innerText = displayStr;
+        
+        // Color feedback on slider thumb based on value (Blue -, Gray 0, Orange +)
+        if(state.guessR < -0.1) valElem.className = "text-3xl font-mono font-bold text-blue-400";
+        else if(state.guessR > 0.1) valElem.className = "text-3xl font-mono font-bold text-secondary";
+        else valElem.className = "text-3xl font-mono font-bold text-gray-400";
+    });
+    
+    document.getElementById('btn-fire').addEventListener('click', fireLaser);
+    
+    generateLevel();
+    
+    state.lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+}
+
+function resizeCanvas() {
+    const rect = state.canvas.parentElement.getBoundingClientRect();
+    state.canvas.width = rect.width;
+    state.canvas.height = rect.height;
+    state.w = rect.width;
+    state.h = rect.height;
+}
+
+// Generador de números aleatorios normales (Box-Muller)
+function randomNormal() {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+function generateLevel() {
+    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
+    state.points = [];
+    
+    // Difficulty Settings
+    let numPoints = 50 + (state.level * 10);
+    state.errorMargin = 0.15 - (state.level * 0.01);
+    document.getElementById('margin-display').innerText = `Margen de Error Permitido: ±${state.errorMargin.toFixed(2)}`;
+    
+    // Determinar Correlación Real
+    // Level 10: Non-linear trap
+    if (state.level === 10) {
+        state.trueR = 0;
+        for(let i=0; i<numPoints; i++) {
+            let x = (Math.random() * 2) - 1; // -1 to 1
+            let y = (x * x * 2 - 1) + (randomNormal() * 0.1); // Parabola + noise
+            state.points.push(new DataPoint(x, y));
+        }
+    } else {
+        // Linear generation using Cholesky Decomposition logic
+        // For levels 1-3: Strong correlations. Levels 4-6: Weak.
+        let strength = (Math.random() > 0.5 ? 1 : -1);
+        if(state.level <= 3) state.trueR = strength * (0.7 + Math.random() * 0.25); // 0.7 to 0.95
+        else if(state.level <= 6) state.trueR = strength * (0.3 + Math.random() * 0.3); // 0.3 to 0.6
+        else state.trueR = strength * (0.1 + Math.random() * 0.8); // Random 7-9
+        
+        let hasOutliers = (state.level >= 7);
+        
+        for(let i=0; i<numPoints; i++) {
+            let u = randomNormal();
+            let v = randomNormal();
+            
+            // Transform to get desired correlation
+            let x = u;
+            let y = state.trueR * u + Math.sqrt(1 - state.trueR*state.trueR) * v;
+            
+            // Normalize to roughly -1 to 1 visually
+            x = x * 0.3; 
+            y = y * 0.3;
+            
+            state.points.push(new DataPoint(x, y));
+        }
+        
+        // Add extreme outliers to mess with visual perception
+        if (hasOutliers) {
+            for(let i=0; i<3; i++) {
+                let ox = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random()*0.2);
+                let oy = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random()*0.2);
+                state.points.push(new DataPoint(ox, oy, true));
+            }
+        }
+    }
+    
+    // Reset Slider visually to 0
+    document.getElementById('slider-r').value = 0;
+    document.getElementById('slider-r').dispatchEvent(new Event('input'));
+}
+
+function fireLaser() {
+    if(state.isFiring) return;
+    
+    document.getElementById('btn-fire').disabled = true;
+    state.isFiring = true;
+    state.fireTimer = 2.0; // Seconds animation
+    
+    // Calculate Error
+    let diff = Math.abs(state.trueR - state.guessR);
+    state.fireSuccess = (diff <= state.errorMargin);
+    
+    if(!state.fireSuccess) {
+        // If fail, ship takes damage based on error
+        let dmg = Math.min(30, Math.max(10, diff * 30));
+        applyDamage(dmg);
+    }
+}
+
+function applyDamage(amount) {
+    state.health -= amount;
+    if (state.health <= 0) state.health = 0;
+    
+    const bar = document.getElementById('health-bar');
+    const pct = state.health;
+    bar.style.width = `${pct}%`;
+    document.getElementById('health-text').innerText = `${pct.toFixed(0)}%`;
+    
+    if(pct <= 30) bar.className = "h-full bg-red-500 transition-all duration-300";
+    else if(pct <= 60) bar.className = "h-full bg-yellow-500 transition-all duration-300";
+    
+    // Shake screen
+    state.canvas.style.transform = 'translate(10px, 10px)';
+    setTimeout(() => state.canvas.style.transform = 'translate(-10px, -10px)', 50);
+    setTimeout(() => state.canvas.style.transform = 'translate(0, 0)', 100);
+}
+
+function gameLoop(timestamp) {
+    const dt = Math.min((timestamp - state.lastTime) / 1000, 0.05);
+    state.lastTime = timestamp;
+    
+    update(dt);
+    draw(timestamp);
+    
+    requestAnimationFrame(gameLoop);
+}
+
+function update(dt) {
+    // Particles
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+        state.particles[i].update(dt);
+        if (state.particles[i].life <= 0) state.particles.splice(i, 1);
+    }
+    
+    // Laser Animation logic
+    if (state.isFiring) {
+        state.fireTimer -= dt;
+        
+        // At mid point, destroy points if success, or launch missiles if fail
+        if (state.fireTimer < 1.0 && state.fireTimer + dt >= 1.0) {
+            if (state.fireSuccess) {
+                // Destroy all points
+                state.points.forEach(p => {
+                    const c = p.getScreenCoords(state.w, state.h);
+                    for(let k=0; k<5; k++) state.particles.push(new Particle(c.x, c.y, '#22c55e'));
+                    p.destroyed = true;
+                });
+            } else {
+                // Points attack ship (center)
+                if(state.health <= 0) {
+                    setTimeout(triggerGatekeeper, 500);
+                }
+            }
+        }
+        
+        if (state.fireTimer <= 0) {
+            state.isFiring = false;
+            document.getElementById('btn-fire').disabled = false;
+            if(state.fireSuccess) {
+                setTimeout(levelUp, 500);
+            }
+        }
+    }
+}
+
+function draw(timestamp) {
+    state.ctx.clearRect(0, 0, state.w, state.h);
+    
+    const cx = state.w / 2;
+    const cy = state.h / 2;
+    const scale = Math.min(state.w, state.h) * 0.4;
+    
+    // Draw Cartesian Axes
+    state.ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    state.ctx.lineWidth = 1;
+    // Grid
+    for(let i=-5; i<=5; i++) {
+        let px = cx + (i/5)*scale;
+        state.ctx.beginPath(); state.ctx.moveTo(px, 0); state.ctx.lineTo(px, state.h); state.ctx.stroke();
+        let py = cy + (i/5)*scale;
+        state.ctx.beginPath(); state.ctx.moveTo(0, py); state.ctx.lineTo(state.w, py); state.ctx.stroke();
+    }
+    // Main axes
+    state.ctx.strokeStyle = 'rgba(96,165,250,0.5)';
+    state.ctx.lineWidth = 2;
+    state.ctx.beginPath(); state.ctx.moveTo(cx, 0); state.ctx.lineTo(cx, state.h); state.ctx.stroke(); // Y
+    state.ctx.beginPath(); state.ctx.moveTo(0, cy); state.ctx.lineTo(state.w, cy); state.ctx.stroke(); // X
+    
+    // Draw Player Guess Laser Line
+    if (state.guessR !== 0 || state.isFiring) {
+        state.ctx.save();
+        state.ctx.translate(cx, cy);
+        
+        // Slope = guessR. Angle = atan(-guessR) because Y is inverted
+        let angle = Math.atan(-state.guessR);
+        
+        if(state.isFiring) {
+            state.ctx.strokeStyle = state.fireSuccess ? '#22c55e' : '#ef4444';
+            state.ctx.lineWidth = 8;
+            state.ctx.shadowColor = state.fireSuccess ? '#22c55e' : '#ef4444';
+            state.ctx.shadowBlur = 20;
+        } else {
+            state.ctx.strokeStyle = '#E85C0B';
+            state.ctx.lineWidth = 3;
+            state.ctx.setLineDash([10, 10]);
+        }
+        
+        state.ctx.rotate(angle);
+        state.ctx.beginPath();
+        state.ctx.moveTo(-state.w, 0);
+        state.ctx.lineTo(state.w, 0);
+        state.ctx.stroke();
+        state.ctx.restore();
+    }
+
+    // Draw True Line (Ghost) if fired
+    if (state.isFiring && !state.fireSuccess) {
+        state.ctx.save();
+        state.ctx.translate(cx, cy);
+        let angle = Math.atan(-state.trueR);
+        state.ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        state.ctx.lineWidth = 2;
+        state.ctx.rotate(angle);
+        state.ctx.beginPath();
+        state.ctx.moveTo(-state.w, 0);
+        state.ctx.lineTo(state.w, 0);
+        state.ctx.stroke();
+        state.ctx.restore();
+        
+        // Draw Text Hint
+        state.ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        state.ctx.font = '14px monospace';
+        state.ctx.fillText(`Error Real: ${state.trueR.toFixed(2)} (Tu estimación: ${state.guessR.toFixed(2)})`, 20, state.h - 20);
+    }
+
+    // Draw Data Points
+    for (let p of state.points) {
+        if(p.destroyed) continue;
+        
+        let c = p.getScreenCoords(state.w, state.h);
+        
+        // Pulsing effect
+        let pulse = Math.sin(timestamp/300 + p.pulsePhase) * 1.5;
+        
+        state.ctx.fillStyle = p.isOutlier ? '#a855f7' : '#60a5fa'; // Purple for outliers, blue for normal
+        if(state.isFiring && !state.fireSuccess && state.fireTimer < 1.0) {
+            state.ctx.fillStyle = '#ef4444'; // Turn red when attacking
+        }
+        
+        state.ctx.beginPath();
+        state.ctx.arc(c.x, c.y, 4 + pulse, 0, Math.PI*2);
+        state.ctx.fill();
+        
+        // Glow
+        state.ctx.shadowBlur = 10;
+        state.ctx.shadowColor = state.ctx.fillStyle;
+        state.ctx.fill();
+        state.ctx.shadowBlur = 0;
+    }
+    
+    // Draw Particles
+    for (let p of state.particles) p.draw(state.ctx);
+}
+
+function levelUp() {
+    if (state.level >= 10) {
+        document.getElementById('end-modal').style.display = 'flex';
+        return;
+    }
+    state.level++;
+    
+    // Restore some health on level up
+    state.health = Math.min(100, state.health + 20);
+    applyDamage(0); // Updates UI
+    
+    generateLevel();
+}
+
+// --- GATEKEEPER ---
+function triggerGatekeeper() {
+    const modal = document.getElementById('gatekeeper-modal');
+    const container = document.getElementById('options-container');
+    
+    const qIndex = Math.floor(Math.random() * questions.length);
+    const qData = questions[qIndex];
+    
+    document.getElementById('question-text').innerText = qData.q;
+    container.innerHTML = '';
+    
+    qData.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-red-500 flex items-start gap-3";
+        btn.innerHTML = `<span class="font-bold text-red-400">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
+        btn.onclick = () => {
+            if(idx === qData.ans) {
+                modal.style.display = 'none';
+                state.health = 50; // Restore to 50%
+                applyDamage(0);
+                generateLevel(); // Retry level with new data
+            } else {
+                btn.style.borderColor = '#ef4444';
+                btn.style.backgroundColor = 'rgba(239,68,68,0.4)';
+            }
+        };
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = 'flex';
+}
+
+window.onload = initGame;
+</script>
+</body>
+</html>
