@@ -240,6 +240,22 @@
             border-radius: 3px;
         }
 
+        .reveal .slides section {
+            max-height: 95vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px; /* Space for scrollbar */
+        }
+
+        /* Custom Premium Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--data-orange); 
+            border-radius: 4px; 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
+
         /* Contenedores de Gráficos Plotly */
         .plotly-container {
             width: 100%;
