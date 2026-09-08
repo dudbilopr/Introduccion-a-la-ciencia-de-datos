@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Gamificado: Decision Tree Lumberjack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#003865', 
+                        secondary: '#E85C0B', 
+                        darkbg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            user-select: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #E85C0B;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(232, 92, 11, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        .fade-in { animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .region-btn {
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .region-btn.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        .gini-badge {
+            font-family: monospace;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col p-4 gap-4 relative">
+
+    <!-- HEADER: HUD Y MÉTRICAS -->
+    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.8)]">
+                <i class="fas fa-tree text-2xl text-blue-200"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Decision Tree Lumberjack</h1>
+                <p class="text-sm text-gray-400 font-mono">Partición Ortogonal, Impureza de Gini & Overfitting</p>
+            </div>
+        </div>
+
+        <div class="flex gap-8 items-center">
+            <div class="text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Nivel</p>
+                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
+            </div>
+            
+            <div class="text-center min-w-[120px] bg-black/40 p-2 rounded-lg border border-gray-600">
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Gini Global Promedio</p>
+                <p class="text-2xl font-bold text-green-400 font-mono" id="gini-display">0.500</p>
+            </div>
+            
+            <div class="text-center min-w-[120px] bg-red-900/30 p-2 rounded-lg border border-red-500/50">
+                <p class="text-[10px] text-red-400 uppercase tracking-widest font-bold mb-1">Profundidad (Depth)</p>
+                <p class="text-2xl font-bold text-red-400 font-mono"><span id="depth-display">0</span> / <span id="max-depth-display">3</span></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA DE JUEGO PRINCIPAL -->
+    <main class="flex-1 flex gap-4 min-h-0 relative z-10">
+        
+        <!-- SIDEBAR DE CONTROLES -->
+        <aside class="w-80 glass-panel rounded-xl p-4 flex flex-col gap-4">
+            
+            <div class="bg-gray-800/80 p-3 rounded-lg text-sm text-gray-300 border border-gray-700">
+                <p class="font-bold text-blue-400 mb-1"><i class="fas fa-info-circle mr-1"></i> Misión:</p>
+                <p id="mission-text">Realiza cortes ortogonales para separar las clases. Logra un Gini promedio < 0.05 antes de superar la profundidad máxima.</p>
+            </div>
+
+            <!-- Regiones Activas -->
+            <div class="flex flex-col gap-2">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nodos Hoja Activos (Selecciona para cortar)</h3>
+                <div id="regions-container" class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 my-2"></div>
+
+            <!-- Controles de Corte -->
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Eje de Corte (Feature)</label>
+                    <div class="flex bg-black/40 rounded-lg p-1 border border-gray-600">
+                        <button id="btn-axis-x" class="flex-1 py-2 text-sm font-bold bg-blue-600 rounded text-white shadow">Eje X</button>
+                        <button id="btn-axis-y" class="flex-1 py-2 text-sm font-bold text-gray-400 hover:text-white rounded">Eje Y</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Umbral (Threshold)</label>
+                        <span id="val-threshold" class="text-secondary font-mono font-bold text-sm">0.00</span>
+                    </div>
+                    <input type="range" id="slider-threshold" min="0" max="100" step="0.5" value="50">
+                    <p class="text-[10px] text-gray-500 mt-1" id="split-preview">Simulando: Gini esperado 0.00</p>
+                </div>
+            </div>
+
+            <div class="mt-auto flex flex-col gap-2">
+                <button id="btn-split" class="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-[0_0_20px_rgba(232,92,11,0.4)] text-lg border-2 border-orange-400">
+                    <i class="fas fa-cut mr-2"></i> REALIZAR CORTE
+                </button>
+                <button id="btn-reset" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition text-sm">
+                    <i class="fas fa-trash-can mr-2"></i> Podar Árbol (Reset)
+                </button>
+            </div>
+            
+        </aside>
+
+        <!-- CANVAS CONTAINER -->
+        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden bg-[#020617]" id="canvas-container">
+            <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+            
+            <div id="cut-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-200 z-20"></div>
+        </div>
+    </main>
+
+    <!-- MODAL GATEKEEPER INTERPRETATIVO -->
+    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border-2 border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.3)] fade-in">
+            <div class="flex items-center gap-4 mb-4">
+                <i class="fas fa-exclamation-triangle text-5xl text-red-500"></i>
+                <h2 class="text-2xl font-bold text-white" id="gatekeeper-title">LÍMITE ALCANZADO</h2>
+            </div>
+            
+            <!-- Contexto dinámico basado en lo que el jugador acaba de ver -->
+            <div class="bg-black/40 p-4 rounded-lg mb-6 border border-gray-700">
+                <p class="text-gray-300 text-lg italic" id="context-text">"Error: Exceso de profundidad."</p>
+            </div>
+
+            <p class="text-red-300 font-bold mb-4 text-xl" id="question-text">Interpreta el fallo geométrico del modelo:</p>
+            
+            <div class="flex flex-col gap-3" id="options-container">
+                <!-- Inyectado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL END GAME -->
+    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
+            <i class="fas fa-trophy text-7xl text-green-400 mb-6 drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]"></i>
+            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Certificación Máxima: Arquitecto ML</h2>
+            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Has superado todas las pruebas del Ecosistema de Machine Learning.</p>
+            
+            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
+                <i class="fas fa-star text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"></i>
+                <i class="fas fa-star text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"></i>
+                <i class="fas fa-star text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"></i>
+            </div>
+
+            <p class="text-sm text-gray-400 mb-6 italic">Has dominado Regresión, Clasificación, Clustering, Optimización y Árboles de Decisión.</p>
+
+            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
+                Reiniciar Ecosistema
+            </button>
+        </div>
+    </div>
+
+<script>
+/**
+ * DECISION TREE LUMBERJACK ENGINE
+ */
+
+const state = {
+    canvas: null, ctx: null,
+    w: 0, h: 0,
+    
+    level: 1,
+    points: [], // {x, y, label} 0=Blue, 1=Orange
+    
+    // Árbol / Regiones
+    regions: [], // Array de rectángulos {id, x, y, width, height, points[], gini, depth}
+    selectedRegionId: 0,
+    maxDepth: 3,
+    
+    // Controles de corte temporal
+    cutAxis: 'x', // 'x' o 'y'
+    cutValue: 50, // porcentaje (0 a 100)
+    
+    nextRegionId: 1
+};
+
+function initGame() {
+    state.canvas = document.getElementById('gameCanvas');
+    state.ctx = state.canvas.getContext('2d');
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    // Eventos UI
+    document.getElementById('btn-axis-x').addEventListener('click', () => setAxis('x'));
+    document.getElementById('btn-axis-y').addEventListener('click', () => setAxis('y'));
+    
+    const slider = document.getElementById('slider-threshold');
+    slider.addEventListener('input', (e) => {
+        state.cutValue = parseFloat(e.target.value);
+        document.getElementById('val-threshold').innerText = state.cutValue.toFixed(1) + "%";
+        updateSplitPreview();
+        draw();
+    });
+    
+    document.getElementById('btn-split').addEventListener('click', executeSplit);
+    document.getElementById('btn-reset').addEventListener('click', generateLevel);
+    
+    generateLevel();
+    requestAnimationFrame(gameLoop);
+}
+
+function resizeCanvas() {
+    const rect = state.canvas.parentElement.getBoundingClientRect();
+    state.canvas.width = rect.width;
+    state.canvas.height = rect.height;
+    state.w = rect.width;
+    state.h = rect.height;
+    draw();
+}
+
+function randomNormal(mean=0, std=1) {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return z * std + mean;
+}
+
+function calculateGini(points) {
+    if (points.length === 0) return 0;
+    let p0 = points.filter(p => p.label === 0).length / points.length;
+    let p1 = points.filter(p => p.label === 1).length / points.length;
+    return 1 - (p0*p0 + p1*p1);
+}
+
+function getWeightedGini(pts1, pts2) {
+    let total = pts1.length + pts2.length;
+    if (total === 0) return 0;
+    return (pts1.length/total) * calculateGini(pts1) + (pts2.length/total) * calculateGini(pts2);
+}
+
+function initRootRegion() {
+    state.regions = [];
+    state.nextRegionId = 1;
+    let root = {
+        id: 0,
+        x: 0, y: 0,
+        width: state.w, height: state.h,
+        points: [...state.points],
+        gini: calculateGini(state.points),
+        depth: 0
+    };
+    state.regions.push(root);
+    selectRegion(0);
+}
+
+function setAxis(axis) {
+    state.cutAxis = axis;
+    if(axis === 'x') {
+        document.getElementById('btn-axis-x').className = "flex-1 py-2 text-sm font-bold bg-blue-600 rounded text-white shadow";
+        document.getElementById('btn-axis-y').className = "flex-1 py-2 text-sm font-bold text-gray-400 hover:text-white rounded";
+    } else {
+        document.getElementById('btn-axis-y').className = "flex-1 py-2 text-sm font-bold bg-blue-600 rounded text-white shadow";
+        document.getElementById('btn-axis-x').className = "flex-1 py-2 text-sm font-bold text-gray-400 hover:text-white rounded";
+    }
+    updateSplitPreview();
+    draw();
+}
+
+function selectRegion(id) {
+    state.selectedRegionId = id;
+    renderRegionsUI();
+    updateSplitPreview();
+    draw();
+}
+
+function renderRegionsUI() {
+    const container = document.getElementById('regions-container');
+    container.innerHTML = '';
+    state.regions.forEach(r => {
+        const btn = document.createElement('button');
+        btn.className = `region-btn p-2 rounded text-xs flex justify-between items-center ${r.id === state.selectedRegionId ? 'selected' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`;
+        
+        // Determinar clase dominante para color visual
+        let n0 = r.points.filter(p => p.label===0).length;
+        let n1 = r.points.filter(p => p.label===1).length;
+        let domColor = n0 > n1 ? 'text-blue-400' : (n1 > n0 ? 'text-orange-400' : 'text-gray-400');
+        if(r.points.length === 0) domColor = 'text-gray-600';
+        
+        btn.innerHTML = `
+            <span class="font-bold ${domColor}">R-${r.id} (D:${r.depth})</span>
+            <span class="gini-badge ${r.gini < 0.05 ? 'text-green-400' : 'text-red-300'}">Gini: ${r.gini.toFixed(2)}</span>
+        `;
+        btn.onclick = () => selectRegion(r.id);
+        container.appendChild(btn);
+    });
+    
+    // Update global metrics
+    let totalPoints = state.points.length;
+    let globalGini = 0;
+    let maxDepth = 0;
+    state.regions.forEach(r => {
+        if(r.depth > maxDepth) maxDepth = r.depth;
+        globalGini += (r.points.length / totalPoints) * r.gini;
+    });
+    
+    document.getElementById('gini-display').innerText = globalGini.toFixed(3);
+    if(globalGini < 0.05) document.getElementById('gini-display').className = "text-2xl font-bold text-green-400 font-mono animate-pulse";
+    else document.getElementById('gini-display').className = "text-2xl font-bold text-secondary font-mono";
+    
+    document.getElementById('depth-display').innerText = maxDepth;
+}
+
+function generateLevel() {
+    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
+    state.points = [];
+    
+    const cx = state.w / 2;
+    const cy = state.h / 2;
+    
+    if (state.level <= 3) {
+        state.maxDepth = 2; // Suficiente para 2 o 3 cortes
+        document.getElementById('mission-text').innerText = "Cortes simples ortogonales. Aísla las nubes de puntos.";
+        // Cuadrantes
+        for(let i=0; i<40; i++) state.points.push({x: cx - 150 + randomNormal(0,30), y: cy - 100 + randomNormal(0,30), label: 0});
+        for(let i=0; i<40; i++) state.points.push({x: cx + 150 + randomNormal(0,30), y: cy + 100 + randomNormal(0,30), label: 1});
+    } else if (state.level <= 6) {
+        state.maxDepth = 4; // Límite estricto para forzar a ver el fallo de escalera
+        document.getElementById('mission-text').innerHTML = "<span class='text-red-400 font-bold'>¡Alerta de Topología!</span> Datos Diagonales. El Árbol solo corta en recto (X o Y).";
+        
+        // Línea diagonal
+        for(let i=-200; i<200; i+=10) {
+            state.points.push({x: cx + i + randomNormal(0, 20), y: cy - i + randomNormal(0, 20), label: 0}); // Diagonal 1
+            state.points.push({x: cx + i + randomNormal(0, 20), y: cy - i + 150 + randomNormal(0, 20), label: 1}); // Diagonal 2
+        }
+    } else {
+        state.maxDepth = 3; 
+        document.getElementById('mission-text').innerHTML = "<span class='text-red-400 font-bold'>¡Trampa de Overfitting!</span> Existe un punto espía. Si intentas aislarlo desperdiciarás tu profundidad.";
+        
+        // Clase 0 masiva izquierda
+        for(let i=0; i<80; i++) state.points.push({x: cx - 150 + randomNormal(0,50), y: cy + randomNormal(0,80), label: 0});
+        // Clase 1 masiva derecha
+        for(let i=0; i<80; i++) state.points.push({x: cx + 150 + randomNormal(0,50), y: cy + randomNormal(0,80), label: 1});
+        
+        // Trampa (Outlier en el territorio enemigo)
+        state.points.push({x: cx - 150, y: cy, label: 1}); // Naranja en medio del azul
+    }
+    
+    document.getElementById('max-depth-display').innerText = state.maxDepth;
+    initRootRegion();
+}
+
+function getSplitParams(region) {
+    let pxCut = 0, pyCut = 0;
+    if (state.cutAxis === 'x') {
+        pxCut = region.x + (state.cutValue / 100) * region.width;
+    } else {
+        pyCut = region.y + (state.cutValue / 100) * region.height;
+    }
+    return { pxCut, pyCut };
+}
+
+function updateSplitPreview() {
+    let reg = state.regions.find(r => r.id === state.selectedRegionId);
+    if(!reg) return;
+    
+    let { pxCut, pyCut } = getSplitParams(reg);
+    
+    let pts1 = [], pts2 = [];
+    reg.points.forEach(p => {
+        if (state.cutAxis === 'x') {
+            if(p.x < pxCut) pts1.push(p); else pts2.push(p);
+        } else {
+            if(p.y < pyCut) pts1.push(p); else pts2.push(p);
+        }
+    });
+    
+    let newGini = getWeightedGini(pts1, pts2);
+    const pv = document.getElementById('split-preview');
+    pv.innerText = `Simulando: Gini resultante ${newGini.toFixed(3)} (Actual: ${reg.gini.toFixed(3)})`;
+    
+    if (newGini < reg.gini - 0.001) pv.className = "text-[10px] text-green-400 mt-1 font-bold";
+    else pv.className = "text-[10px] text-red-400 mt-1 font-bold";
+}
+
+function executeSplit() {
+    let regIndex = state.regions.findIndex(r => r.id === state.selectedRegionId);
+    if(regIndex === -1) return;
+    let reg = state.regions[regIndex];
+    
+    if (reg.depth >= state.maxDepth) {
+        triggerGatekeeper("LÍMITE DE PROFUNDIDAD (OVERFITTING)", "Has alcanzado la profundidad máxima del árbol y aún no has separado los datos.",
+        "¿Por qué es peligroso dejar que un Árbol de Decisión crezca infinitamente (profundidad infinita)?",
+        ["Porque se vuelve demasiado rápido.", "Porque memoriza el ruido y los outliers (Overfitting), perdiendo capacidad de generalizar a datos nuevos.", "Porque el Gini se vuelve negativo.", "Porque automáticamente se convierte en un Random Forest."],
+        1, true);
+        return;
+    }
+    
+    let { pxCut, pyCut } = getSplitParams(reg);
+    
+    let pts1 = [], pts2 = [];
+    reg.points.forEach(p => {
+        if (state.cutAxis === 'x') {
+            if(p.x < pxCut) pts1.push(p); else pts2.push(p);
+        } else {
+            if(p.y < pyCut) pts1.push(p); else pts2.push(p);
+        }
+    });
+    
+    let newGini = getWeightedGini(pts1, pts2);
+    
+    // Si no hay ganancia de información (tolerancia baja)
+    if (newGini >= reg.gini - 0.001) {
+        // Cut failed visual feedback
+        document.getElementById('canvas-container').classList.add('border-2', 'border-red-500');
+        setTimeout(() => document.getElementById('canvas-container').classList.remove('border-2', 'border-red-500'), 300);
+        return;
+    }
+    
+    // Flash effect
+    const flash = document.getElementById('cut-flash');
+    flash.style.opacity = '0.5';
+    setTimeout(() => flash.style.opacity = '0', 200);
+    
+    // Efectuar división geométrica
+    let reg1 = { id: state.nextRegionId++, points: pts1, gini: calculateGini(pts1), depth: reg.depth + 1 };
+    let reg2 = { id: state.nextRegionId++, points: pts2, gini: calculateGini(pts2), depth: reg.depth + 1 };
+    
+    if (state.cutAxis === 'x') {
+        reg1.x = reg.x; reg1.y = reg.y; reg1.width = pxCut - reg.x; reg1.height = reg.height;
+        reg2.x = pxCut; reg2.y = reg.y; reg2.width = (reg.x + reg.width) - pxCut; reg2.height = reg.height;
+    } else {
+        reg1.x = reg.x; reg1.y = reg.y; reg1.width = reg.width; reg1.height = pyCut - reg.y;
+        reg2.x = reg.x; reg2.y = pyCut; reg2.width = reg.width; reg2.height = (reg.y + reg.height) - pyCut;
+    }
+    
+    // Reemplazar nodo padre por los dos hijos
+    state.regions.splice(regIndex, 1);
+    state.regions.push(reg1, reg2);
+    
+    // Seleccionar automáticamente la región hija más impura
+    state.selectedRegionId = reg1.gini >= reg2.gini ? reg1.id : reg2.id;
+    
+    renderRegionsUI();
+    updateSplitPreview();
+    draw();
+    
+    checkWinCondition();
+}
+
+function checkWinCondition() {
+    let totalPoints = state.points.length;
+    let globalGini = 0;
+    state.regions.forEach(r => {
+        globalGini += (r.points.length / totalPoints) * r.gini;
+    });
+    
+    if (globalGini < 0.05) {
+        if(state.level === 10) {
+            setTimeout(() => document.getElementById('end-modal').style.display = 'flex', 1000);
+        } else {
+            setTimeout(levelUp, 1000);
+        }
+    } else if (state.level > 3 && state.level <= 6) {
+        // En los niveles diagonales, verificar si se quedó sin profundidad
+        let allMaxed = state.regions.every(r => r.depth >= state.maxDepth || r.gini === 0);
+        if (allMaxed && globalGini >= 0.05) {
+            triggerGatekeeper("LÍMITE GEOMÉTRICO (DIAGONALES)", "Tus cortes en forma de escalera consumieron toda la profundidad permitida sin aislar la clase diagonal.",
+            "Visualmente, ¿Por qué un solo Árbol de Decisión sufre tanto con relaciones diagonales o curvas?",
+            ["Porque Gini solo funciona con números negativos.", "Porque sus divisiones siempre son ortogonales (rectas paralelas a los ejes X e Y), forzándolo a aproximar curvas haciendo 'escaleras' de muchos cortes pequeños.", "Porque los árboles no pueden ver colores.", "Es un mito, los árboles son los mejores para curvas."],
+            1, false);
+        }
+    }
+}
+
+function levelUp() {
+    if(state.level >= 10) return;
+    state.level++;
+    generateLevel();
+}
+
+function gameLoop() {
+    // Para animar partículas o pulsos en el futuro
+    requestAnimationFrame(gameLoop);
+}
+
+function draw() {
+    if (!state.ctx) return;
+    state.ctx.clearRect(0, 0, state.w, state.h);
+    
+    // Dibujar Regiones Físicas
+    state.regions.forEach(r => {
+        // Fondo tintado basado en clase mayoritaria (Opacidad basada en pureza)
+        let n0 = r.points.filter(p => p.label===0).length;
+        let n1 = r.points.filter(p => p.label===1).length;
+        
+        state.ctx.beginPath();
+        state.ctx.rect(r.x, r.y, r.width, r.height);
+        
+        if (n0 === 0 && n1 === 0) {
+            state.ctx.fillStyle = 'rgba(0,0,0,0)';
+        } else {
+            // Mientras más puro (gini cerca de 0), más opaco el color de fondo
+            let alpha = 0.05 + ((0.5 - r.gini) * 0.4); 
+            state.ctx.fillStyle = n0 > n1 ? `rgba(59, 130, 246, ${alpha})` : `rgba(249, 115, 22, ${alpha})`;
+            state.ctx.fill();
+        }
+        
+        // Bordes de la región
+        state.ctx.strokeStyle = r.id === state.selectedRegionId ? 'rgba(59, 130, 246, 0.8)' : 'rgba(255,255,255,0.2)';
+        state.ctx.lineWidth = r.id === state.selectedRegionId ? 2 : 1;
+        state.ctx.stroke();
+    });
+    
+    // Dibujar Puntos
+    state.points.forEach(p => {
+        state.ctx.beginPath();
+        state.ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+        state.ctx.fillStyle = p.label === 0 ? '#3b82f6' : '#f97316';
+        state.ctx.fill();
+    });
+    
+    // Dibujar Corte Propuesto (Láser de corte)
+    let reg = state.regions.find(r => r.id === state.selectedRegionId);
+    if(reg) {
+        let { pxCut, pyCut } = getSplitParams(reg);
+        
+        state.ctx.strokeStyle = '#E85C0B';
+        state.ctx.lineWidth = 3;
+        state.ctx.setLineDash([10, 5]);
+        state.ctx.shadowBlur = 10;
+        state.ctx.shadowColor = '#E85C0B';
+        
+        state.ctx.beginPath();
+        if(state.cutAxis === 'x') {
+            state.ctx.moveTo(pxCut, reg.y);
+            state.ctx.lineTo(pxCut, reg.y + reg.height);
+        } else {
+            state.ctx.moveTo(reg.x, pyCut);
+            state.ctx.lineTo(reg.x + reg.width, pyCut);
+        }
+        state.ctx.stroke();
+        
+        state.ctx.setLineDash([]);
+        state.ctx.shadowBlur = 0;
+    }
+}
+
+// --- GATEKEEPER INTERPRETATIVO ---
+function triggerGatekeeper(title, context, question, opts, correctAns, isOverfittingTrap=false) {
+    const modal = document.getElementById('gatekeeper-modal');
+    const container = document.getElementById('options-container');
+    
+    document.getElementById('gatekeeper-title').innerText = title;
+    document.getElementById('context-text').innerText = `"${context}"`;
+    document.getElementById('question-text').innerText = question;
+    
+    container.innerHTML = '';
+    
+    opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-red-500 flex items-start gap-3";
+        btn.innerHTML = `<span class="font-bold text-red-400">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
+        btn.onclick = () => {
+            if(idx === correctAns) {
+                modal.style.display = 'none';
+                if(isOverfittingTrap && state.level >= 7) {
+                    // Passed the overfitting test trap! Win the game!
+                    document.getElementById('end-modal').style.display = 'flex';
+                } else {
+                    generateLevel(); // Retries level
+                }
+            } else {
+                btn.style.borderColor = '#ef4444';
+                btn.style.backgroundColor = 'rgba(239,68,68,0.4)';
+            }
+        };
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = 'flex';
+}
+
+window.onload = initGame;
+</script>
+</body>
+</html>
