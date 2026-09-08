@@ -418,6 +418,7 @@
                             <button id="btn-video" onclick="switchTab('video')" class="tab-btn active px-6 py-3 whitespace-nowrap"><i class="fas fa-video mr-2"></i>Video Lecture</button>
                             <button id="btn-theory" onclick="switchTab('theory')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-chalkboard-teacher mr-2"></i>Teoría e Interactividad</button>
                             <button id="btn-lab" onclick="switchTab('lab')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fab fa-python mr-2"></i>Laboratorio Jupyter</button>
+                            <button id="btn-taller" onclick="switchTab('taller')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-file-pdf mr-2"></i>Taller Práctico</button>
                             <button id="btn-game" onclick="switchTab('game')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-gamepad mr-2"></i>Reto Gamificado</button>
                             <button id="btn-quiz" onclick="switchTab('quiz')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-tasks mr-2"></i>Evaluación</button>
                         </div>
@@ -457,6 +458,22 @@
                                 <!-- Render de Jupyter Notebook -->
                                 <div class="w-full h-[800px] overflow-y-auto bg-white">
                                     <iframe src="Semanas/Semana_${data.w}/Colab_Guiado_Semana_${data.w}_render.html" width="100%" height="100%" frameborder="0" style="background: white;" onerror="this.outerHTML='<div class=\\'p-10 text-center text-gray-500\\'><i class=\\'fas fa-tools text-4xl mb-4\\'></i><p>El cuaderno renderizado no está disponible para esta semana. Usa el botón de Colab.</p></div>'"></iframe>
+                                </div>
+                            </div>
+
+                            <!-- TAB: TALLER PRÁCTICO -->
+                            <div id="content-taller" class="tab-content p-0">
+                                <div class="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                                    <div>
+                                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200"><i class="fas fa-file-pdf text-red-600 mr-2"></i>Taller Práctico (Retos Autónomos)</h3>
+                                        <p class="text-sm text-gray-500 mt-1">Guía PDF con ejercicios para resolución independiente.</p>
+                                    </div>
+                                    <a href="Semanas/Semana_${data.w}/Taller_Semana_${data.w}.pdf" target="_blank" class="bg-primary text-white px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-blue-900 transition flex items-center gap-2">
+                                        <i class="fas fa-download"></i> Descargar PDF
+                                    </a>
+                                </div>
+                                <div class="w-full h-[800px] bg-slate-100">
+                                    <iframe src="Semanas/Semana_${data.w}/Taller_Semana_${data.w}.pdf" width="100%" height="100%" frameborder="0" onerror="this.outerHTML='<div class=\\'p-10 text-center text-gray-500\\'><i class=\\'fas fa-tools text-4xl mb-4\\'></i><p>El Taller en PDF aún no está disponible para esta semana.</p></div>'"></iframe>
                                 </div>
                             </div>
 

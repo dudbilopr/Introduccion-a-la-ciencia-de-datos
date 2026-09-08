@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Gamificado: Semana 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#003865', secondary: '#E85C0B', darkbg: '#0f172a' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .chart-card { transition: all 0.3s; cursor: pointer; }
+        .chart-card:hover { border-color: #E85C0B; background: rgba(232, 92, 11, 0.1); transform: scale(1.02); }
+        .chart-card.selected { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); }
+        .matched { visibility: hidden; opacity: 0; transition: opacity 0.3s; }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="glass-panel w-full max-w-5xl rounded-2xl p-8 relative">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-chart-pie text-secondary mr-3"></i>Reto: Visualización de Datos</h1>
+            <p class="text-gray-300">Selecciona el caso de uso arriba, y luego el gráfico correcto abajo para hacer match.</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 mb-8" id="cases-container">
+            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="scatter">Mostrar la relación (correlación) entre dos variables continuas.</div>
+            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="bar">Comparar categorías distintas (Ej. Ventas por país).</div>
+            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="line">Mostrar la tendencia de una variable a lo largo del tiempo.</div>
+        </div>
+
+        <div class="h-px w-full bg-white/20 mb-8"></div>
+
+        <div class="grid grid-cols-3 gap-6" id="charts-container">
+            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="line">
+                <i class="fas fa-chart-line text-5xl text-blue-300"></i>
+                <span class="font-bold tracking-wide">Gráfico de Líneas</span>
+            </div>
+            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="scatter">
+                <i class="fas fa-project-diagram text-5xl text-green-300"></i>
+                <span class="font-bold tracking-wide">Gráfico de Dispersión</span>
+            </div>
+            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="bar">
+                <i class="fas fa-chart-bar text-5xl text-yellow-300"></i>
+                <span class="font-bold tracking-wide">Gráfico de Barras</span>
+            </div>
+        </div>
+
+        <div id="end-screen" class="absolute inset-0 bg-slate-900/90 backdrop-blur-md rounded-2xl hidden flex-col items-center justify-center z-10">
+            <h2 class="text-4xl font-bold text-green-400 mb-4">¡Excelente Análisis!</h2>
+            <p class="text-xl text-gray-300 mb-8">Comprendes qué gráfico usar para cada propósito.</p>
+            <button onclick="location.reload()" class="bg-primary text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-900 transition">Reintentar</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedCase = null;
+        let matches = 0;
+
+        document.querySelectorAll('.case-card').forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('matched')) return;
+                document.querySelectorAll('.case-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedCase = card;
+            });
+        });
+
+        document.querySelectorAll('.chart-card').forEach(chart => {
+            chart.addEventListener('click', () => {
+                if(!selectedCase) return;
+                
+                const caseId = selectedCase.getAttribute('data-id');
+                const chartId = chart.getAttribute('data-id');
+
+                if(caseId === chartId) {
+                    // Match!
+                    selectedCase.classList.add('matched');
+                    chart.classList.add('matched');
+                    selectedCase.classList.remove('selected');
+                    selectedCase = null;
+                    matches++;
+                    
+                    if(matches === 3) {
+                        setTimeout(() => {
+                            document.getElementById('end-screen').style.display = 'flex';
+                        }, 500);
+                    }
+                } else {
+                    // Error
+                    chart.classList.add('border-red-500');
+                    setTimeout(() => chart.classList.remove('border-red-500'), 400);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Gamificado: Semana 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#003865', secondary: '#E85C0B', darkbg: '#0f172a' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .stat-btn { transition: all 0.2s; }
+        .stat-btn:hover { transform: scale(1.05); }
+        .fade-in { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="glass-panel w-full max-w-4xl rounded-2xl p-8 relative">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-calculator text-secondary mr-3"></i>Reto: Detective Estadístico</h1>
+            <p class="text-gray-300">Descubre la métrica estadística correcta según la pista del detective.</p>
+        </div>
+
+        <div class="flex items-start gap-6 mb-10">
+            <div class="w-24 h-24 rounded-full bg-blue-900 flex items-center justify-center border-4 border-blue-400 flex-shrink-0 shadow-[0_0_15px_rgba(96,165,250,0.5)]">
+                <i class="fas fa-user-secret text-4xl text-blue-200"></i>
+            </div>
+            <div class="glass-panel p-6 rounded-xl rounded-tl-none flex-1 relative fade-in" id="dialogue-box">
+                <h3 class="text-sm font-bold text-secondary uppercase tracking-wider mb-2">Pista del Caso</h3>
+                <p class="text-xl text-gray-200" id="clue-text">"Necesito saber cuál es el valor que parte mis datos exactamente por la mitad, sin importar que hayan millonarios extremos distorsionando la realidad."</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="buttons-container">
+            <button onclick="checkAnswer('media')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-blue-500 hover:bg-white/10">Media</button>
+            <button onclick="checkAnswer('mediana')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-green-500 hover:bg-white/10">Mediana</button>
+            <button onclick="checkAnswer('moda')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-yellow-500 hover:bg-white/10">Moda</button>
+            <button onclick="checkAnswer('desviacion')" class="stat-btn glass-panel py-4 px-2 rounded-lg font-bold text-center border-b-4 border-transparent hover:border-purple-500 hover:bg-white/10">Desv. Estándar</button>
+        </div>
+
+        <div id="end-screen" class="absolute inset-0 bg-slate-900/95 backdrop-blur-xl rounded-2xl hidden flex-col items-center justify-center z-10 fade-in">
+            <i class="fas fa-search-dollar text-7xl text-blue-400 mb-6"></i>
+            <h2 class="text-4xl font-bold text-white mb-2">¡Caso Cerrado!</h2>
+            <p class="text-xl text-gray-300 mb-8">Dominas el lenguaje de la Estadística Descriptiva.</p>
+            <button onclick="location.reload()" class="bg-secondary text-white font-bold px-8 py-3 rounded-lg hover:bg-orange-600 transition shadow-lg">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        const clues = [
+            { text: '"Necesito saber cuál es el valor que parte mis datos exactamente por la mitad, es muy robusto contra los datos atípicos (outliers)."', ans: 'mediana' },
+            { text: '"Quiero saber cuál fue el producto más vendido en nuestra tienda. Simplemente el que más se repite en la base de datos."', ans: 'moda' },
+            { text: '"Quiero un número que me diga, en promedio, qué tan alejados están los datos del centro. Si es grande, hay mucha variabilidad."', ans: 'desviacion' },
+            { text: '"Es el centro de gravedad numérico. Si sumas todo y lo divides entre la cantidad de datos, lo obtienes, pero ¡cuidado con los outliers!"', ans: 'media' }
+        ];
+
+        let currentClue = 0;
+
+        function renderClue() {
+            if(currentClue >= clues.length) {
+                document.getElementById('end-screen').style.display = 'flex';
+                return;
+            }
+            const el = document.getElementById('clue-text');
+            el.innerText = clues[currentClue].text;
+            document.getElementById('dialogue-box').classList.remove('fade-in');
+            void document.getElementById('dialogue-box').offsetWidth;
+            document.getElementById('dialogue-box').classList.add('fade-in');
+        }
+
+        function checkAnswer(ans) {
+            if(ans === clues[currentClue].ans) {
+                currentClue++;
+                renderClue();
+            } else {
+                const box = document.getElementById('dialogue-box');
+                box.style.borderColor = '#ef4444';
+                setTimeout(() => box.style.borderColor = 'rgba(255,255,255,0.1)', 300);
+            }
+        }
+        
+        renderClue();
+    </script>
+</body>
+</html>

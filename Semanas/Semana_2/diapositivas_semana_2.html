@@ -3,64 +3,161 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Introducción a la Ciencia de Datos - Semana 2</title>
+    <title>Ciencia de Datos - Semana 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
 
     <style>
         :root {
             --data-blue: #003865;
             --data-orange: #E85C0B;
+            --cyber-dark: #050510;
+            --neon-cyan: #00ffcc;
+            --neon-pink: #ff007f;
         }
 
-        .reveal h1,
-        .reveal h2,
-        .reveal h3,
-        .reveal h4 {
+        body { font-family: 'Inter', sans-serif; }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
             color: var(--data-blue);
             text-transform: none;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .reveal h2 {
-            border-bottom: 2px solid var(--data-orange);
+            border-bottom: 3px solid var(--data-orange);
             display: inline-block;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 30px;
         }
 
-        .accent {
-            color: var(--data-orange);
-        }
+        .accent { color: var(--data-orange) !important; font-weight: bold; }
+        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
 
-        .reveal li {
-            margin-bottom: 15px;
-        }
-
-        .reveal .controls {
-            color: var(--data-orange);
-        }
-
-        .reveal .progress {
-            color: var(--data-orange);
-        }
+        .reveal .controls, .reveal .progress { color: var(--data-orange); }
 
         .icon-container {
-            font-size: 3rem;
+            font-size: 5rem;
             color: var(--data-orange);
             margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
         
-        .box {
-            background-color: #f4f4f4;
-            border-left: 8px solid var(--data-orange);
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 5px;
+        .box-glass {
+            background: rgba(240, 244, 248, 0.9);
+            border-left: 6px solid var(--data-orange);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: left;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            color: #333;
             font-size: 0.9em;
         }
+
+        .reveal.cyber-mode,
+        .reveal.cyber-mode .slide-background,
+        .reveal.cyber-mode .slide-background-content {
+            background-color: var(--cyber-dark) !important;
+        }
+
+        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
+            color: #fff !important;
+        }
+
+        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
+
+        .reveal.cyber-mode .box-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-left: 6px solid var(--neon-cyan);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .split-layout {
+            display: flex; gap: 30px; align-items: stretch;
+            height: 100%;
+        }
+        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+        .quote-container {
+            position: relative;
+            padding: 30px 40px;
+            background: #f9f9f9;
+            border-left: 8px solid var(--data-blue);
+            font-style: italic;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+        .quote-container::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-size: 6rem;
+            color: rgba(0, 56, 101, 0.1);
+            font-family: Georgia, serif;
+        }
+        .quote-author {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            font-style: normal;
+            color: var(--data-orange);
+            text-align: right;
+        }
+
+        .reveal .slides section {
+            max-height: 95vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
+
+        pre { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
+
+        /* Icon Grid */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .icon-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .icon-card:hover { transform: translateY(-5px); border-color: var(--data-orange); }
+        .icon-card i { font-size: 3rem; color: var(--data-blue); margin-bottom: 10px; }
     </style>
 </head>
 
@@ -71,189 +168,275 @@
             <!-- Slide 1: Título -->
             <section>
                 <div class="icon-container">
-                    <i class="fa-solid fa-database"></i>
+                    <i class="fab fa-python"></i>
                 </div>
-                <h1>Introducción a la Ciencia de Datos</h1>
-                <h3>Semana 2: Ecosistema Python y <span class="accent">Colab</span></h3>
-                <p>
-                    <small>Programa de Ciencia de Datos - Data10.easy</small>
-                </p>
+                <h1>Ciencia de Datos</h1>
+                <h3>Semana 2: <span class="accent">Fundamentos de Python</span></h3>
+                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
             </section>
 
             <!-- Slide 2: Introducción y RAE -->
             <section>
                 <section>
-                    <h2><i class="fa-solid fa-door-open"></i> Introducción</h2>
-                    <div class="box">
-                        <p>Bienvenidos al ecosistema Python. En la Ciencia de Datos, las herramientas que elegimos dictan la eficiencia de nuestro trabajo.</p>
-                        <p>Hoy estableceremos nuestra base operativa: el lenguaje Python y los entornos de desarrollo interactivos en la nube, para pasar de la teoría pura a la ejecución práctica sin fricciones técnicas.</p>
+                    <h2><i class="fa-solid fa-code"></i> El Entorno de Trabajo</h2>
+                    <p>Por qué Python domina el mundo de los datos.</p>
+                    <div class="box-glass">
+                        <p>No se trata de aprender otro lenguaje de programación, sino de adoptar la filosofía "Pythonic": código legible, simple e intuitivo diseñado para trabajar con datos eficientemente.</p>
+                        <hr>
+                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta:</h4>
+                        <p class="text-center" style="font-weight:bold;">¿Por qué un Científico de Datos usa Python en lugar de Java o C++?</p>
                     </div>
                 </section>
                 <section>
-                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje (RAE)</h2>
-                    <div class="box">
+                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
+                    <div class="box-glass">
                         <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Reconocer la sintaxis básica y los tipos de datos fundamentales del lenguaje Python.</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Operar un entorno de Jupyter Notebook en la nube utilizando Google Colab.</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Implementar librerías de análisis numérico (Pandas) para la construcción de datos estructurados.</li>
+                            <li class="fragment"><strong>RAE 1:</strong> Configurar el ecosistema interactivo (Jupyter Notebooks, Colab).</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Dominar las estructuras de datos nativas (Listas, Tuplas, Diccionarios).</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Entender y aplicar la filosofía "Pythonic" de Joel Grus.</li>
                         </ul>
                     </div>
                 </section>
-            </section>
-
-            <!-- Slide 3: Reglas -->
-            <section>
-                <h2><i class="fa-solid fa-clipboard-check"></i> Reglas de Oro</h2>
-                <ul>
-                    <li class="fragment">Puntualidad: La clase inicia a las <strong class="accent">7:00 AM</strong>.</li>
-                    <li class="fragment">Participación Activa: No hay respuestas equivocadas.</li>
-                    <li class="fragment">Pausas Cognitivas: Fundamentales para asimilar la información.</li>
-                </ul>
             </section>
 
             <!-- Slide 3: Agenda -->
             <section>
                 <h2><i class="fa-solid fa-list"></i> Agenda</h2>
-                <ul>
-                    <li class="fragment">Espacio EMI (English as a Medium of Instruction)</li>
-                    <li class="fragment">Teoría: El lenguaje Python</li>
-                    <li class="fragment">Google Colab vs. Entornos Locales</li>
-                    <li class="fragment">Práctica: Pair Programming con Datos Sintéticos</li>
-                </ul>
-            </section>
-
-            <!-- Slide 5: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-book-open-reader"></i> Glosario de Términos</h2>
-                <div class="box" style="font-size: 0.9rem;">
-                    <ul>
-                        <li><strong class="accent">Librería (Library):</strong> Colección de código preescrito que los programadores pueden usar para optimizar tareas.</li>
-                        <li><strong class="accent">Jupyter Notebook:</strong> Documento interactivo que combina código ejecutable, ecuaciones, visualizaciones y texto narrativo.</li>
-                        <li><strong class="accent">Datos Sintéticos:</strong> Información generada artificialmente en lugar de ser producida por eventos del mundo real, muy útil para pruebas y entrenamiento de algoritmos.</li>
-                    </ul>
+                <div class="split-layout">
+                    <div>
+                        <ul>
+                            <li class="fragment">¿Por qué Python? (El Zen de Python)</li>
+                            <li class="fragment">Jupyter Notebooks: El lienzo interactivo</li>
+                            <li class="fragment">Tipos de Datos y Operadores</li>
+                            <li class="fragment">Estructuras Base: Listas, Tuplas y Diccionarios</li>
+                            <li class="fragment">Control de Flujo (If, For, While)</li>
+                            <li class="fragment">Glosario EMI & Pair Programming</li>
+                        </ul>
+                    </div>
+                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
+                        <i class="fab fa-python text-gray-300" style="font-size:8rem;"></i>
+                    </div>
                 </div>
             </section>
 
-            <!-- Slide 6: EMI Space -->
+            <!-- Slide 4: Filosofía Pythonic -->
             <section>
-                <section>
-                    <h2><i class="fa-solid fa-globe"></i> EMI Space</h2>
-                    <h3 class="accent">Data Types and Classifications</h3>
-                    <p class="fragment">Vamos a la pizarra digital.</p>
-                </section>
-                <section>
-                    <h2><i class="fa-brands fa-youtube"></i> Video Analysis</h2>
-                    <p>Six Data Types</p>
-                    <div class="box fragment">
-                        Presten atención a las dos formas de clasificar la información.
+                <h2><i class="fa-solid fa-yin-yang"></i> La Filosofía Pythonic</h2>
+                <div class="split-layout">
+                    <div class="quote-container" style="font-size: 0.95rem;">
+                        "Existen muchas maneras de escribir código en Python, pero generalmente hay una, y preferiblemente solo una, manera <strong>obvia</strong> de hacerlo. Esa manera es la que llamamos 'Pythonic'. La legibilidad cuenta."
+                        <span class="quote-author">— Data Science from Scratch (Joel Grus)</span>
                     </div>
-                </section>
-            </section>
-
-            <!-- Slide 5: Python -->
-            <section>
-                <section>
-                    <h2><i class="fa-brands fa-python"></i> ¿Qué es Python?</h2>
-                    <ul>
-                        <li class="fragment">Lenguaje de programación de <strong>alto nivel</strong>.</li>
-                        <li class="fragment">Interpretado y multiparadigma.</li>
-                        <li class="fragment">Sintaxis clara y legible (casi como leer inglés).</li>
-                        <li class="fragment">El estándar actual en <span class="accent">Ciencia de Datos</span> e Inteligencia Artificial.</li>
-                    </ul>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-cubes"></i> El Ecosistema</h2>
-                    <p>Python no trabaja solo. Se apoya en librerías:</p>
-                    <ul>
-                        <li class="fragment"><strong class="accent">Pandas:</strong> Manipulación y análisis de datos tabulares (como Excel pero con esteroides).</li>
-                        <li class="fragment"><strong class="accent">NumPy:</strong> Cálculo numérico y matricial.</li>
-                        <li class="fragment"><strong class="accent">Matplotlib/Seaborn:</strong> Visualización de datos.</li>
-                    </ul>
-                </section>
-            </section>
-
-            <!-- Slide 6: Colab -->
-            <section>
-                <h2><i class="fa-brands fa-google"></i> Google Colab</h2>
-                <ul>
-                    <li class="fragment">Un entorno de <em>Jupyter Notebook</em> en la nube.</li>
-                    <li class="fragment"><strong>Cero Configuración:</strong> No requieres instalar nada localmente.</li>
-                    <li class="fragment">Permite intercalar código, resultados y texto explicativo (Markdown).</li>
-                    <li class="fragment">Se guarda automáticamente en <span class="accent">Google Drive</span>.</li>
-                </ul>
-            </section>
-
-            <!-- Slide 7: Práctica -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-laptop-code"></i> Pair Programming</h2>
-                    <p>Programación en parejas para el taller práctico.</p>
-                    <div class="box fragment">
-                        <strong>Piloto:</strong> Escribe el código.<br>
-                        <strong>Copiloto:</strong> Revisa, busca errores y guía la lógica.
-                    </div>
-                    <p class="fragment accent"><i class="fa-solid fa-rotate"></i> ¡Cambiaremos roles a la mitad!</p>
-                </section>
-                <section>
-                    <h2>El Reto de Hoy</h2>
-                    <h3>Generación de Datos Sintéticos</h3>
-                    <ul>
-                        <li class="fragment">Simularemos ser analistas de una tienda sin datos históricos.</li>
-                        <li class="fragment">Generaremos registros aleatorios (productos, ventas, fechas) usando Python.</li>
-                        <li class="fragment">Convertiremos estos datos a un <strong>DataFrame de Pandas</strong>.</li>
-                        <li class="fragment">Analizaremos las métricas principales.</li>
-                    </ul>
-                </section>
-            </section>
-
-            <!-- Slide 10: Conclusiones y Bibliografía -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-flag-checkered"></i> Conclusiones</h2>
-                    <div class="box">
+                    <div class="box-glass fragment">
+                        <h3 class="accent">El Zen de Python (Tim Peters)</h3>
                         <ul>
-                            <li class="fragment">Python es el lenguaje dominante en Ciencia de Datos gracias a su ecosistema abierto (Pandas, Numpy).</li>
-                            <li class="fragment">Google Colab elimina las barreras de configuración inicial y estandariza el entorno de desarrollo para todo el equipo.</li>
-                            <li class="fragment">El Pair Programming no solo mejora el código, sino que fomenta la comunicación de hallazgos analíticos.</li>
+                            <li>Hermoso es mejor que feo.</li>
+                            <li>Explícito es mejor que implícito.</li>
+                            <li>Simple es mejor que complejo.</li>
+                            <li>Plano es mejor que anidado.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Jupyter Notebooks -->
+            <section>
+                <h2><i class="fa-solid fa-book"></i> Jupyter Notebooks</h2>
+                <p>Donde el código, la teoría y los resultados coexisten.</p>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <p>A diferencia del desarrollo de software tradicional (donde se compila todo un proyecto), en Data Science necesitamos interactuar paso a paso con los datos. Jupyter nos permite dividir el código en <strong>Celdas</strong>.</p>
+                        <p class="accent mt-4"><strong>Google Colab:</strong> Es un Jupyter Notebook alojado en la nube de Google. Cero configuraciones, hardware gratuito.</p>
+                    </div>
+                    <div class="icon-grid fragment">
+                        <div class="icon-card">
+                            <i class="fa-solid fa-code"></i>
+                            <h4>Celda de Código</h4>
+                            <p style="font-size:0.75rem;">Ejecuta Python y mantiene variables en memoria.</p>
+                        </div>
+                        <div class="icon-card">
+                            <i class="fa-brands fa-markdown"></i>
+                            <h4>Celda de Texto</h4>
+                            <p style="font-size:0.75rem;">Soporta Markdown y LaTeX ($\LaTeX$) para documentar.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Estructuras de Datos -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-layer-group"></i> Estructuras Core</h2>
+                    <p>La forma en que organizas los datos antes de aplicar los algoritmos.</p>
+                    <div class="box-glass">
+                        <ul>
+                            <li><strong>Listas (List):</strong> Colecciones ordenadas, mutables. <code>[1, 2, 'tres']</code></li>
+                            <li><strong>Tuplas (Tuple):</strong> Colecciones ordenadas, <strong>inmutables</strong>. <code>(1, 2)</code></li>
+                            <li><strong>Diccionarios (Dict):</strong> Colecciones clave-valor. <code>{'nombre': 'Juan'}</code></li>
+                            <li><strong>Sets:</strong> Colecciones sin elementos duplicados. <code>{1, 2, 3}</code></li>
                         </ul>
                     </div>
                 </section>
                 <section>
-                    <h2><i class="fa-solid fa-book"></i> Bibliografía</h2>
-                    <div class="box" style="font-size: 0.9rem;">
-                        <ul>
-                            <li>Guttag, J. V. (2021). <em>Introduction to Computation and Programming Using Python</em>. MIT Press.</li>
-                            <li>Documentación Oficial de Python: <a href="https://docs.python.org/3/" target="_blank">docs.python.org</a></li>
-                            <li>Google Colab Tutorial Oficial: <a href="https://colab.research.google.com/" target="_blank">colab.research.google.com</a></li>
-                        </ul>
+                    <h2><i class="fa-solid fa-code-compare"></i> Listas vs Tuplas</h2>
+                    <div class="split-layout">
+                        <div class="box-glass">
+                            <h3 class="accent">La Lista (Mutable)</h3>
+                            <pre><code class="python" data-trim data-noescape>
+                            # Se define con corchetes
+                            mi_lista = [10, 20, 30]
+                            
+                            # Puedo alterar sus elementos
+                            mi_lista[0] = 99
+                            print(mi_lista) 
+                            # Salida: [99, 20, 30]
+                            </code></pre>
+                        </div>
+                        <div class="box-glass fragment">
+                            <h3 class="accent">La Tupla (Inmutable)</h3>
+                            <pre><code class="python" data-trim data-noescape>
+                            # Se define con paréntesis
+                            mi_tupla = (10, 20, 30)
+                            
+                            # ESTO LANZA UN ERROR:
+                            mi_tupla[0] = 99
+                            # TypeError: 'tuple' object does 
+                            # not support item assignment
+                            </code></pre>
+                            <p style="font-size:0.8rem; color:#d9534f; font-weight:bold;">Se usan para retornar múltiples valores de una función o para proteger datos que no deben cambiar.</p>
+                        </div>
                     </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-key"></i> El Poder de los Diccionarios</h2>
+                    <div class="quote-container" style="font-size: 0.95rem;">
+                        "Si solo pudieras llevar una estructura de datos a una isla desierta, debería ser el Diccionario. Es la estructura fundamental de Python."
+                        <span class="quote-author">— Data Science from Scratch</span>
+                    </div>
+                    <pre><code class="python" data-trim data-noescape>
+                    # Se definen con llaves {clave: valor}
+                    alumno = {
+                        "nombre": "Pedro",
+                        "calificaciones": [4.5, 3.8, 5.0],
+                        "aprobado": True
+                    }
+
+                    # Búsqueda ultra-rápida (O(1))
+                    print(alumno["calificaciones"])
+                    </code></pre>
                 </section>
             </section>
 
-            <!-- Slide 11: Cierre -->
+            <!-- Slide 7: Glosario -->
             <section>
-                <h2><i class="fa-brands fa-github"></i> Portafolio y Cierre</h2>
-                <ul>
-                    <li class="fragment">Descarguen su Notebook <code>(.ipynb)</code> de Colab.</li>
-                    <li class="fragment">Hagan su primer <strong>Push</strong> a su repositorio de GitHub.</li>
-                </ul>
-                <div class="box fragment">
-                    <h3 class="accent">¡Nos vemos la próxima semana!</h3>
+                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <ul>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>String:</strong> Cadena de Texto.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Integer / Float:</strong> Entero / Decimal.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Boolean:</strong> Booleano (True/False).</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass">
+                        <ul>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>List / Tuple / Dictionary:</strong> Lista / Tupla / Diccionario.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Loop (For/While):</strong> Bucle o Ciclo.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Function / Method:</strong> Función / Método.</li>
+                        </ul>
+                    </div>
                 </div>
+            </section>
+
+            <!-- Slide 8: Pair Programming -->
+            <section data-state="cyber-mode">
+                <h2><i class="fa-solid fa-terminal"></i> Pair Programming</h2>
+                <div class="box-glass">
+                    <h3 class="cyber-accent">Misión: Fundamentos e Inicialización</h3>
+                    <p>Abran Google Colab y carguen el <code>Fundamentos_Python_Semana2.ipynb</code>.</p>
+                    <p>Aprenderemos la sintaxis base, a estructurar la lógica mediante identación (no usamos llaves <code>{}</code> en Python), a manipular listas con List Comprehensions y a estructurar datos JSON-like mediante Diccionarios.</p>
+                    <p><i class="fa-solid fa-code" style="color: #00ffcc;"></i> ¡Manos a la obra!</p>
+                </div>
+            </section>
+
+            <!-- Slide 9: Cyber Status y Conclusiones -->
+            <section data-state="cyber-mode">
+                <section>
+                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
+                    <div class="box-glass" style="min-height: 200px;">
+                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
+                    <div class="box-glass" style="margin-bottom: 20px;">
+                        <ul>
+                            <li>Python no prioriza el rendimiento puro de la máquina, prioriza <strong>el rendimiento del programador</strong> mediante código legible.</li>
+                            <li>Los Jupyter Notebooks (Colab) son el lienzo iterativo donde los datos cobran vida sin compilar proyectos masivos.</li>
+                            <li>Los Diccionarios y Listas son la base de casi toda estructura de datos compleja (como los DataFrames de Pandas).</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
+                        <strong>Bibliografía de la Clase:</strong>
+                        <ul>
+                            <li>Grus, J. (2019). <em>Data Science from Scratch: First Principles with Python</em>. O'Reilly Media.</li>
+                            <li>McKinney, W. (2017). <em>Python for Data Analysis</em>. O'Reilly Media.</li>
+                        </ul>
+                    </div>
+                </section>
             </section>
 
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    
     <script>
         Reveal.initialize({
-            hash: true,
-            transition: 'zoom', // convex, slide, zoom, fade
-            controls: true,
-            progress: true,
+            hash: true, transition: 'slide', controls: true, progress: true,
+            margin: 0.1, minScale: 0.2, maxScale: 2.0,
+            mathjax2: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_HTML-full',
+                tex2jax: {
+                    inlineMath: [['$','$'], ['\\(','\\)']],
+                    displayMath: [['$$','$$'], ['\\[','\\]']]
+                }
+            },
+            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
+        });
+
+        var typedInstance = null;
+
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
+                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
+                setTimeout(() => {
+                    typedInstance = new Typed('#typed-output', {
+                        strings: [
+                            "> Analizando entorno de ejecución (Colab)...",
+                            "> Memoria RAM asignada. Kernel iniciado.",
+                            "> Escaneando sintaxis: PEP-8 validado.",
+                            "> Listas indexadas y Diccionarios mapeados.",
+                            "> SISTEMA ESTABLE Y PYTHONIC.",
+                            "> [TAREA]: Ejecutar celdas en el Notebook de Fundamentos."
+                        ],
+                        typeSpeed: 30,
+                        backSpeed: 10,
+                        loop: false,
+                        showCursor: true,
+                        cursorChar: '█'
+                    });
+                }, 500);
+            } else if (typedInstance) {
+                typedInstance.destroy();
+                var el = document.getElementById('typed-output');
+                if(el) el.innerHTML = '';
+            }
         });
     </script>
 </body>
-
 </html>

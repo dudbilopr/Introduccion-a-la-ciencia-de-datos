@@ -414,12 +414,12 @@
                     <div class="split-layout">
                         <div class="box-glass">
                             <h3 class="accent">Varianza ($s^2$)</h3>
-                            <p style="font-size: 1.2rem; text-align: center;">$s^2 = \frac{\sum (x_i - \bar{x})^2}{n - 1}$</p>
+                            <div style="font-size: 1.2rem; text-align: center;">$$s^2 = \frac{\sum (x_i - \bar{x})^2}{n - 1}$$</div>
                             <p>Dividimos por $n-1$ (grados de libertad para muestras). Penaliza fuertemente a los outliers, pero sus unidades son irreales (ej. $ dólares cuadrados).</p>
                         </div>
                         <div class="box-glass fragment">
                             <h3 class="accent">Desviación Estándar ($s$)</h3>
-                            <p style="font-size: 1.2rem; text-align: center;">$s = \sqrt{s^2}$</p>
+                            <div style="font-size: 1.2rem; text-align: center;">$$s = \sqrt{s^2}$$</div>
                             <p>La raíz cuadrada de la Varianza. Es la <strong>métrica reina</strong> porque regresa a la escala original de los datos.</p>
                         </div>
                     </div>
@@ -429,12 +429,12 @@
                     <p>El Rango simple (Max - Min) es inútil y frágil si hay outliers reales.</p>
                     <div class="box-glass fragment">
                         <h4 class="accent">1. Rango Intercuartílico (IQR)</h4>
-                        <p style="text-align: center; font-weight:bold;">$IQR = Q_3 - Q_1$</p>
+                        <div style="text-align: center; font-weight:bold;">$$IQR = Q_3 - Q_1$$</div>
                         <p>La diferencia entre el percentil 75 (Q3) y el percentil 25 (Q1). Representa el <strong>corazón del 50%</strong> de los datos centrales, ignorando las colas extremas.</p>
                     </div>
                     <div class="box-glass fragment">
                         <h4 class="accent">2. Desviación Absoluta de la Mediana (MAD)</h4>
-                        <p style="text-align: center; font-weight:bold;">$MAD = \text{Mediana}(|x_i - \tilde{x}|)$</p>
+                        <div style="text-align: center; font-weight:bold;">$$MAD = \text{Mediana}(|x_i - \tilde{x}|)$$</div>
                         <p>La mediana de las diferencias absolutas de todos los datos respecto a su propia mediana. Es la métrica matemáticamente más inmune a los extremos.</p>
                     </div>
                 </section>
@@ -495,7 +495,7 @@
                     </div>
                     <div class="box-glass fragment">
                         <h3 class="accent">Correlación de Pearson ($r$)</h3>
-                        <p style="font-size: 1.1rem; text-align: center;">$r = \frac{Cov(x,y)}{s_x s_y}$</p>
+                        <div style="font-size: 1.1rem; text-align: center;">$$r = \frac{Cov(x,y)}{s_x s_y}$$</div>
                         <p>Mide la <strong>fuerza</strong> de la relación lineal en un rango exacto de <code>-1 a 1</code>.</p>
                         <div style="background:#fdf2f2; border-left:4px solid #d9534f; padding:8px; margin-top:10px; font-size:0.85em;">
                             <strong style="color:#d9534f;">¡Límite!</strong> Pearson solo mide relaciones lineales y es muy sensible a outliers.
@@ -575,7 +575,7 @@
         <span class="close-modal" onclick="closeModals()">&times;</span>
         <h2 class="accent"><i class="fa-solid fa-scale-unbalanced"></i> Media Aritmética</h2>
         <p>Suma de todos los valores dividida por el número de observaciones.</p>
-        <p style="font-size: 1.5rem; text-align: center;">$\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i$</p>
+        <div style="font-size: 1.5rem; text-align: center;">$$\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i$$</div>
         <p>Sensible a valores extremos. Ideal para distribuciones simétricas.</p>
     </div>
 
@@ -583,7 +583,7 @@
         <span class="close-modal" onclick="closeModals()">&times;</span>
         <h2 class="accent"><i class="fa-solid fa-align-center"></i> Mediana</h2>
         <p>Valor central de un conjunto de datos ordenados. Divide el conjunto por la mitad.</p>
-        <p style="font-size: 1.5rem; text-align: center;">$\tilde{x} = x_{(n+1)/2}$</p>
+        <div style="font-size: 1.5rem; text-align: center;">$$\tilde{x} = x_{(n+1)/2}$$</div>
         <p>Robusta ante outliers. Ideal para salarios o distribuciones sesgadas.</p>
     </div>
 
@@ -602,7 +602,7 @@
     <script>
         Reveal.initialize({
             hash: true, transition: 'slide', controls: true, progress: true,
-            width: "100%", height: "100%", margin: 0, minScale: 1, maxScale: 1,
+            margin: 0.1, minScale: 0.2, maxScale: 2.0,
             mathjax2: {
                 mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
                 config: 'TeX-AMS_HTML-full',

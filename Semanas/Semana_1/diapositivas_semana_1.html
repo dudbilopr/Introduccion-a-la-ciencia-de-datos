@@ -1,306 +1,474 @@
 <!doctype html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8">
-    <title>Introducción a la Ciencia de Datos - Data10.easy</title>
+    <title>Ciencia de Datos - Semana 1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
-    <!-- Tema claro y profesional -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
-    <!-- FontAwesome para iconos profesionales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
     <style>
         :root {
             --data-blue: #003865;
             --data-orange: #E85C0B;
+            --cyber-dark: #050510;
+            --neon-cyan: #00ffcc;
+            --neon-pink: #ff007f;
         }
-        .reveal {
-            font-size: 30px; /* Reducción de letra para evitar desbordes */
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        .reveal h1, .reveal h2, .reveal h3 {
+
+        body { font-family: 'Inter', sans-serif; }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
             color: var(--data-blue);
-            font-family: 'Segoe UI', Arial, sans-serif;
             text-transform: none;
-            font-weight: 600;
+            font-weight: 800;
         }
-        .reveal h1 { font-size: 1.8em; }
-        .reveal h2 { font-size: 1.4em; }
-        .reveal h3 { font-size: 1.1em; }
-        
-        .accent {
-            color: var(--data-orange) !important;
+
+        .reveal h2 {
+            border-bottom: 3px solid var(--data-orange);
+            display: inline-block;
+            padding-bottom: 8px;
+            margin-bottom: 30px;
         }
-        .bg-dark {
-            background-color: var(--data-blue);
-        }
-        .container {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .col {
-            flex: 1;
-            padding: 10px;
-        }
-        .reveal ul {
-            font-size: 0.9em;
-            line-height: 1.5;
-            display: block;
-        }
-        .reveal li {
-            margin-bottom: 12px;
-        }
-        .highlight-box {
-            background: #f8f9fa;
-            border-left: 6px solid var(--data-orange);
-            padding: 20px;
-            border-radius: 4px;
-            text-align: left;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-top: 15px;
-        }
-        .icon {
+
+        .accent { color: var(--data-orange) !important; font-weight: bold; }
+        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
+
+        .reveal .controls, .reveal .progress { color: var(--data-orange); }
+
+        .icon-container {
+            font-size: 5rem;
             color: var(--data-orange);
-            margin-right: 12px;
-            width: 30px;
-            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            animation: float 3s ease-in-out infinite;
         }
-        .img-shadow {
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .box-glass {
+            background: rgba(240, 244, 248, 0.9);
+            border-left: 6px solid var(--data-orange);
+            padding: 25px;
             border-radius: 8px;
-            max-height: 350px;
-            object-fit: cover;
-        }
-        .mentimeter-q {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
             text-align: left;
-        }
-        .mentimeter-q p {
-            margin: 0 0 10px 0;
-            font-weight: bold;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            color: #333;
             font-size: 0.9em;
         }
-        .mentimeter-q span {
-            font-size: 0.8em;
-            color: #555;
-            display: block;
+
+        /* Dark Mode / Cyber Mode slides */
+        .reveal.cyber-mode,
+        .reveal.cyber-mode .slide-background,
+        .reveal.cyber-mode .slide-background-content {
+            background-color: var(--cyber-dark) !important;
         }
+
+        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
+            color: #fff !important;
+        }
+
+        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
+
+        .reveal.cyber-mode .box-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-left: 6px solid var(--neon-cyan);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .split-layout {
+            display: flex; gap: 30px; align-items: stretch;
+            height: 100%;
+        }
+        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+        .quote-container {
+            position: relative;
+            padding: 30px 40px;
+            background: #f9f9f9;
+            border-left: 8px solid var(--data-blue);
+            font-style: italic;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+        .quote-container::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-size: 6rem;
+            color: rgba(0, 56, 101, 0.1);
+            font-family: Georgia, serif;
+        }
+        .quote-author {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            font-style: normal;
+            color: var(--data-orange);
+            text-align: right;
+        }
+
+        .reveal .slides section {
+            max-height: 95vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
+
+        /* VENN DIAGRAM CSS */
+        .venn-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        .venn-circle {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+            opacity: 0.8;
+            mix-blend-mode: multiply;
+            transition: all 0.3s;
+        }
+        .venn-circle:hover { opacity: 0.95; z-index: 10; transform: scale(1.05); }
+        .venn-cs { background-color: #ff4d4d; top: 0; left: 75px; }
+        .venn-math { background-color: #4da6ff; bottom: 30px; left: 0; }
+        .venn-domain { background-color: #ffcc00; bottom: 30px; right: 0; color: #333; }
+        .venn-center {
+            position: absolute;
+            top: 160px;
+            left: 140px;
+            width: 120px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: #000;
+            z-index: 5;
+        }
+
     </style>
 </head>
+
 <body>
+    <div class="reveal">
+        <div class="slides">
 
-<div class="reveal">
-    <div class="slides">
-
-        <!-- Portada -->
-        <section data-transition="zoom">
-            <h1 style="font-weight: 800; font-size: 2.5em;">Introducción a la <br><span class="accent">Ciencia de Datos</span></h1>
-            <hr style="border: 2px solid var(--data-orange); width: 60%; margin: 20px auto;">
-            <h3 style="color: #555;">Clase 1: Reglas, Herramientas y Visión a Futuro</h3>
-            <p style="margin-top: 40px; font-size: 0.9em;">Docente: <strong>Dudbil Olvasada Pabon Riaño</strong></p>
-            <p style="font-size: 0.8em; color: var(--data-blue); font-weight: bold;">Programa de Ciencia de Datos</p>
-            <p style="font-size: 0.7em; color: #888;">Universidad Autónoma de Bucaramanga</p>
-        </section>
-
-        <!-- Reglas -->
-        <section data-transition="slide">
-            <h2>Acuerdos de Clase</h2>
-            <div class="highlight-box">
-                <ul style="list-style-type: none; margin-left: 0;">
-                    <li class="fragment"><i class="fas fa-clock icon"></i><strong>Puntualidad:</strong> Iniciamos a las 7:00 AM en punto.</li>
-                    <li class="fragment"><i class="fas fa-brain icon"></i><strong>Descansos Cognitivos:</strong> Pausas estratégicas para evitar fatiga mental.</li>
-                    <li class="fragment"><i class="fas fa-language icon"></i><strong>Estrategia EMI:</strong> Inmersión de 10 minutos en inglés técnico.</li>
-                    <li class="fragment"><i class="fas fa-handshake icon"></i><strong>Respeto:</strong> Espacio psicológicamente seguro para el debate.</li>
-                    <li class="fragment"><i class="fas fa-envelope icon"></i><strong>Comunidad:</strong> Uso activo del Espacio en Gmail.</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- Syllabus y Guía -->
-        <section data-transition="slide">
-            <h2><i class="fas fa-map-signs icon"></i> Ruta de Aprendizaje (16 Semanas)</h2>
-            <div class="highlight-box">
-                <p style="font-size: 0.9em; margin-bottom: 20px;">El programa está estructurado para llevarte desde los conceptos básicos hasta la implementación práctica de la Ciencia de Datos a lo largo de <strong>16 semanas</strong> de inmersión total.</p>
-                <hr style="border: 1px solid #ddd; margin: 20px 0;">
-                <p style="text-align: center; margin-top: 35px;">
-                    <a href="https://docs.google.com/document/d/1itDXpwbP8RUZmbFlKWBXYFDgHxyGJS-2/edit?usp=sharing&ouid=106944831136849908935&rtpof=true&sd=true" target="_blank" style="display: inline-block; background-color: var(--data-orange); color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-                        <i class="fas fa-file-alt" style="margin-right: 10px;"></i> Ver Guía de Aprendizaje Detallada
-                    </a>
-                </p>
-                <p style="text-align: center; font-size: 0.7em; color: #777; margin-top: 15px;">(Contiene cronograma, competencias y RAEs del curso)</p>
-            </div>
-        </section>
-
-        <!-- EMI Warm Up -->
-        <section data-transition="convex" data-background-color="var(--data-blue)">
-            <h2 style="color: white;"><i class="fas fa-comment-dots accent"></i> EMI: Warm-Up</h2>
-            <br>
-            <h3 class="fragment" style="color: #ccc; font-weight: normal;">What is the first word that comes to your mind when you hear...</h3>
-            <h1 class="fragment" style="color: var(--data-orange); font-size: 2.5em; margin-top: 30px;">'Data Science'?</h1>
-        </section>
-
-        <!-- EMI Video (Incrustado) -->
-        <section data-transition="fade">
-            <h2><i class="fas fa-video icon"></i> EMI: What is Data Science?</h2>
-            <p style="font-size: 0.8em; margin-bottom: 20px;"><strong>Objectives:</strong> Learn key technical vocabulary and understand the core concept.</p>
-            <!-- Video de YouTube Incrustado -->
-            <iframe width="800" height="450" src="https://www.youtube.com/embed/xN6dbHSbohk?cc_load_policy=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="box-shadow: 0 10px 20px rgba(0,0,0,0.2); border-radius: 8px;"></iframe>
-        </section>
-
-        <!-- EMI Vocabulary -->
-        <section data-transition="slide">
-            <h2><i class="fas fa-book-open icon"></i> EMI: Vocabulary Guide</h2>
-            <div class="container" style="margin-top: 30px;">
-                <div class="col highlight-box" style="margin-right: 10px;">
-                    <ul style="list-style-type: none; margin: 0;">
-                        <li class="fragment" style="margin-bottom: 25px;">
-                            <strong style="color: var(--data-blue); font-size: 1.1em;">Data:</strong><br>
-                            <span style="color: #666;">Raw facts and statistics.</span>
-                        </li>
-                        <li class="fragment">
-                            <strong style="color: var(--data-blue); font-size: 1.1em;">Insights:</strong><br>
-                            <span style="color: #666;">Deep understanding or discoveries.</span>
-                        </li>
-                    </ul>
+            <!-- Slide 1: Título -->
+            <section>
+                <div class="icon-container">
+                    <i class="fa-solid fa-network-wired"></i>
                 </div>
-                <div class="col highlight-box" style="margin-left: 10px;">
-                    <ul style="list-style-type: none; margin: 0;">
-                        <li class="fragment" style="margin-bottom: 25px;">
-                            <strong style="color: var(--data-blue); font-size: 1.1em;">Machine Learning:</strong><br>
-                            <span style="color: #666;">Algorithms that learn from data.</span>
-                        </li>
-                        <li class="fragment">
-                            <strong style="color: var(--data-blue); font-size: 1.1em;">Predict:</strong><br>
-                            <span style="color: #666;">To say what will happen in the future.</span>
-                        </li>
-                    </ul>
+                <h1>Ciencia de Datos</h1>
+                <h3>Semana 1: <span class="accent">El ADN del Data Scientist</span></h3>
+                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
+            </section>
+
+            <!-- Slide 2: Introducción y RAE -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-compass"></i> Bienvenidos a la Era de los Datos</h2>
+                    <p>Más que un rol, es una forma de pensar.</p>
+                    <div class="box-glass">
+                        <p>A lo largo del tiempo, la intuición dominó las decisiones corporativas. Hoy, la intuición sin evidencia empírica es un riesgo inaceptable.</p>
+                        <hr>
+                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta:</h4>
+                        <p class="text-center" style="font-weight:bold;">¿Qué diferencia a un Científico de Datos de un Analista Tradicional?</p>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li class="fragment"><strong>RAE 1:</strong> Comprender la intersección disciplinar que conforma la Ciencia de Datos (Diagrama de Conway).</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Diferenciar los roles del ecosistema (Data Engineer vs Data Scientist vs Data Analyst).</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Entender el ciclo de vida analítico de un proyecto basado en datos.</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 3: Agenda -->
+            <section>
+                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
+                <div class="split-layout">
+                    <div>
+                        <ul>
+                            <li class="fragment">El Paradigma del Dato (La Nueva Revolución)</li>
+                            <li class="fragment">El Diagrama de Venn de Drew Conway</li>
+                            <li class="fragment">Roles en la Industria y Perfil del Científico</li>
+                            <li class="fragment">El Ciclo de Vida de los Datos (CRISP-DM)</li>
+                            <li class="fragment">Glosario EMI</li>
+                        </ul>
+                    </div>
+                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
+                        <i class="fa-solid fa-brain text-gray-300" style="font-size:8rem;"></i>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Mentimeter Embebido Real -->
-        <section data-transition="convex" data-background-color="#f4f4f4">
-            <h2><i class="fas fa-mobile-alt icon"></i> Mentimeter Live!</h2>
-            <div style='position: relative; padding-bottom: 56.25%; padding-top: 35px; height: 0; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border-radius: 8px;'>
-                <iframe sandbox='allow-popups allow-scripts allow-same-origin allow-presentation' allowfullscreen='true' allowtransparency='true' frameborder='0' height='315' src='https://www.mentimeter.com/app/presentation/al98bewf92dygznt9ewhmwhpmp4cvo6k/embed' style='position: absolute; top: 0; left: 0; width: 100%; height: 100%;' width='420'></iframe>
-            </div>
-        </section>
-
-        <!-- Mentimeter 1 (Respuestas de Repaso) -->
-        <section data-transition="slide">
-            <h2><i class="fas fa-check-circle icon"></i> Let's Check! (1/2)</h2>
-            <p style="font-size: 0.8em; color: #555;">Reviewing the answers</p>
-            
-            <div class="mentimeter-q fragment">
-                <p>Q1: What are the three V's of Big Data mentioned in the video?</p>
-                <span>A) Video, Vision, Value &nbsp;|&nbsp; <strong class="fragment highlight-green">B) Volume, Velocity, Variety</strong> &nbsp;|&nbsp; C) Virtual, Vector, Volume</span>
-            </div>
-            <div class="mentimeter-q fragment">
-                <p>Q2: What is the first component of Data Science according to the video?</p>
-                <span><strong class="fragment highlight-green">A) Domain expertise & scientific methods</strong> &nbsp;|&nbsp; B) Buying hardware &nbsp;|&nbsp; C) Writing blog posts</span>
-            </div>
-            <div class="mentimeter-q fragment">
-                <p>Q3: What does 'Velocity' refer to in Big Data?</p>
-                <span>A) The speed of the computer &nbsp;|&nbsp; <strong class="fragment highlight-green">B) Huge amounts of data flowing at a tremendous speed</strong> &nbsp;|&nbsp; C) Typing skills</span>
-            </div>
-        </section>
-
-        <!-- Mentimeter 2 (Respuestas de Repaso) -->
-        <section data-transition="slide">
-            <h2><i class="fas fa-check-circle icon"></i> Let's Check! (2/2)</h2>
-            
-            <div class="mentimeter-q fragment">
-                <p>Q4: What helps provide insights by building and running automated models?</p>
-                <span><strong class="fragment highlight-green">A) Machine Learning</strong> &nbsp;|&nbsp; B) Data Cleansing &nbsp;|&nbsp; C) Web Design</span>
-            </div>
-            <div class="mentimeter-q fragment">
-                <p>Q5: (Word Cloud) Write one format of Big Data mentioned in the video!</p>
-                <span><strong class="fragment highlight-green">Examples: Structured, Semi-structured, Unstructured, JSON, XML...</strong></span>
-            </div>
-        </section>
-
-        <!-- GitHub -->
-        <section data-transition="convex">
-            <div class="container">
-                <div class="col" style="flex: 0.8;">
-                    <img src="img/ds_github_1785838801063.png" alt="GitHub" class="img-shadow">
+            <!-- Slide 4: Definición Histórica -->
+            <section>
+                <h2><i class="fa-solid fa-book-open"></i> ¿Qué es la Ciencia de Datos?</h2>
+                <div class="split-layout">
+                    <div class="quote-container" style="font-size: 0.95rem;">
+                        "La Ciencia de Datos es la disciplina de extraer conocimiento y descubrimientos a partir de información bruta, utilizando un enfoque holístico que mezcla programación, matemáticas y contexto de negocio. No se trata de qué algoritmos conoces, sino de <strong>qué problemas puedes resolver</strong>."
+                        <span class="quote-author">— What is Data Science (O'Reilly Media)</span>
+                    </div>
+                    <div class="box-glass fragment">
+                        <h3 class="accent"><i class="fa-solid fa-lightbulb"></i> El Cambio de Paradigma</h3>
+                        <ul>
+                            <li><strong>Analítica Clásica:</strong> "¿Qué pasó en el pasado?" (Reportes, BI).</li>
+                            <li><strong>Ciencia de Datos:</strong> "¿Por qué pasó? ¿Qué pasará después? ¿Cómo lo optimizo?" (Modelado Predictivo y Prescriptivo).</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col" style="text-align: left; padding-left: 30px;">
-                    <h2><i class="fab fa-github icon"></i> GitHub</h2>
-                    <p style="font-weight: 600; color: #555;">El estándar de la industria.</p>
-                    <ul class="fa-ul">
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Ingresa a <strong>github.com</strong></li>
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Usa tu correo institucional para hacer 'Sign Up'</li>
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Es tu futuro portafolio profesional y herramienta de control de versiones.</li>
-                    </ul>
+            </section>
+
+            <!-- Slide 5: Diagrama de Venn de Conway -->
+            <section>
+                <h2><i class="fa-solid fa-chart-pie"></i> El ADN: Diagrama de Conway</h2>
+                <p>Nacido en 2010, define el equilibrio del Data Scientist perfecto.</p>
+                
+                <div class="split-layout" style="align-items: center;">
+                    <div class="venn-container">
+                        <div class="venn-circle venn-cs"><div style="margin-top:-80px">Hacking Skills<br>(CS)</div></div>
+                        <div class="venn-circle venn-math"><div style="margin-bottom:-80px; margin-left:-30px;">Math &<br>Stats</div></div>
+                        <div class="venn-circle venn-domain"><div style="margin-bottom:-80px; margin-right:-30px;">Domain<br>Expertise</div></div>
+                        
+                        <div class="venn-center fade-in">Data<br>Science</div>
+                    </div>
+                    
+                    <div class="box-glass fragment" style="margin-top:0;">
+                        <ul>
+                            <li><strong style="color: #ff4d4d;">Hacking Skills:</strong> No es hackear bancos. Es saber programar, manipular archivos, raspar la web (Python/SQL).</li>
+                            <li><strong style="color: #4da6ff;">Math & Stats:</strong> Rigor matemático para no dejarse engañar por números ruidosos y crear modelos.</li>
+                            <li><strong style="color: #e6b800;">Domain Expertise:</strong> Conocer el negocio. Un buen algoritmo en el negocio equivocado es inútil.</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- LLMNotebook -->
-        <section data-transition="convex">
-            <div class="container">
-                <div class="col" style="text-align: left; padding-right: 30px;">
-                    <h2><i class="fas fa-robot icon"></i> LLMNotebook</h2>
-                    <p style="font-weight: 600; color: #555;">IA como tu copiloto cognitivo.</p>
-                    <ul class="fa-ul">
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Acelera el aprendizaje, no lo reemplaza.</li>
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Formula un <strong>prompt efectivo</strong> (Contexto + Tarea + Formato).</li>
-                        <li class="fragment"><span class="fa-li"><i class="fas fa-check accent"></i></span>Analiza críticamente; tú eres el piloto.</li>
-                    </ul>
+            <!-- Slide 6: Peligro -->
+            <section>
+                <h2><i class="fa-solid fa-triangle-exclamation"></i> Las Zonas de Peligro</h2>
+                <div class="box-glass">
+                    <p>La intersección incompleta de estas tres áreas crea perfiles funcionales, pero a veces peligrosos.</p>
                 </div>
-                <div class="col" style="flex: 0.8;">
-                    <img src="img/ds_ai_1785838810770.png" alt="AI" class="img-shadow">
+                <div class="split-layout mt-4">
+                    <div class="box-glass fragment text-center">
+                        <h4 style="color:#d9534f;">CS + Domain</h4>
+                        <p><strong>La Zona de Peligro</strong></p>
+                        <p style="font-size: 0.8rem;">Personas que saben programar y conocen el negocio, pero aplican algoritmos sin entender la estadística subyacente. ¡Producen modelos que parecen funcionar pero mienten!</p>
+                    </div>
+                    <div class="box-glass fragment text-center">
+                        <h4 style="color:#4da6ff;">Math + CS</h4>
+                        <p><strong>Machine Learning</strong></p>
+                        <p style="font-size: 0.8rem;">Construyen sistemas asombrosos (ej. reconocimiento facial), pero si carecen de <em>Domain Expertise</em>, rara vez resuelven el problema real de la empresa.</p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Actividad Grupal -->
-        <section data-transition="zoom">
-            <h2><i class="fas fa-users icon"></i> Actividad Central</h2>
-            <h4 style="color: #666; font-weight: normal; margin-bottom: 20px;">"El Futuro del Científico de Datos"</h4>
-            <div class="highlight-box">
-                <p style="font-size: 0.9em;"><i class="fas fa-bullseye accent"></i> <strong>Meta:</strong> Analizar (Donoho, WEF, Stanford AI) usando LLMNotebook para sintetizar en grupos.</p>
-                <hr style="border: 1px solid #ddd; margin: 15px 0;">
-                <p style="font-size: 0.9em;"><strong>Entregables (Sustentación):</strong></p>
-                <ol style="font-size: 0.85em;">
-                    <li class="fragment"><strong>Resumen Visual:</strong> Diapositiva o Infografía.</li>
-                    <li class="fragment"><strong>Conexión Práctica:</strong> Ejemplo real aplicable hoy.</li>
-                    <li class="fragment"><strong>Dato de Impacto:</strong> Un hallazgo sorprendente.</li>
-                </ol>
-            </div>
-        </section>
+            <!-- Slide 7: Roles -->
+            <section>
+                <h2><i class="fa-solid fa-users"></i> Ecosistema de Roles</h2>
+                <div class="box-glass">
+                    <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+                        <tr style="border-bottom: 2px solid var(--data-blue);">
+                            <th style="padding: 10px; text-align:left;">Rol</th>
+                            <th style="padding: 10px; text-align:left;">Enfoque Principal</th>
+                            <th style="padding: 10px; text-align:left;">Herramientas Clave</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ccc;">
+                            <td style="padding: 10px; font-weight:bold;">Data Engineer</td>
+                            <td style="padding: 10px;">Construye la tubería (pipelines) para que los datos fluyan limpios y escalables.</td>
+                            <td style="padding: 10px;">SQL, Spark, AWS/GCP, Airflow</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ccc;">
+                            <td style="padding: 10px; font-weight:bold; color:var(--data-orange);">Data Scientist</td>
+                            <td style="padding: 10px;">Encuentra patrones complejos, entrena modelos predictivos y experimenta estadísticamente.</td>
+                            <td style="padding: 10px;">Python (Pandas, Scikit-Learn), R</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight:bold;">Data Analyst</td>
+                            <td style="padding: 10px;">Responde preguntas descriptivas rápidas del negocio usando visualizaciones.</td>
+                            <td style="padding: 10px;">Excel, PowerBI, Tableau, SQL</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
 
-        <!-- Final -->
-        <section data-transition="slide" data-background-color="var(--data-orange)">
-            <h1 style="color: white; font-size: 2.5em; text-transform: uppercase;"><i class="fas fa-stopwatch"></i> Sustentaciones</h1>
-            <br>
-            <h3 style="color: var(--data-blue); background: white; display: inline-block; padding: 10px 30px; border-radius: 50px;">15 Minutos por Grupo</h3>
-            <p style="color: white; margin-top: 30px; font-weight: bold; font-size: 1.2em;">¡Manos a la obra!</p>
-        </section>
+            <!-- Slide 8: Ciclo de Vida -->
+            <section>
+                <h2><i class="fa-solid fa-rotate"></i> El Ciclo de Vida (CRISP-DM)</h2>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <ol>
+                            <li><strong>Entendimiento del Negocio:</strong> ¿Qué resolvemos?</li>
+                            <li><strong>Entendimiento del Dato:</strong> ¿Qué tenemos?</li>
+                            <li><strong class="accent">Preparación del Dato:</strong> Limpieza (Toma el 80% del tiempo).</li>
+                            <li><strong>Modelado:</strong> Aplicar Machine Learning.</li>
+                            <li><strong>Evaluación:</strong> ¿Es confiable?</li>
+                            <li><strong>Despliegue:</strong> Poner en producción.</li>
+                        </ol>
+                    </div>
+                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
+                        <div id="cyclePlot" class="plotly-container" style="height: 300px; width:100%; border-radius: 50%;"></div>
+                    </div>
+                </div>
+            </section>
 
+            <!-- Slide 9: Glosario -->
+            <section>
+                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <ul>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Data Science:</strong> Ciencia de Datos.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Domain Expertise:</strong> Experiencia en el Dominio / Negocio.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Hacking Skills:</strong> Habilidades de Programación.</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass">
+                        <ul>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Pipeline:</strong> Tubería de Procesamiento.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Deployment:</strong> Despliegue.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Raw Data:</strong> Datos Crudos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 10: Cyber Status y Conclusiones -->
+            <section data-state="cyber-mode">
+                <section>
+                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
+                    <div class="box-glass" style="min-height: 200px;">
+                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
+                    <div class="box-glass" style="margin-bottom: 20px;">
+                        <ul>
+                            <li>La herramienta no hace al científico; la forma estructurada de pensar y resolver problemas sí.</li>
+                            <li>El equilibrio perfecto requiere Programación, Matemáticas y un entendimiento profundo del contexto de negocio.</li>
+                            <li>Existen roles diferenciados: no tienes que hacerlo todo tú solo. La ingeniería de datos y el análisis de datos son ramas aliadas.</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
+                        <strong>Bibliografía de la Clase:</strong>
+                        <ul>
+                            <li>O'Neil, C., & Schutt, R. (2013). <em>Doing Data Science</em>. O'Reilly Media.</li>
+                            <li>Conway, D. (2010). <em>The Data Science Venn Diagram</em>.</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+        </div>
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
-<script>
-    Reveal.initialize({
-        controls: true,
-        progress: true,
-        center: true,
-        hash: true,
-        transition: 'convex', // Transición global dinámica
-        transitionSpeed: 'fast',
-        slideNumber: 'c/t' // Mostrar número de slide
-    });
-</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true, transition: 'slide', controls: true, progress: true,
+            margin: 0.1, minScale: 0.2, maxScale: 2.0,
+            mathjax2: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_HTML-full',
+                tex2jax: {
+                    inlineMath: [['$','$'], ['\\(','\\)']],
+                    displayMath: [['$$','$$'], ['\\[','\\]']]
+                }
+            },
+            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
+        });
+
+        function drawPlotlyGraphs() {
+            // Un gráfico circular (Donut) simple para el ciclo
+            var data = [{
+                values: [15, 10, 40, 20, 10, 5],
+                labels: ['1. Negocio', '2. Dato', '3. Limpieza', '4. Modelo', '5. Evaluación', '6. Despliegue'],
+                type: 'pie',
+                hole: .4,
+                marker: {
+                    colors: ['#003865', '#28a745', '#E85C0B', '#17a2b8', '#ffc107', '#6c757d']
+                }
+            }];
+            var layout = {
+                margin: {t:10, b:10, l:10, r:10},
+                showlegend: false,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                annotations: [{ font: {size: 16}, showarrow: false, text: 'CRISP-DM', x: 0.5, y: 0.5 }]
+            };
+            Plotly.newPlot('cyclePlot', data, layout, {displayModeBar: false});
+        }
+
+        Reveal.on('ready', event => { drawPlotlyGraphs(); });
+
+        var typedInstance = null;
+
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
+                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
+                setTimeout(() => {
+                    typedInstance = new Typed('#typed-output', {
+                        strings: [
+                            "> Iniciando protocolo fundacional...",
+                            "> Cargando módulos: Hacking, Math, Domain...",
+                            "> Evitando Zona de Peligro (Algoritmos sin contexto detectados)",
+                            "> Integración de ADN completada.",
+                            "> SISTEMA OPERATIVO Y LISTO PARA APRENDER."
+                        ],
+                        typeSpeed: 30,
+                        backSpeed: 10,
+                        loop: false,
+                        showCursor: true,
+                        cursorChar: '█'
+                    });
+                }, 500);
+            } else if (typedInstance) {
+                typedInstance.destroy();
+                var el = document.getElementById('typed-output');
+                if(el) el.innerHTML = '';
+            }
+        });
+    </script>
 </body>
 </html>

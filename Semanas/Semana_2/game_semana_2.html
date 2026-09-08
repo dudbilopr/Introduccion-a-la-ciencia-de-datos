@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Gamificado: Semana 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#003865', secondary: '#E85C0B', darkbg: '#0f172a' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .draggable { cursor: grab; transition: transform 0.2s; }
+        .draggable:active { cursor: grabbing; transform: scale(0.95); }
+        .droppable { border: 2px dashed rgba(255, 255, 255, 0.3); transition: all 0.3s; }
+        .droppable.drag-over { border-color: #E85C0B; background: rgba(232, 92, 11, 0.1); }
+        .matched { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; pointer-events: none; }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="glass-panel w-full max-w-4xl rounded-2xl p-8 relative">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-gamepad text-secondary mr-3"></i>Reto: Ecosistema Python</h1>
+            <p class="text-gray-300">Arrastra cada estructura de datos a su definición correcta.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Conceptos (Draggables) -->
+            <div class="space-y-4" id="concepts">
+                <div class="draggable glass-panel p-4 rounded-lg text-center font-bold text-lg text-white hover:bg-white/10" draggable="true" data-id="list">Lista (List)</div>
+                <div class="draggable glass-panel p-4 rounded-lg text-center font-bold text-lg text-white hover:bg-white/10" draggable="true" data-id="dict">Diccionario (Dict)</div>
+                <div class="draggable glass-panel p-4 rounded-lg text-center font-bold text-lg text-white hover:bg-white/10" draggable="true" data-id="tuple">Tupla (Tuple)</div>
+                <div class="draggable glass-panel p-4 rounded-lg text-center font-bold text-lg text-white hover:bg-white/10" draggable="true" data-id="df">DataFrame</div>
+            </div>
+
+            <!-- Definiciones (Droppables) -->
+            <div class="space-y-4" id="definitions">
+                <div class="droppable glass-panel p-4 rounded-lg min-h-[60px] flex items-center justify-center text-sm text-gray-400 text-center" data-match="dict">
+                    Estructura clave-valor, mutable y no ordenada (Ej. {'nombre': 'Juan'}).
+                </div>
+                <div class="droppable glass-panel p-4 rounded-lg min-h-[60px] flex items-center justify-center text-sm text-gray-400 text-center" data-match="df">
+                    Tabla bidimensional de Pandas, similar a una hoja de cálculo.
+                </div>
+                <div class="droppable glass-panel p-4 rounded-lg min-h-[60px] flex items-center justify-center text-sm text-gray-400 text-center" data-match="list">
+                    Colección ordenada y mutable de elementos (Ej. [1, 2, 3]).
+                </div>
+                <div class="droppable glass-panel p-4 rounded-lg min-h-[60px] flex items-center justify-center text-sm text-gray-400 text-center" data-match="tuple">
+                    Colección ordenada e INMUTABLE (Ej. (1, 2, 3)).
+                </div>
+            </div>
+        </div>
+
+        <div id="success-msg" class="hidden mt-8 text-center text-green-400 font-bold text-2xl animate-pulse">
+            ¡Reto Completado! <i class="fas fa-check-circle"></i>
+        </div>
+    </div>
+
+    <script>
+        const draggables = document.querySelectorAll('.draggable');
+        const droppables = document.querySelectorAll('.droppable');
+        let matchedCount = 0;
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+                draggable.style.opacity = '0.5';
+            });
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+                draggable.style.opacity = '1';
+            });
+        });
+
+        droppables.forEach(droppable => {
+            droppable.addEventListener('dragover', e => {
+                e.preventDefault();
+                droppable.classList.add('drag-over');
+            });
+            droppable.addEventListener('dragleave', () => {
+                droppable.classList.remove('drag-over');
+            });
+            droppable.addEventListener('drop', e => {
+                e.preventDefault();
+                droppable.classList.remove('drag-over');
+                const draggable = document.querySelector('.dragging');
+                if(!draggable) return;
+
+                const matchId = droppable.getAttribute('data-match');
+                const dragId = draggable.getAttribute('data-id');
+
+                if(matchId === dragId) {
+                    droppable.classList.add('matched');
+                    droppable.innerHTML = `<span class="text-green-400 font-bold text-lg"><i class="fas fa-check mr-2"></i>${draggable.innerText}</span>`;
+                    draggable.style.display = 'none';
+                    matchedCount++;
+                    if(matchedCount === 4) {
+                        document.getElementById('success-msg').classList.remove('hidden');
+                    }
+                } else {
+                    // Animación de error
+                    droppable.classList.add('border-red-500');
+                    setTimeout(() => droppable.classList.remove('border-red-500'), 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
