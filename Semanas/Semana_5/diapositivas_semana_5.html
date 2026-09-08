@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
     <style>
         :root {
@@ -152,12 +153,12 @@
         /* Nuevos Componentes Visuales */
         .quote-container {
             position: relative;
-            padding: 40px;
+            padding: 30px 40px;
             background: #f9f9f9;
             border-left: 8px solid var(--data-blue);
             font-style: italic;
-            font-size: 1.2rem;
-            margin: 20px 0;
+            font-size: 1.1rem;
+            margin: 15px 0;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
             text-align: left;
         }
@@ -172,9 +173,9 @@
         }
         .quote-author {
             display: block;
-            margin-top: 15px;
+            margin-top: 10px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-style: normal;
             color: var(--data-orange);
             text-align: right;
@@ -187,7 +188,7 @@
             border-radius: 8px;
             padding: 20px;
             position: relative;
-            height: 250px;
+            height: 200px;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
@@ -239,6 +240,15 @@
             border-radius: 3px;
         }
 
+        /* Contenedores de Gráficos Plotly */
+        .plotly-container {
+            width: 100%;
+            height: 250px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -256,162 +266,287 @@
                 <p><small>Programa de Ciencia de Datos - UNAB</small></p>
             </section>
 
-            <!-- Slide 2: RAE -->
-            <section>
-                <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
-                <div class="box-glass">
-                    <ul>
-                        <li class="fragment"><strong>RAE 1:</strong> Calcular e interpretar medidas de tendencia central.</li>
-                        <li class="fragment"><strong>RAE 2:</strong> Evaluar la dispersión de los datos utilizando varianza y desviación estándar.</li>
-                        <li class="fragment"><strong>RAE 3:</strong> Identificar sesgos provocados por valores atípicos (outliers) y combatirlos aplicando métodos estadísticos robustos.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Slide 3: Medidas de Tendencia Central -->
-            <section>
-                <h2><i class="fa-solid fa-crosshairs"></i> Tendencia Central</h2>
-                <p>El punto de equilibrio gravitacional de nuestros datos.</p>
-                <div class="box-glass">
-                    <p>Haz clic para profundizar en la base de conocimiento:</p>
-                    <ul>
-                        <li class="mb-4"><span class="clickable-concept" onclick="openModal('mediaModal')">Media Aritmética (Mean)</span></li>
-                        <li class="mb-4"><span class="clickable-concept" onclick="openModal('medianaModal')">Mediana (Median)</span></li>
-                        <li><span class="clickable-concept" onclick="openModal('modaModal')">Moda (Mode)</span></li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Slide 4: El Efecto Bill Gates (Outliers) - Split Layout & Quote -->
-            <section>
-                <h2><i class="fa-solid fa-bolt"></i> El Problema del Sesgo</h2>
-                <div class="split-layout">
-                    <div>
-                        <div class="quote-container" style="font-size: 1rem; padding: 25px;">
-                            "Al comparar salarios, si usamos la media produciría resultados muy diferentes porque Bill Gates vive ahí. Si usamos la mediana, no importa lo rico que sea Bill Gates, la posición del valor central seguirá siendo la misma."
-                            <span class="quote-author">— Practical Statistics for Data Scientists (Bruce & Bruce)</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="box-glass fragment">
-                            <h3 style="font-size: 1.2rem;" class="accent">Simulación Visual</h3>
-                            <div class="simulation-box" id="sim1">
-                                <!-- Datos normales -->
-                                <div class="data-point" style="left: 10%;">1</div>
-                                <div class="data-point" style="left: 20%;">2</div>
-                                <div class="data-point" style="left: 30%;">3</div>
-                                <div class="data-point" style="left: 40%;">4</div>
-                                <div class="data-point" style="left: 50%;">5</div>
-                                
-                                <!-- Indicadores -->
-                                <div class="line-median" style="left: 30%;" id="sim1-median"><span class="sim-label" style="background: #28a745; left: -25px;">Mediana</span></div>
-                                <div class="line-mean" style="left: 30%;" id="sim1-mean"><span class="sim-label" style="background: var(--data-orange);">Media</span></div>
-                            </div>
-                            <button class="fragment" onclick="triggerOutlier()" style="margin-top:10px; padding:8px 15px; cursor:pointer; background:var(--data-blue); color:white; border:none; border-radius:4px;">
-                                <i class="fa-solid fa-plus"></i> Añadir Outlier (Bill Gates)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 5: Media Recortada -->
-            <section>
-                <h2><i class="fa-solid fa-scissors"></i> La Media Recortada (Trimmed Mean)</h2>
-                <div class="box-glass">
-                    <p>Es un estimador robusto que funciona como compromiso entre la rigidez de la Mediana y la sensibilidad de la Media.</p>
-                    <p>Consiste en <strong>ordenar</strong> los datos y <strong>descartar</strong> un porcentaje fijo en ambos extremos (por ejemplo, el 10% más bajo y el 10% más alto) antes de calcular el promedio.</p>
-                </div>
-                <div class="callout-tip fragment">
-                    <i class="fa-solid fa-shield-halved accent"></i> <strong>Aplicación Real:</strong> En los modelos de Machine Learning para detección de fraudes (Anomaly Detection), utilizar métricas "Trimmed" es el estándar para evitar que una sola transacción fraudulenta de millones de dólares mueva los umbrales de normalidad.
-                </div>
-            </section>
-
-            <!-- Slide 6: Dispersión -->
+            <!-- Slide 2: Introducción y RAE -->
             <section>
                 <section>
-                    <h2><i class="fa-solid fa-arrows-left-right"></i> Medidas de Dispersión</h2>
-                    <p>El centro no cuenta toda la historia. Necesitamos conocer la amplitud.</p>
+                    <h2><i class="fa-solid fa-compass"></i> El Arte del EDA</h2>
+                    <p>Análisis Exploratorio de Datos (John Tukey, 1977)</p>
+                    <div class="box-glass">
+                        <p>En lugar de limitarnos a la memorización de fórmulas mecánicas, el <strong>EDA</strong> promueve descubrir los datos a través de la visualización y el código.</p>
+                        <hr>
+                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta en vivo:</h4>
+                        <p class="text-center" style="font-weight:bold;">¿Qué es lo primero que haces cuando te entregan un archivo CSV nuevo?</p>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
+                    <div class="box-glass">
+                        <ul>
+                            <li class="fragment"><strong>RAE 1:</strong> Calcular e interpretar medidas de tendencia central y dispersión robusta (MAD, IQR).</li>
+                            <li class="fragment"><strong>RAE 2:</strong> Evaluar la asimetría de los datos (Skewness) y su impacto en el modelado.</li>
+                            <li class="fragment"><strong>RAE 3:</strong> Identificar relaciones bivariadas e interpretar Diagramas de Caja y Histogramas como herramientas diagnósticas.</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 3: Agenda -->
+            <section>
+                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
+                <div class="split-layout">
+                    <div>
+                        <ul>
+                            <li class="fragment">El Tablero de Juego (Tipos de Datos)</li>
+                            <li class="fragment">Localización y el Peligro de los Outliers</li>
+                            <li class="fragment">Variabilidad y Dispersión Robusta</li>
+                            <li class="fragment">Herramientas de Diagnóstico Visual</li>
+                            <li class="fragment">Asimetría y Relaciones Bivariadas</li>
+                            <li class="fragment">Pair Programming</li>
+                        </ul>
+                    </div>
+                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
+                        <i class="fa-solid fa-chart-pie text-gray-300" style="font-size:8rem;"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Tipos de Datos -->
+            <section>
+                <h2><i class="fa-solid fa-cubes"></i> El Tablero: Tipos de Datos</h2>
+                <p>La naturaleza del dato determina qué operaciones matemáticas son válidas.</p>
+                <div class="split-layout" style="margin-bottom:10px;">
+                    <div class="box-glass">
+                        <h3 class="accent"><i class="fa-solid fa-hashtag"></i> Numéricos</h3>
+                        <ul>
+                            <li><strong>Continuos:</strong> Valores en cualquier intervalo (ej. Salario, Temperatura).</li>
+                            <li><strong>Discretos:</strong> Valores enteros o conteos (ej. Número de hijos).</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass">
+                        <h3 class="accent"><i class="fa-solid fa-tags"></i> Categóricos</h3>
+                        <ul>
+                            <li><strong>Ordinales:</strong> Tienen un orden lógico (ej. Nivel de educación).</li>
+                            <li><strong>Binarios / Nominales:</strong> (ej. Booleanos, Código Postal).</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout-tip fragment" style="border-left-color: #d9534f; background-color: #fdf2f2;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #d9534f;"></i> <strong style="color: #d9534f;">La Advertencia del Experto:</strong> Aunque usemos números para los datos Ordinales (ej. Satisfacción de 1 a 5), calcular una <em>Media Aritmética</em> $\left( \bar{x} \right)$ sobre ellos carece de sentido matemático. Usa la Mediana o Moda.
+                </div>
+            </section>
+
+            <!-- Slide 5: Medidas de Tendencia Central y Outliers -->
+            <section>
+                <section>
+                    <h2><i class="fa-solid fa-crosshairs"></i> Localización: ¿Dónde está el centro?</h2>
+                    <p>El punto de equilibrio gravitacional de nuestros datos.</p>
+                    <div class="box-glass">
+                        <p>Haz clic para explorar las ecuaciones fundamentales:</p>
+                        <ul>
+                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('mediaModal')">Media Aritmética (Promedio)</span></li>
+                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('medianaModal')">Mediana (Percentil 50)</span></li>
+                            <li><span class="clickable-concept" onclick="openModal('modaModal')">Moda (Valor Frecuente)</span></li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-bolt"></i> El Peligro de los Outliers</h2>
+                    <p>La Media es ingenua. La Mediana es robusta.</p>
                     <div class="split-layout">
-                        <div class="box-glass">
-                            <h3 class="accent">Varianza</h3>
-                            <p>Mide cuánto se alejan los datos de la media. Como eleva las diferencias al cuadrado, penaliza fuertemente a los outliers pero sus unidades son irreales (ej. dólares cuadrados).</p>
+                        <div class="quote-container" style="font-size: 0.95rem;">
+                            "Al comparar salarios del vecindario de Medina, usar la media daría resultados absurdos porque <strong>Bill Gates</strong> vive ahí. Si usamos la mediana, el centro se mantiene intacto."
+                            <span class="quote-author">— Practical Statistics for Data Scientists</span>
                         </div>
-                        <div class="box-glass fragment">
-                            <h3 class="accent">Desviación Estándar</h3>
-                            <p>Al aplicar la raíz cuadrada a la Varianza, regresamos a la escala original. Es la métrica reina para estandarizar modelos predictivos.</p>
+                        <div class="quote-container fragment" style="font-size: 0.95rem;">
+                            "En 1984, el salario promedio de los graduados en geografía de la Univ. de Carolina del Norte se disparó a niveles récord debido a un solo estudiante: <strong>Michael Jordan</strong>."
+                            <span class="quote-author">— Caso Real Estadístico</span>
+                        </div>
+                    </div>
+                    <p class="fragment text-center accent" style="margin-top: 15px; font-weight: bold;">
+                        ¿Si fueras el director de la universidad, qué métrica reportarías en el folleto publicitario?
+                    </p>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-eye"></i> Simulación Visual del Sesgo</h2>
+                    <div class="box-glass">
+                        <div class="simulation-box" id="sim1">
+                            <!-- Datos normales -->
+                            <div class="data-point" style="left: 10%;">1</div>
+                            <div class="data-point" style="left: 20%;">2</div>
+                            <div class="data-point" style="left: 30%;">3</div>
+                            <div class="data-point" style="left: 40%;">4</div>
+                            <div class="data-point" style="left: 50%;">5</div>
+                            
+                            <!-- Indicadores -->
+                            <div class="line-median" style="left: 30%;" id="sim1-median"><span class="sim-label" style="background: #28a745; left: -25px;">Mediana</span></div>
+                            <div class="line-mean" style="left: 30%;" id="sim1-mean"><span class="sim-label" style="background: var(--data-orange);">Media</span></div>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button onclick="triggerOutlier()" style="padding:10px 20px; cursor:pointer; background:var(--data-blue); color:white; border:none; border-radius:6px; font-weight:bold;">
+                                <i class="fa-solid fa-plus"></i> Añadir a Michael Jordan / Bill Gates
+                            </button>
                         </div>
                     </div>
                 </section>
             </section>
 
-            <!-- Slide 7: Percentiles -->
+            <!-- Slide 7: Dispersión -->
             <section>
-                <h2><i class="fa-solid fa-chart-pie"></i> Posición y Percentiles</h2>
-                <div class="quote-container" style="padding: 25px; margin-bottom: 20px;">
-                    "En detección de anomalías, los puntos de interés son los outliers. La gran masa de datos sirve principalmente para definir lo 'normal' contra lo cual medimos la anomalía."
-                    <span class="quote-author">— Practical Statistics for Data Scientists</span>
-                </div>
-                <div class="box-glass fragment">
-                    <p>Los <strong>Cuartiles</strong> dividen la distribución en cuatro partes iguales:</p>
-                    <ul>
-                        <li><strong>Q1 (25%)</strong> | <strong>Q2 (50% / Mediana)</strong> | <strong>Q3 (75%)</strong></li>
-                    </ul>
-                    <hr>
-                    <p><strong>IQR (Rango Intercuartílico):</strong> Q3 - Q1. Es la medida de dispersión equivalente a la Mediana: ignora completamente las colas extremas.</p>
+                <section>
+                    <h2><i class="fa-solid fa-arrows-left-right"></i> Dispersión: El Ruido de los Datos</h2>
+                    <p>Conocer el centro no basta; necesitamos medir qué tan dispersos están los datos.</p>
+                    <div class="split-layout">
+                        <div class="box-glass">
+                            <h3 class="accent">Varianza ($s^2$)</h3>
+                            <p style="font-size: 1.2rem; text-align: center;">$s^2 = \frac{\sum (x_i - \bar{x})^2}{n - 1}$</p>
+                            <p>Dividimos por $n-1$ (grados de libertad para muestras). Penaliza fuertemente a los outliers, pero sus unidades son irreales (ej. $ dólares cuadrados).</p>
+                        </div>
+                        <div class="box-glass fragment">
+                            <h3 class="accent">Desviación Estándar ($s$)</h3>
+                            <p style="font-size: 1.2rem; text-align: center;">$s = \sqrt{s^2}$</p>
+                            <p>La raíz cuadrada de la Varianza. Es la <strong>métrica reina</strong> porque regresa a la escala original de los datos.</p>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-shield"></i> Dispersión Robusta</h2>
+                    <p>El Rango simple (Max - Min) es inútil y frágil si hay outliers reales.</p>
+                    <div class="box-glass fragment">
+                        <h4 class="accent">1. Rango Intercuartílico (IQR)</h4>
+                        <p style="text-align: center; font-weight:bold;">$IQR = Q_3 - Q_1$</p>
+                        <p>La diferencia entre el percentil 75 (Q3) y el percentil 25 (Q1). Representa el <strong>corazón del 50%</strong> de los datos centrales, ignorando las colas extremas.</p>
+                    </div>
+                    <div class="box-glass fragment">
+                        <h4 class="accent">2. Desviación Absoluta de la Mediana (MAD)</h4>
+                        <p style="text-align: center; font-weight:bold;">$MAD = \text{Mediana}(|x_i - \tilde{x}|)$</p>
+                        <p>La mediana de las diferencias absolutas de todos los datos respecto a su propia mediana. Es la métrica matemáticamente más inmune a los extremos.</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 8: Distribución Visual -->
+            <section>
+                <h2><i class="fa-solid fa-chart-column"></i> Diagnóstico Visual de la Forma</h2>
+                <p>No son "dibujos bonitos", son radiografías estadísticas de tus datos.</p>
+                <div class="split-layout">
+                    <div class="box-glass" style="padding: 10px 20px;">
+                        <h3 class="accent text-center">El Histograma</h3>
+                        <p style="font-size:0.7em;">Revela la frecuencia, modas y asimetría de los datos.</p>
+                        <div id="histPlot" class="plotly-container"></div>
+                    </div>
+                    <div class="box-glass fragment" style="padding: 10px 20px;">
+                        <h3 class="accent text-center">El Boxplot</h3>
+                        <p style="font-size:0.7em;">Caja=IQR. Línea=Mediana. Puntos=$1.5 \times \text{IQR}$ (Outliers).</p>
+                        <div id="boxPlot" class="plotly-container"></div>
+                    </div>
                 </div>
             </section>
 
-            <!-- Slide 8: Glosario -->
+            <!-- Slide 9: Momentos Estadísticos y Asimetría -->
+            <section>
+                <h2><i class="fa-solid fa-scale-unbalanced"></i> Momentos y Asimetría</h2>
+                <div class="box-glass">
+                    <p>Los 4 momentos del Data Science: Localización (1er), Variabilidad (2do), <strong>Asimetría / Skewness (3er)</strong>, y <strong>Curtosis / Kurtosis (4to)</strong> que evalúa el peso de las colas.</p>
+                </div>
+                <div class="split-layout" style="margin-top: 20px;">
+                    <div class="box-glass fragment" style="text-align: center;">
+                        <h4 style="color: #d9534f;">Sesgo Negativo</h4>
+                        <p>(Cola Izquierda)</p>
+                        <p><code>Media < Mediana < Moda</code></p>
+                    </div>
+                    <div class="box-glass fragment" style="text-align: center; border-left: 6px solid #28a745;">
+                        <h4 style="color: #28a745;">Distribución Normal</h4>
+                        <p>(Simétrica)</p>
+                        <p><code>Media = Mediana = Moda</code></p>
+                    </div>
+                    <div class="box-glass fragment" style="text-align: center;">
+                        <h4 style="color: #f0ad4e;">Sesgo Positivo</h4>
+                        <p>(Cola Derecha)</p>
+                        <p><code>Moda < Mediana < Media</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 9.5: Relaciones Bivariadas -->
+            <section>
+                <h2><i class="fa-solid fa-link"></i> Descriptiva Bivariada</h2>
+                <p>¿Cómo se mueven dos variables numéricas juntas?</p>
+                <div class="split-layout">
+                    <div class="box-glass">
+                        <h3 class="accent">Covarianza ($Cov$)</h3>
+                        <p>Nos indica la <strong>dirección</strong> (positiva o negativa), pero su valor numérico no está estandarizado.</p>
+                        <div id="scatterPlot" class="plotly-container" style="height: 180px;"></div>
+                    </div>
+                    <div class="box-glass fragment">
+                        <h3 class="accent">Correlación de Pearson ($r$)</h3>
+                        <p style="font-size: 1.1rem; text-align: center;">$r = \frac{Cov(x,y)}{s_x s_y}$</p>
+                        <p>Mide la <strong>fuerza</strong> de la relación lineal en un rango exacto de <code>-1 a 1</code>.</p>
+                        <div style="background:#fdf2f2; border-left:4px solid #d9534f; padding:8px; margin-top:10px; font-size:0.85em;">
+                            <strong style="color:#d9534f;">¡Límite!</strong> Pearson solo mide relaciones lineales y es muy sensible a outliers.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 10: Glosario -->
             <section>
                 <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
                 <div class="split-layout">
                     <div class="box-glass">
                         <ul>
                             <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Mean / Trimmed Mean:</strong> Media / Media Recortada.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Median:</strong> Mediana.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Mode:</strong> Moda.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Median / Mode:</strong> Mediana / Moda.</li>
                             <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Variance:</strong> Varianza.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Standard Deviation:</strong> Desv. Estándar.</li>
                         </ul>
                     </div>
                     <div class="box-glass">
                         <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Standard Deviation:</strong> Desv. Estándar.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Outliers:</strong> Valores atípicos.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Skewness:</strong> Asimetría / Sesgo.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>IQR:</strong> Rango Intercuartílico.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Skewness / Kurtosis:</strong> Asimetría / Curtosis.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Covariance:</strong> Covarianza.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Correlation:</strong> Correlación.</li>
+                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Outliers / IQR:</strong> Atípicos / Rango Intercuartílico.</li>
                         </ul>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 9: Pair Programming -->
+            <!-- Slide 11: Pair Programming -->
             <section data-state="cyber-mode">
                 <h2><i class="fa-solid fa-terminal"></i> Pair Programming</h2>
                 <div class="box-glass">
-                    <h3 class="cyber-accent">Misión: Análisis Robusto en Python</h3>
-                    <p>Diríjanse al repositorio de GitHub y descarguen el cuaderno <code>Colab_Guiado_Semana_5.ipynb</code>.</p>
-                    <p>Analizaremos un dataset real de Seaborn utilizando <code>pandas</code>. Implementaremos cálculos de medidas centrales, desviación estándar, y visualizaremos distribuciones completas identificando si la asimetría exige usar la Mediana.</p>
+                    <h3 class="cyber-accent">Misión: Análisis Exploratorio en Python</h3>
+                    <p>Abran Google Colab y carguen el <code>Colab_Guiado_Semana_5.ipynb</code>.</p>
+                    <p>Usaremos el comando estrella <code>df.describe()</code> en Pandas. Plotearán un Boxplot y un Histograma utilizando Seaborn para identificar la <strong>Asimetría</strong> real de los datos, demostrando empíricamente que la Mediana es superior a la Media en este dataset y calculando su <strong>Correlación</strong>.</p>
                     <p><i class="fa-solid fa-code" style="color: #00ffcc;"></i> ¡Manos a la obra!</p>
                 </div>
             </section>
 
-            <!-- Slide 10: Conclusiones -->
-            <section>
-                <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones y Bibliografía</h2>
-                <div class="box-glass" style="margin-bottom: 20px;">
-                    <ul>
-                        <li>La <strong>Mediana</strong> y la <strong>Media Recortada</strong> son estimadores robustos, indispensables en el mundo real donde los datos sucios (outliers) son la norma.</li>
-                        <li>Las medidas de dispersión calibran nuestro nivel de confianza sobre el promedio.</li>
-                    </ul>
-                </div>
-                <div class="box-glass" style="font-size: 0.8em; background: #fff;">
-                    <strong>Lecturas extraídas del Cerebro de Conocimiento:</strong>
-                    <ul>
-                        <li>Bruce, P., Bruce, A., & Gedeck, P. (2020). <em>Practical Statistics for Data Scientists</em>. O'Reilly.</li>
-                        <li>McKinney, W. (2017). <em>Python for Data Analysis</em>. O'Reilly.</li>
-                    </ul>
-                </div>
+            <!-- Slide 12: Cyber Status y Conclusiones -->
+            <section data-state="cyber-mode">
+                <section>
+                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
+                    <div class="box-glass" style="min-height: 200px;">
+                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
+                    </div>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
+                    <div class="box-glass" style="margin-bottom: 20px;">
+                        <ul>
+                            <li>La <strong>Mediana</strong> y la <strong>Media Recortada</strong> son indispensables en el mundo real donde los outliers son la norma.</li>
+                            <li>Las medidas de dispersión calibran nuestro nivel de confianza sobre el promedio.</li>
+                            <li>Los histogramas y boxplots diagnostican asimetrías y colas pesadas antes del modelado.</li>
+                        </ul>
+                    </div>
+                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
+                        <strong>Bibliografía de la Clase:</strong>
+                        <ul>
+                            <li>Bruce, P., Bruce, A., & Gedeck, P. (2020). <em>Practical Statistics for Data Scientists</em>. O'Reilly.</li>
+                            <li>Tukey, J. W. (1977). <em>Exploratory Data Analysis</em>. Addison-Wesley.</li>
+                        </ul>
+                    </div>
+                </section>
             </section>
 
         </div>
@@ -424,37 +559,35 @@
         <span class="close-modal" onclick="closeModals()">&times;</span>
         <h2 class="accent"><i class="fa-solid fa-scale-unbalanced"></i> Media Aritmética</h2>
         <p>Suma de todos los valores dividida por el número de observaciones.</p>
+        <p style="font-size: 1.5rem; text-align: center;">$\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i$</p>
         <p>Sensible a valores extremos. Ideal para distribuciones simétricas.</p>
-        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; color:#003865;">
-            df['columna'].mean()
-        </div>
     </div>
 
     <div class="concept-modal" id="medianaModal">
         <span class="close-modal" onclick="closeModals()">&times;</span>
         <h2 class="accent"><i class="fa-solid fa-align-center"></i> Mediana</h2>
         <p>Valor central de un conjunto de datos ordenados. Divide el conjunto por la mitad.</p>
+        <p style="font-size: 1.5rem; text-align: center;">$\tilde{x} = x_{(n+1)/2}$</p>
         <p>Robusta ante outliers. Ideal para salarios o distribuciones sesgadas.</p>
-        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; color:#003865;">
-            df['columna'].median()
-        </div>
     </div>
 
     <div class="concept-modal" id="modaModal">
         <span class="close-modal" onclick="closeModals()">&times;</span>
         <h2 class="accent"><i class="fa-solid fa-users"></i> Moda</h2>
-        <p>Valor más frecuente. Única medida aplicable a datos cualitativos categóricos.</p>
-        <div style="background:#f4f4f4; padding:10px; border-radius:5px; margin-top:15px; font-family:monospace; color:#003865;">
-            df['columna'].mode()
-        </div>
+        <p>Valor más frecuente en el conjunto de datos.</p>
+        <p>Única medida aplicable matemáticamente a datos categóricos nominales (como país o color).</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
     
     <script>
         Reveal.initialize({
             hash: true, transition: 'slide', controls: true, progress: true,
-            width: "100%", height: "100%", margin: 0, minScale: 1, maxScale: 1
+            width: "100%", height: "100%", margin: 0, minScale: 1, maxScale: 1,
+            plugins: [ RevealHighlight, RevealMath.KaTeX ]
         });
 
         function openModal(id) {
@@ -474,18 +607,84 @@
             if(outlierAdded) return;
             outlierAdded = true;
             
-            // Creamos el elemento del Outlier
             const sim = document.getElementById('sim1');
             const outlier = document.createElement('div');
             outlier.className = 'data-point outlier';
             outlier.style.left = '90%';
-            outlier.innerHTML = '<i class="fa-solid fa-sack-dollar"></i>';
+            outlier.innerHTML = '<i class="fa-solid fa-basketball"></i>';
             sim.appendChild(outlier);
 
-            // Movemos la media agresivamente, la mediana se queda intacta (o apenas se mueve)
             document.getElementById('sim1-mean').style.left = '65%';
             document.getElementById('sim1-median').style.left = '32%';
         }
+
+        // Plotly Graphs Generation
+        function drawPlotlyGraphs() {
+            // Generar datos aleatorios sesgados para el histograma
+            var histData = [];
+            for (var i = 0; i < 500; i++) {
+                histData.push(Math.pow(Math.random(), 2) * 100); 
+            }
+            
+            // 1. Histograma
+            var traceHist = { x: histData, type: 'histogram', marker: {color: '#003865'} };
+            var layoutHist = { margin: {l: 20, r: 20, t: 20, b: 20}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false}, yaxis: {showgrid: false} };
+            Plotly.newPlot('histPlot', [traceHist], layoutHist, {displayModeBar: false});
+
+            // 2. Boxplot
+            var traceBox = { x: histData, type: 'box', name: '', marker: {color: '#E85C0B'} };
+            var layoutBox = { margin: {l: 20, r: 20, t: 20, b: 20}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false} };
+            Plotly.newPlot('boxPlot', [traceBox], layoutBox, {displayModeBar: false});
+
+            // 3. Scatter Plot (Correlación)
+            var scatterX = []; var scatterY = [];
+            for (var j = 0; j < 50; j++) {
+                var xVal = Math.random() * 100;
+                scatterX.push(xVal);
+                scatterY.push(xVal + (Math.random() * 20 - 10)); // Alta correlación positiva
+            }
+            var traceScatter = { x: scatterX, y: scatterY, mode: 'markers', type: 'scatter', marker: {color: '#003865'} };
+            var layoutScatter = { margin: {l: 10, r: 10, t: 10, b: 10}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false, zeroline:false, showticklabels:false}, yaxis: {showgrid: false, zeroline:false, showticklabels:false} };
+            Plotly.newPlot('scatterPlot', [traceScatter], layoutScatter, {displayModeBar: false});
+        }
+
+        // Render charts once the slide is visible
+        Reveal.on('ready', event => { drawPlotlyGraphs(); });
+
+        // Eventos dinámicos por Slide (Typed.js)
+        var typedInstance = null;
+
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
+                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
+                setTimeout(() => {
+                    typedInstance = new Typed('#typed-output', {
+                        strings: [
+                            "> Analizando Matriz de Covarianza...",
+                            "> [ALERTA] Outlier extremo detectado en índice: Michael_Jordan",
+                            "> Recalibrando centro de masa mediante Trimmed Mean...",
+                            "> Evaluando coeficiente de Pearson: r = 0.89",
+                            "> SISTEMA ESTABLE.",
+                            "> [TAREA]: Ejecutar validación estadística en Python."
+                        ],
+                        typeSpeed: 30,
+                        backSpeed: 10,
+                        loop: false,
+                        showCursor: true,
+                        cursorChar: '█'
+                    });
+                }, 500);
+            } else if (typedInstance) {
+                typedInstance.destroy();
+                var el = document.getElementById('typed-output');
+                if(el) el.innerHTML = '';
+            }
+            
+            // Forzar redibujado de Plotly si entramos a la slide de gráficos (bug de redibujado en tabs ocultos)
+            if (event.indexh === 6 || event.indexh === 8) {
+                window.dispatchEvent(new Event('resize'));
+            }
+        });
     </script>
 </body>
 </html>
