@@ -23,90 +23,134 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        .chart-card { transition: all 0.3s; cursor: pointer; }
-        .chart-card:hover { border-color: #E85C0B; background: rgba(232, 92, 11, 0.1); transform: scale(1.02); }
-        .chart-card.selected { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); }
-        .matched { visibility: hidden; opacity: 0; transition: opacity 0.3s; }
+        .fade-in { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .tinder-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s, opacity 0.3s;
+            transform-origin: 50% 100%;
+            will-change: transform, opacity;
+            z-index: 10;
+        }
+        
+        .swipe-left { transform: translateX(-150%) rotate(-30deg); opacity: 0; }
+        .swipe-right { transform: translateX(150%) rotate(30deg); opacity: 0; }
+        
+        .badge-keep { position: absolute; top: 20px; left: 20px; border: 4px solid #22c55e; color: #22c55e; font-size: 2rem; font-weight: bold; padding: 5px 10px; border-radius: 10px; transform: rotate(-15deg); opacity: 0; transition: opacity 0.2s;}
+        .badge-drop { position: absolute; top: 20px; right: 20px; border: 4px solid #ef4444; color: #ef4444; font-size: 2rem; font-weight: bold; padding: 5px 10px; border-radius: 10px; transform: rotate(15deg); opacity: 0; transition: opacity 0.2s;}
+
     </style>
 </head>
 <body class="h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="glass-panel w-full max-w-5xl rounded-2xl p-8 relative">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-chart-pie text-secondary mr-3"></i>Reto: Visualización de Datos</h1>
-            <p class="text-gray-300">Selecciona el caso de uso arriba, y luego el gráfico correcto abajo para hacer match.</p>
+    <div class="w-full max-w-lg relative h-[600px] flex flex-col">
+        <div class="text-center mb-4 z-0">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2"><i class="fas fa-broom text-secondary mr-3"></i>Data Janitor 3000</h1>
+            <p class="text-gray-300 text-sm">Decide rápido: <span class="text-red-400 font-bold">Descartar (Drop)</span> datos basura o <span class="text-green-400 font-bold">Aprobar/Imputar</span> datos salvables.</p>
         </div>
 
-        <div class="grid grid-cols-3 gap-4 mb-8" id="cases-container">
-            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="scatter">Mostrar la relación (correlación) entre dos variables continuas.</div>
-            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="bar">Comparar categorías distintas (Ej. Ventas por país).</div>
-            <div class="glass-panel p-4 rounded-lg text-center font-semibold text-sm cursor-pointer case-card hover:bg-white/10" data-id="line">Mostrar la tendencia de una variable a lo largo del tiempo.</div>
+        <div class="relative flex-1 w-full" id="card-container">
+            <!-- Cards appended here -->
         </div>
 
-        <div class="h-px w-full bg-white/20 mb-8"></div>
-
-        <div class="grid grid-cols-3 gap-6" id="charts-container">
-            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="line">
-                <i class="fas fa-chart-line text-5xl text-blue-300"></i>
-                <span class="font-bold tracking-wide">Gráfico de Líneas</span>
-            </div>
-            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="scatter">
-                <i class="fas fa-project-diagram text-5xl text-green-300"></i>
-                <span class="font-bold tracking-wide">Gráfico de Dispersión</span>
-            </div>
-            <div class="chart-card glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-3" data-id="bar">
-                <i class="fas fa-chart-bar text-5xl text-yellow-300"></i>
-                <span class="font-bold tracking-wide">Gráfico de Barras</span>
-            </div>
+        <div class="flex justify-center gap-8 mt-6 z-0">
+            <button onclick="handleBtnClick('drop')" class="w-16 h-16 rounded-full bg-slate-800 border-2 border-red-500 text-red-500 text-2xl hover:bg-red-500 hover:text-white transition shadow-[0_0_15px_rgba(239,68,68,0.3)]"><i class="fas fa-times"></i></button>
+            <button onclick="handleBtnClick('keep')" class="w-16 h-16 rounded-full bg-slate-800 border-2 border-green-500 text-green-500 text-2xl hover:bg-green-500 hover:text-white transition shadow-[0_0_15px_rgba(34,197,94,0.3)]"><i class="fas fa-check"></i></button>
         </div>
 
-        <div id="end-screen" class="absolute inset-0 bg-slate-900/90 backdrop-blur-md rounded-2xl hidden flex-col items-center justify-center z-10">
-            <h2 class="text-4xl font-bold text-green-400 mb-4">¡Excelente Análisis!</h2>
-            <p class="text-xl text-gray-300 mb-8">Comprendes qué gráfico usar para cada propósito.</p>
-            <button onclick="location.reload()" class="bg-primary text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-900 transition">Reintentar</button>
+        <div id="end-screen" class="absolute inset-0 bg-slate-900/95 backdrop-blur-xl rounded-2xl hidden flex-col items-center justify-center z-50 fade-in">
+            <i class="fas fa-star text-7xl text-yellow-400 mb-6"></i>
+            <h2 class="text-4xl font-bold text-white mb-2">¡Dataset Limpio!</h2>
+            <p class="text-xl text-gray-300 mb-4">Puntuación: <span id="final-score" class="text-blue-400 font-bold">0</span>/5</p>
+            <p class="text-md text-gray-400 mb-8 text-center px-4" id="feedback-msg"></p>
+            <button onclick="location.reload()" class="bg-secondary text-white font-bold px-8 py-3 rounded-lg hover:bg-orange-600 transition shadow-lg">Otra Limpieza</button>
         </div>
     </div>
 
     <script>
-        let selectedCase = null;
-        let matches = 0;
+        const dataRows = [
+            { id: 1, text: "Edad: 1500 años<br>Salario: $50,000<br>Ocupación: Ingeniero", action: 'drop', reason: "La edad es biológicamente imposible (ruido/basura extremo)." },
+            { id: 2, text: "Edad: 35 años<br>Salario: NaN<br>Ocupación: Médico", action: 'keep', reason: "El salario nulo se puede imputar con la mediana de los médicos." },
+            { id: 3, text: "ID: NaN<br>Nombre: NaN<br>Edad: NaN", action: 'drop', reason: "Fila completamente vacía, no aporta ninguna información." },
+            { id: 4, text: "Edad: 22 años<br>Salario: $25,000<br>Género: N/A", action: 'keep', reason: "El género ausente puede ser imputado con la moda o dejado como 'Desconocido'." },
+            { id: 5, text: "Edad: -5 años<br>Salario: -$10,000<br>Ocupación: NaN", action: 'drop', reason: "Valores numéricos negativos sin sentido para edad y salario." }
+        ].reverse(); // Reverse so we can pop from end (top of visual stack)
 
-        document.querySelectorAll('.case-card').forEach(card => {
-            card.addEventListener('click', () => {
-                if(card.classList.contains('matched')) return;
-                document.querySelectorAll('.case-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedCase = card;
+        let score = 0;
+        let currentIndex = 5;
+
+        function createCard(data, index) {
+            const card = document.createElement('div');
+            card.className = 'tinder-card glass-panel rounded-2xl bg-slate-800 border-2 border-slate-600 shadow-xl flex flex-col justify-center p-8';
+            card.style.zIndex = index;
+            card.dataset.action = data.action;
+            card.dataset.reason = data.reason;
+            
+            card.innerHTML = `
+                <div class="badge-keep">APROBAR</div>
+                <div class="badge-drop">DROP</div>
+                <div class="mb-6">
+                    <h3 class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Fila de Datos #${5 - index}</h3>
+                    <div class="w-full h-1 bg-slate-700 rounded-full"></div>
+                </div>
+                <div class="font-mono text-xl text-blue-200 leading-loose">
+                    ${data.text}
+                </div>
+            `;
+            return card;
+        }
+
+        function initCards() {
+            const container = document.getElementById('card-container');
+            dataRows.forEach((data, i) => {
+                container.appendChild(createCard(data, i));
             });
-        });
+        }
 
-        document.querySelectorAll('.chart-card').forEach(chart => {
-            chart.addEventListener('click', () => {
-                if(!selectedCase) return;
-                
-                const caseId = selectedCase.getAttribute('data-id');
-                const chartId = chart.getAttribute('data-id');
+        function handleBtnClick(userAction) {
+            const container = document.getElementById('card-container');
+            const cards = container.querySelectorAll('.tinder-card:not(.swipe-left):not(.swipe-right)');
+            if (cards.length === 0) return;
+            
+            const topCard = cards[cards.length - 1];
+            const correctAction = topCard.dataset.action;
+            
+            // Show badge
+            if(userAction === 'keep') {
+                topCard.querySelector('.badge-keep').style.opacity = '1';
+                topCard.classList.add('swipe-right');
+            } else {
+                topCard.querySelector('.badge-drop').style.opacity = '1';
+                topCard.classList.add('swipe-left');
+            }
 
-                if(caseId === chartId) {
-                    // Match!
-                    selectedCase.classList.add('matched');
-                    chart.classList.add('matched');
-                    selectedCase.classList.remove('selected');
-                    selectedCase = null;
-                    matches++;
-                    
-                    if(matches === 3) {
-                        setTimeout(() => {
-                            document.getElementById('end-screen').style.display = 'flex';
-                        }, 500);
-                    }
-                } else {
-                    // Error
-                    chart.classList.add('border-red-500');
-                    setTimeout(() => chart.classList.remove('border-red-500'), 400);
+            if(userAction === correctAction) {
+                score++;
+            }
+
+            setTimeout(() => {
+                topCard.style.display = 'none';
+                currentIndex--;
+                if(currentIndex === 0) {
+                    showEndScreen();
                 }
-            });
-        });
+            }, 300);
+        }
+
+        function showEndScreen() {
+            document.getElementById('end-screen').style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+            let msg = "";
+            if(score === 5) msg = "¡Impecable! Eres un verdadero Data Janitor. Sabes distinguir el ruido de los datos útiles.";
+            else if(score >= 3) msg = "Buen trabajo, pero algunos algoritmos podrían envenenarse con las filas que dejaste pasar.";
+            else msg = "Cuidado. Eliminar datos útiles o aprobar basura destruye cualquier modelo de Machine Learning.";
+            document.getElementById('feedback-msg').innerText = msg;
+        }
+
+        initCards();
     </script>
 </body>
 </html>

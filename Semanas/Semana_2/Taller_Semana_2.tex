@@ -7,14 +7,12 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{fancyhdr}
+\usepackage{amsmath}
 
 \definecolor{unabblue}{HTML}{003865}
 \definecolor{unaborange}{HTML}{E85C0B}
 \definecolor{codegray}{rgb}{0.95,0.95,0.95}
 \definecolor{codeorange}{rgb}{0.8,0.3,0.0}
-
-
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -25,7 +23,7 @@
 \begin{document}
 
 \begin{center}
-    {\huge \textcolor{unabblue}{\textbf{Taller 2: Fundamentos de Python}}} \\[0.5cm]
+    {\huge \textcolor{unabblue}{\textbf{Taller 2: Fundamentos "Pythonic" y Estructuras Core}}} \\[0.5cm]
     {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
     \rule{\textwidth}{1pt}
 \end{center}
@@ -33,55 +31,77 @@
 \vspace{0.5cm}
 
 \section*{\textcolor{unabblue}{1. Objetivo del Taller}}
-Afianzar los conocimientos en estructuras básicas de Python, declaración de variables, operadores y uso de librerías esenciales (Pandas) mediante la resolución de un problema práctico de negocio.
+Desarrollar la lógica de programación mediante el dominio de las estructuras de datos nativas de Python (Listas, Tuplas, Diccionarios y Sets). El estudiante aprenderá a escribir código eficiente, legible y alineado con la filosofía "Pythonic" de Joel Grus, sentando las bases para la posterior manipulación de DataFrames masivos.
 
-\section*{\textcolor{unabblue}{2. Instrucciones}}
-Deberá resolver los siguientes ejercicios utilizando \textbf{Google Colab}. Una vez finalizado, descargue su archivo \texttt{.ipynb} y súbalo a su repositorio de GitHub. 
+\section*{\textcolor{unabblue}{2. Instrucciones Generales}}
+Desarrolle los siguientes retos en un Jupyter Notebook (Google Colab). Utilice celdas de Markdown para explicar la lógica de su código. \textbf{Restricción estricta:} En este taller está prohibido importar librerías externas como Pandas o Numpy. Toda solución debe construirse usando exclusivamente Python puro (Built-in functions). Al finalizar, descargue el notebook o suba el enlace a su repositorio.
 
 \vspace{0.5cm}
 \noindent\fbox{%
     \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
-        \textbf{\textcolor{unabblue}{Ejercicio Práctico: Inventario Estelar}}\\[0.2cm]
-        Usted es el encargado del inventario de una tienda de tecnología. Su base de datos local se ha corrompido, pero logró rescatar algunos datos en bruto en forma de código Python.
+        \textbf{\textcolor{unabblue}{Misión Analítica: El Motor del E-Commerce}}\\[0.2cm]
+        Ha sido asignado al equipo de ingeniería de datos de una startup de comercio electrónico. Su tarea es procesar las estructuras de datos crudas (JSON-like) provenientes de la base de datos de usuarios y carritos de compras, para generar analítica de valor.
     }%
 }
 \vspace{0.5cm}
 
-\subsection*{Parte A: Tipos de Datos (25\%)}
-Declare las siguientes variables en Python y utilice la función \texttt{type()} para imprimir el tipo de dato de cada una:
-\begin{itemize}
-    \item \texttt{producto = "Laptop Gamer"}
-    \item \texttt{precio = 1250.50}
-    \item \texttt{cantidad = 15}
-    \item \texttt{en\_stock = True}
-\end{itemize}
-
-\subsection*{Parte B: Colecciones (25\%)}
-Cree una \textbf{lista} llamada \texttt{ventas\_semana} que contenga las siguientes cantidades: \texttt{5, 12, 8, 20, 3}.
-Luego, utilizando funciones nativas de Python (como \texttt{sum()}, \texttt{max()}, \texttt{min()}):
+\subsection*{Reto 1: La Magia de las List Comprehensions (20\%)}
+El departamento de ventas necesita aplicar un descuento relámpago del 15\% a todos los productos de la tienda y filtrar solo aquellos que queden con un precio final menor a \$50. 
+Dado el siguiente listado de precios (en dólares):
+\begin{center}
+    \texttt{precios = [25.5, 60.0, 15.0, 120.0, 45.0, 99.9, 10.0]}
+\end{center}
 \begin{enumerate}
-    \item Calcule e imprima el total de ventas de la semana.
-    \item Calcule e imprima el día de mayor y menor venta.
+    \item Resuelva el problema escribiendo un \textbf{bucle \texttt{for} tradicional} (creando una lista vacía y haciendo \texttt{append}).
+    \item Resuelva el \textbf{mismo problema} en una sola línea de código utilizando una \textbf{List Comprehension}.
+    \item \textbf{Análisis Crítico:} Basado en el "Zen de Python", ¿por qué la segunda opción es preferida por los Científicos de Datos?
 \end{enumerate}
 
-\subsection*{Parte C: Introducción a Pandas (50\%)}
-A partir del siguiente diccionario en Python, conviértalo en un \textbf{DataFrame} utilizando Pandas y expórtelo como un archivo CSV llamado \texttt{inventario.csv}.
-
+\subsection*{Reto 2: El Diccionario como Base de Datos (30\%)}
+Usted recibe la información de un usuario desde la API en formato Diccionario:
 \begin{verbatim}
-import pandas as pd
-
-datos = {
-    'Producto': ['Mouse', 'Teclado', 'Monitor', 'Cable HDMI'],
-    'Precio': [15.0, 45.0, 200.0, 5.0],
-    'Stock': [100, 50, 20, 200]
+usuario = {
+    "id": 105,
+    "nombre": "Ana Gomez",
+    "historial_compras": [
+        {"item": "Laptop", "precio": 1200},
+        {"item": "Mouse", "precio": 25},
+        {"item": "Monitor", "precio": 250}
+    ],
+    "activo": True
 }
 \end{verbatim}
+\begin{enumerate}
+    \item Escriba el código en Python para extraer (imprimir) el precio del "Monitor" navegando por la estructura anidada del diccionario.
+    \item Calcule el "Total Gastado" por la usuaria iterando sobre su \texttt{historial\_compras} (recuerde: es una lista de diccionarios).
+    \item Agregue una nueva clave al diccionario principal llamada \texttt{"categoria\_cliente"} que sea \texttt{"VIP"} si el gasto total supera los \$1000, y \texttt{"Standard"} si es menor. Imprima el diccionario actualizado.
+\end{enumerate}
 
-Una vez convertido a DataFrame, calcule en una nueva columna el valor total del inventario por producto (Multiplicando Precio x Stock).
+\subsection*{Reto 3: Desduplicación con Sets (20\%)}
+El equipo de marketing lanzó una campaña y registró los IDs de los usuarios que hicieron clic en el anuncio. Sin embargo, el sistema falló y guardó clics duplicados del mismo usuario.
+\begin{center}
+    \texttt{clics = [101, 102, 101, 105, 108, 102, 109, 101, 110]}
+\end{center}
+\begin{enumerate}
+    \item Utilizando la estructura de datos \texttt{Set} (Conjunto), limpie la lista para que contenga únicamente IDs únicos.
+    \item Calcule y muestre en pantalla cuántos usuarios \textbf{únicos} interactuaron con la campaña.
+\end{enumerate}
+
+\subsection*{Reto 4: Tuplas y Desempaquetado (Tuple Unpacking) (10\%)}
+Usted tiene una función (simulada) de una base de datos que retorna las coordenadas espaciales de los repartidores como una \textbf{Tupla}: \texttt{coordenadas = (4.6097, -74.0817, "Bogotá")}
+\begin{enumerate}
+    \item Utilice la técnica de "Tuple Unpacking" para asignar estos tres valores directamente a tres variables distintas (\texttt{latitud}, \texttt{longitud}, \texttt{ciudad}) en una sola línea de código.
+    \item Intente reasignar el valor de la latitud modificando la tupla original (Ej. \texttt{coordenadas[0] = 5.0}). Explique el error que Python arroja y la importancia de la \textbf{inmutabilidad} en el diseño de software.
+\end{enumerate}
+
+\subsection*{Reto 5: Reto Autónomo de Integración (20\%)}
+Cree un programa que reciba un texto corto (Ej. "la ciencia de datos es el futuro de la ciencia").
+Su objetivo es construir un diccionario donde las \textbf{claves} sean las palabras únicas del texto, y los \textbf{valores} sean la cantidad de veces que aparece esa palabra (frecuencia).
+\textit{Pista: Puede usar el método \texttt{.split()} para separar el texto en una lista de palabras, y luego iterar sobre ella.}
 
 \vspace{1cm}
 \begin{center}
-    \textit{\textcolor{gray}{"El código limpio siempre parece que fue escrito por alguien a quien le importa."}}
+    \textit{\textcolor{gray}{"Hermoso es mejor que feo. Explícito es mejor que implícito. Simple es mejor que complejo." \\ - El Zen de Python}}
 \end{center}
 
 \end{document}

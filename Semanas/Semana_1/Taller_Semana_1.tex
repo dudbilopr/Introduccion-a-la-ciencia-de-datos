@@ -7,9 +7,12 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
+\usepackage{amsmath}
 
 \definecolor{unabblue}{HTML}{003865}
 \definecolor{unaborange}{HTML}{E85C0B}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeorange}{rgb}{0.8,0.3,0.0}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -20,7 +23,7 @@
 \begin{document}
 
 \begin{center}
-    {\huge \textcolor{unabblue}{\textbf{Taller 1: El Perfil del Científico de Datos}}} \\[0.5cm]
+    {\huge \textcolor{unabblue}{\textbf{Taller 1: El ADN del Data Scientist y Casos de Negocio}}} \\[0.5cm]
     {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
     \rule{\textwidth}{1pt}
 \end{center}
@@ -28,36 +31,51 @@
 \vspace{0.5cm}
 
 \section*{\textcolor{unabblue}{1. Objetivo del Taller}}
-Profundizar en los conceptos fundamentales sobre el rol del científico de datos, la evolución del Big Data y el panorama ético y profesional de la Inteligencia Artificial en la actualidad, con base en el material introductorio.
+Identificar las capacidades, roles y perfilamiento requerido en un equipo de Ciencia de Datos frente a escenarios de negocio reales. El estudiante aplicará el Diagrama de Venn de Conway para categorizar perfiles analíticos y comprender el ciclo de vida (CRISP-DM) aplicado a un caso práctico de la industria.
 
-\section*{\textcolor{unabblue}{2. Instrucciones}}
-Lea detalladamente las siguientes situaciones y responda cada pregunta. Puede utilizar herramientas de IA como apoyo (ChatGPT, Claude), pero las respuestas deben estar argumentadas con sus propias palabras.
+\section*{\textcolor{unabblue}{2. Instrucciones Generales}}
+Este es un taller conceptual y de análisis estratégico. No requiere código de programación, pero requiere un análisis riguroso y justificación técnica. Las respuestas deben entregarse en un documento estructurado (Word/PDF o un Markdown en su repositorio). \textbf{Justifique cada respuesta; no se aceptan soluciones de una sola palabra.}
 
 \vspace{0.5cm}
 \noindent\fbox{%
     \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
-        \textbf{\textcolor{unabblue}{Caso Práctico 1: El Dilema de los Datos}}\\[0.2cm]
-        \textbf{Contexto:} Una empresa de comercio electrónico ha recopilado millones de registros sobre los hábitos de compra de sus usuarios. Quieren contratar a un Científico de Datos para que aumente las ventas sin importar si eso implica sesgar las recomendaciones o invadir la privacidad de los usuarios.
+        \textbf{\textcolor{unabblue}{Misión Analítica: Diseñando el Dream Team}}\\[0.2cm]
+        Usted ha sido contratado como Chief Data Officer (CDO) de una gran empresa de telecomunicaciones. Su objetivo es diagnosticar los problemas actuales del departamento de analítica y estructurar las soluciones desde un enfoque de Ciencia de Datos moderno.
     }%
 }
 \vspace{0.5cm}
 
+\subsection*{Reto 1: Análisis del Diagrama de Conway (25\%)}
+Al llegar a la empresa, audita a tres miembros clave de su equipo actual. Basado en el Diagrama de Venn de Drew Conway, identifique en qué perfil exacto o intersección se encuentra cada empleado y explique los riesgos que esto conlleva:
 \begin{enumerate}
-    \item Según lo visto en clase sobre el perfil profesional, ¿cuál debería ser la postura ética del Científico de Datos frente a esta solicitud? Justifique su respuesta basándose en los estándares de la industria (ej. WEF, Stanford AI).
-    \item ¿Qué diferencia existe entre un Data Engineer y un Data Scientist en este proyecto? Describa brevemente qué tareas le corresponderían a cada rol.
+    \item \textbf{Empleado A:} Tiene 10 años en la empresa. Conoce a la perfección qué clientes se dan de baja y cómo se comportan las ventas. Utiliza Excel avanzado para generar reportes, pero no sabe programar en Python ni conoce la teoría probabilística.
+    \item \textbf{Empleado B:} Un ingeniero de software recién contratado. Es experto en crear bases de datos y raspar información de la web (Web Scraping). Se le pidió encontrar por qué se van los clientes, así que aplicó un algoritmo complejo que encontró en internet, sin entender las matemáticas subyacentes ni el modelo de negocio.
+    \item \textbf{Empleado C:} Tiene un doctorado en Física. Es un experto en inferencia estadística y domina Python/R a la perfección. Sin embargo, nunca ha trabajado en el sector empresarial y desconoce qué es el ``ARPU" (Ingreso Promedio por Usuario) o cómo impactan sus modelos en el balance financiero.
 \end{enumerate}
 
-\section*{\textcolor{unabblue}{3. Investigación Autonoma}}
-Ingrese a un portal de empleo (ej. LinkedIn o Glassdoor) y busque el cargo "Data Scientist". Analice 3 ofertas de trabajo y complete lo siguiente:
-\begin{itemize}
-    \item Liste las 3 herramientas tecnológicas más solicitadas.
-    \item Identifique al menos 2 habilidades blandas (\textit{Soft Skills}) requeridas.
-    \item ¿Qué tan importante es el dominio del idioma inglés en estas ofertas?
-\end{itemize}
+\subsection*{Reto 2: Distinción de Roles en la Industria (25\%)}
+La junta directiva autoriza la contratación de tres nuevos profesionales: un \textbf{Data Engineer}, un \textbf{Data Analyst} y un \textbf{Data Scientist}. Asigne el rol correcto a cada una de las siguientes tareas y justifique su elección:
+\begin{enumerate}
+    \item Diseñar y entrenar una red neuronal para predecir si un nuevo cliente será un fraude.
+    \item Crear un tablero (Dashboard) interactivo en PowerBI para que el gerente de ventas vea el rendimiento mensual regional.
+    \item Construir un pipeline (tubería) en la nube (AWS/GCP) que extraiga millones de registros de logs del servidor web y los almacene de forma estructurada en un Data Warehouse.
+\end{enumerate}
+
+\subsection*{Reto 3: Aplicando el Ciclo CRISP-DM (30\%)}
+El problema de mayor impacto financiero actual en la empresa es el `Churn' (abandono de clientes). Se le pide liderar el proyecto para reducir esta tasa.
+Describa, paso a paso, cómo aplicaría las 6 fases del marco de trabajo \textbf{CRISP-DM} a este problema específico. 
+\textit{Pista: Comience definiendo cuál es el objetivo de negocio (Business Understanding) y qué información solicitaría (Data Understanding).}
+
+\subsection*{Reto 4: Análisis Crítico y Ética (20\%)}
+Durante la fase de exploración del proyecto de Churn, su equipo descubre que pueden predecir con gran exactitud si un cliente abandonará la empresa utilizando la variable `Estatus Socioeconómico' y la variable `Raza', basándose en registros históricos de deudas.
+\begin{enumerate}
+    \item ¿Cuáles son los riesgos éticos y de sesgo de utilizar estas variables en un modelo predictivo?
+    \item Relacionando esto con el concepto de \textit{Ciencia de Datos Responsable}, ¿cómo debería proceder el Científico de Datos en este escenario?
+\end{enumerate}
 
 \vspace{1cm}
 \begin{center}
-    \textit{\textcolor{gray}{"El mayor valor de los datos no está en tenerlos, sino en saber qué preguntas hacerles."}}
+    \textit{\textcolor{gray}{`La herramienta no hace al científico; la forma estructurada de pensar y resolver problemas sí.'}}
 \end{center}
 
 \end{document}

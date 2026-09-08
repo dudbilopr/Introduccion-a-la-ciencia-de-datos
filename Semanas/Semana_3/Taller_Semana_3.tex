@@ -7,14 +7,12 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{fancyhdr}
+\usepackage{amsmath}
 
 \definecolor{unabblue}{HTML}{003865}
 \definecolor{unaborange}{HTML}{E85C0B}
 \definecolor{codegray}{rgb}{0.95,0.95,0.95}
 \definecolor{codeorange}{rgb}{0.8,0.3,0.0}
-
-
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -25,7 +23,7 @@
 \begin{document}
 
 \begin{center}
-    {\huge \textcolor{unabblue}{\textbf{Taller 3: Estructuras, Ciclos y Pandas}}} \\[0.5cm]
+    {\huge \textcolor{unabblue}{\textbf{Taller 3: Vectorización, Numpy y Exploración con Pandas}}} \\[0.5cm]
     {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
     \rule{\textwidth}{1pt}
 \end{center}
@@ -33,55 +31,69 @@
 \vspace{0.5cm}
 
 \section*{\textcolor{unabblue}{1. Objetivo del Taller}}
-Integrar el conocimiento de control de flujo (ciclos iterativos y condicionales) con el análisis de grandes volúmenes de datos utilizando la librería Pandas.
+Demostrar la superioridad en rendimiento de la vectorización matemática frente a la iteración clásica de Python. El estudiante importará y explorará datos tubulares utilizando Pandas y ejecutará operaciones masivas a nivel de CPU usando Numpy.
 
-\section*{\textcolor{unabblue}{2. Instrucciones}}
-Cree un nuevo cuaderno en Google Colab para desarrollar este taller. Todo el código debe estar comentado y los resultados deben ser claros. Suba el archivo a su repositorio al finalizar.
+\section*{\textcolor{unabblue}{2. Instrucciones Generales}}
+Desarrolle los siguientes retos en un Jupyter Notebook (Google Colab). En este taller \textbf{SÍ} está permitido y es obligatorio el uso de \texttt{numpy} y \texttt{pandas}. Documente su proceso utilizando celdas de Markdown. Al finalizar, descargue el notebook o suba el enlace a su repositorio.
 
 \vspace{0.5cm}
 \noindent\fbox{%
     \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
-        \textbf{\textcolor{unabblue}{Misión Analítica: Recursos Humanos}}\\[0.2cm]
-        El departamento de RRHH de una startup tecnológica le ha entregado datos desorganizados de sus empleados. Usted debe automatizar la limpieza y el análisis de estos datos.
+        \textbf{\textcolor{unabblue}{Misión Analítica: IoT y Big Data}}\\[0.2cm]
+        Una red de sensores IoT instalada en tractores agrícolas envía miles de mediciones de temperatura y humedad por minuto. El código actual en Python puro está colapsando el servidor por su lentitud. Su misión es refactorizar el procesamiento a Numpy y Pandas.
     }%
 }
 \vspace{0.5cm}
 
-\subsection*{Reto 1: Limpieza con Ciclos (30\%)}
-Usted recibe la siguiente lista de nombres, los cuales fueron ingresados erróneamente por un sistema antiguo (con mayúsculas, minúsculas y espacios extra):
-
-\begin{verbatim}
-empleados_sucios = [
-    "   aNa perEz  ", "CARLOS Gomez", " lucia fernandez ", 
-    "mArIo RoDrIgUeZ ", "   jUaN pAbLo ", "SOFIA martinez   ",
-    "   ALBERTO fRAnCO", " david gonzalez ", " mArIa jOsE  ",
-    " PABLO  escobar", "ANDRES felipe   ", "  cArMeN sAlInAs "
-]
-\end{verbatim}
-
-Utilizando un \textbf{ciclo for} y funciones de texto en Python (como \texttt{strip()} y \texttt{title()}), genere una nueva lista llamada \texttt{empleados\_limpios} que contenga los nombres formateados correctamente (Ej. "Ana Perez").
-
-\subsection*{Reto 2: Construcción del DataFrame (30\%)}
-Utilizando la lista \texttt{empleados\_limpios} del Reto 1, y la siguiente información adicional, construya un DataFrame de Pandas:
-\begin{itemize}
-    \item \begin{verbatim}
-salarios = [2500, 3200, 1800, 4500, 2100, 3600, 2900, 1500, 4100, 3000, 2800, 3500]
-\end{verbatim} 
-    \item \textbf{Departamento:} ['Ventas', 'TI', 'Ventas', 'Finanzas', 'TI', 'Ventas', 'Finanzas', 'TI', 'Ventas', 'TI', 'Finanzas', 'Ventas']
-\end{itemize}
-Imprima el DataFrame resultante en pantalla.
-
-\subsection*{Reto 3: Lógica y Filtrado (40\%)}
-Con el DataFrame construido en el Reto 2, escriba código en Pandas para responder a las siguientes preguntas:
+\subsection*{Reto 1: La Muerte del Bucle \texttt{for} (30\%)}
+Para simular el volumen de datos, cree una lista en Python con 1 millón de registros aleatorios de temperatura (entre 10.0 y 40.0 grados Celsius):
+\begin{center}
+    \texttt{import random}\\
+    \texttt{temp\_celsius = [random.uniform(10.0, 40.0) for \_ in range(1000000)]}
+\end{center}
 \begin{enumerate}
-    \item ¿Cuál es el salario promedio de la empresa?
-    \item Filtre el DataFrame para mostrar \textbf{solo} a los empleados que trabajan en el departamento de "Ventas".
-    \item (Bonus) Escriba un código condicional (\texttt{if}) que verifique si el salario promedio es mayor a 3000, imprimiendo "Salario competitivo" en caso afirmativo, y "Revisar tabulador" en caso negativo.
+    \item \textbf{El método lento:} Escriba una función clásica con un bucle \texttt{for} que convierta todas las temperaturas de Celsius a Fahrenheit ($F = C \times 1.8 + 32$). Mida el tiempo de ejecución usando el módulo \texttt{time}.
+    \item \textbf{La vía Numpy:} Convierta la lista a un arreglo de Numpy (\texttt{np.array}). Ejecute la misma operación matemática directamente sobre el arreglo completo (vectorización). Mida el tiempo de ejecución.
+    \item \textbf{Análisis Crítico:} Calcule cuántas veces más rápido es Numpy en comparación con el bucle tradicional y explique \textbf{por qué} ocurre este fenómeno a nivel de arquitectura (pista: C vs Python y memoria contigua).
+\end{enumerate}
+
+\subsection*{Reto 2: Álgebra Lineal Descriptiva (20\%)}
+Usted tiene una matriz de $3 \times 3$ que representa las ventas (en miles de USD) de 3 sucursales durante 3 días.
+\begin{center}
+    $ \text{Ventas} = \begin{bmatrix}
+    12 & 15 & 10 \\
+    20 & 18 & 22 \\
+    8 & 9 & 11
+    \end{bmatrix} $
+\end{center}
+\begin{enumerate}
+    \item Utilice \texttt{numpy} para construir la matriz bidimensional (\texttt{np.array}).
+    \item Utilice funciones vectorizadas para responder:
+    \begin{itemize}
+        \item ¿Cuál fue la venta máxima registrada en toda la matriz?
+        \item ¿Cuál fue el promedio de ventas por cada \textbf{día} (columnas) (usando el argumento \texttt{axis})?
+        \item ¿Cuál fue el total de ventas por \textbf{sucursal} (filas)?
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Reto 3: Exploración Sensorial con Pandas (30\%)}
+Para este reto, debe investigar cómo generar un DataFrame de juguete usando Pandas.
+\begin{enumerate}
+    \item Cree un \texttt{pd.DataFrame} de 5 filas y 4 columnas. Las columnas deben ser: \texttt{['id\_sensor', 'fecha', 'temperatura', 'estado']}. Llene los datos con valores inventados realistas (el estado puede ser "Activo" o "Inactivo").
+    \item Utilice los métodos \texttt{.head()}, \texttt{.info()} y \texttt{.describe()} sobre el DataFrame e interprete lo que cada uno arroja en una celda de Markdown.
+    \item Ejecute la instrucción \texttt{df['temperatura'].mean()} y explique qué tipo de objeto (clase) retorna extraer una sola columna de un DataFrame (Series vs DataFrame).
+\end{enumerate}
+
+\subsection*{Reto 4: Filtrado Booleano Inteligente (20\%)}
+Del DataFrame creado en el Reto 3, el equipo de mantenimiento necesita una lista de los sensores que presenten fallas.
+\begin{enumerate}
+    \item Escriba el código en Pandas para filtrar y mostrar \textbf{únicamente} las filas donde el \texttt{estado} sea "Inactivo" \textbf{Y} (\texttt{\&}) la \texttt{temperatura} sea superior a 30 grados.
+    \item \textbf{Análisis Crítico:} ¿Por qué en Pandas utilizamos el operador \texttt{\&} en lugar de la palabra reservada \texttt{and} de Python tradicional al hacer filtrado múltiple?
 \end{enumerate}
 
 \vspace{1cm}
 \begin{center}
-    \textit{\textcolor{gray}{"Automatizar lo repetitivo para enfocarnos en lo creativo."}}
+    \textit{\textcolor{gray}{`Vectorizar no es solo una optimización de código, es cambiar la mentalidad algorítmica iterativa por una mentalidad algebraica.'}}
 \end{center}
 
 \end{document}

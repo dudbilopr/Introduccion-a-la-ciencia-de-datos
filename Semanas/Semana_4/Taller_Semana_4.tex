@@ -7,22 +7,12 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{listings}
-\usepackage{booktabs}
+\usepackage{amsmath}
 
 \definecolor{unabblue}{HTML}{003865}
 \definecolor{unaborange}{HTML}{E85C0B}
-
-\lstset{
-    language=Python,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{unaborange}\bfseries,
-    stringstyle=\color{unabblue},
-    commentstyle=\color{gray},
-    frame=single,
-    backgroundcolor=\color{white},
-    showstringspaces=false
-}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeorange}{rgb}{0.8,0.3,0.0}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -33,7 +23,7 @@
 \begin{document}
 
 \begin{center}
-    {\huge \textcolor{unabblue}{\textbf{Taller 4: Análisis Exploratorio y Visualización}}} \\[0.5cm]
+    {\huge \textcolor{unabblue}{\textbf{Taller 4: Data Janitor 3000 (Limpieza y SQL)}}} \\[0.5cm]
     {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
     \rule{\textwidth}{1pt}
 \end{center}
@@ -41,57 +31,75 @@
 \vspace{0.5cm}
 
 \section*{\textcolor{unabblue}{1. Objetivo del Taller}}
-Aplicar de manera sistemática los 8 pasos del Procesamiento Exhaustivo de Datos (EDA) utilizando la librería Pandas. Aprender a limpiar, transformar y visualizar datos complejos del mundo real utilizando estándares de alto impacto (Seaborn, Plotly).
+Enfrentar la realidad de los datos del mundo real: la suciedad y la inconsistencia. El estudiante aplicará técnicas de imputación estadística usando Pandas y ejecutará cruces lógicos simulando operaciones de bases de datos relacionales (SQL Joins).
 
-\section*{\textcolor{unabblue}{2. Caso de Estudio: Análisis Clínico Cardiovascular}}
-Usted ha sido contratado como Científico de Datos Junior en la clínica "UNAB-Salud". Le han proporcionado un extracto de registros médicos (sobre los cuales debe aplicar un diagnóstico de la calidad de la información) antes de entrenar un modelo predictivo de riesgo cardíaco.
+\section*{\textcolor{unabblue}{2. Instrucciones Generales}}
+Desarrolle los retos en un Jupyter Notebook. Para este taller necesitará generar los \texttt{DataFrames} de juguete propuestos usando diccionarios. Suba el documento a su repositorio documentando claramente por qué tomó cada decisión de limpieza.
 
-\vspace{0.3cm}
-\noindent\textbf{Muestra del Dataset:}
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{@{}lrlclcr@{}}
-\toprule
-\textbf{Paciente\_ID} & \textbf{Edad} & \textbf{Género} & \textbf{Colesterol} & \textbf{Fumador} & \textbf{Glucosa} & \textbf{Riesgo} \\ \midrule
-P001                 & 54            & M               & 220                 & Sí               & 110              & 1               \\
-P002                 & NaN           & F               & 180                 & No               & 95               & 0               \\
-P003                 & 62            & M               & 280                 & NaN              & 130              & 1               \\
-P004                 & 45            & F               & 195                 & No               & NaN              & 0               \\
-P005                 & 70            & M               & 310                 & Sí               & 160              & 1               \\
-P006                 & 38            & F               & 150                 & No               & 85               & 0               \\
-P007                 & 54            & M               & 220                 & Sí               & 110              & 1               \\
-P008                 & 91            & F               & 160                 & No               & 92               & 0               \\ \bottomrule
-\end{tabular}
-\end{table}
+\vspace{0.5cm}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        \textbf{\textcolor{unabblue}{Misión Analítica: El Rescate del CRM}}\\[0.2cm]
+        Usted es el ``Data Janitor" de una aerolínea. El equipo de reservas migró la base de datos antigua a un nuevo sistema, pero en el proceso, se generaron valores nulos (\texttt{NaN}), edades ilógicas y clientes duplicados. Si los modelos de Machine Learning entran en producción con esta basura, la empresa perderá millones.
+    }%
+}
+\vspace{0.5cm}
 
-\section*{\textcolor{unabblue}{3. Desarrollo del Taller}}
+\subsection*{Reto 1: Detectando la Basura Oculta (20\%)}
+Cree el siguiente DataFrame en Pandas usando este código:
+\begin{verbatim}
+import pandas as pd
+import numpy as np
 
-\subsection*{Parte A: Identificación y Limpieza (Steps 2 y 3)}
-Observe la tabla superior, que corresponde a los primeros 8 registros de una base de datos de 15,000 pacientes.
+data = {
+    'cliente_id': [101, 102, 103, 104, 105, 106, 101],
+    'edad': [25, 30, np.nan, 800, 45, 22, 25],
+    'genero': ['M', 'F', 'F', 'M', 'O', np.nan, 'M'],
+    'millas': [1500, 2000, 50, 10000, np.nan, 300, 1500]
+}
+df = pd.DataFrame(data)
+\end{verbatim}
+
 \begin{enumerate}
-    \item Identifique un problema grave de calidad de datos en la fila de \textbf{P007} con respecto a otra fila de la tabla. Describa qué método de Pandas utilizaría para solucionar este error de forma automatizada y evitar duplicidad en el modelo.
-    \item Describa la estrategia de imputación que utilizaría para tratar los valores \texttt{NaN} en las columnas \texttt{Edad} (numérica), \texttt{Fumador} (categórica) y \texttt{Glucosa} (numérica). Justifique médicamente o estadísticamente su elección de medida de tendencia central (media, mediana o moda).
+    \item Utilice los métodos \texttt{.isnull().sum()} o \texttt{.info()} para contar exactamente cuántos valores nulos (\texttt{NaN}) tiene cada columna. Imprima el reporte.
+    \item \textbf{Análisis Crítico:} Observe el valor de la edad del cliente 104. ¿Es posible tener 800 años? Describa en una celda de texto cómo esta ``anomalía semántica" (que no es un \texttt{NaN}) afectaría el promedio (media) de edades si la pasamos por alto.
 \end{enumerate}
 
-\subsection*{Parte B: Visualización de Alto Impacto (Step 5)}
-El Director Médico solicita un reporte sobre los datos atípicos de la variable "Colesterol". 
+\subsection*{Reto 2: Cirugía de Datos: Imputación (30\%)}
+No podemos simplemente eliminar filas porque perderíamos información valiosa de los clientes. Debemos ``Imputar" (rellenar inteligentemente).
 \begin{enumerate}
-    \item Redacte el fragmento de código (script en Python) utilizando Seaborn para generar un gráfico de tipo \textbf{Boxplot} que asocie el Colesterol (eje Y) según el Género (eje X).
-    \item Explique por qué un Boxplot es superior a un gráfico de barras tradicional para detectar "Outliers" en un análisis clínico.
+    \item \textbf{Imputar Variables Numéricas:} Rellene el valor nulo de la columna \texttt{millas} utilizando la \textbf{mediana} de esa misma columna. (Pista: investigue el método \texttt{.fillna()}).
+    \item \textbf{Imputar Variables Categóricas:} Rellene el valor nulo de la columna \texttt{genero} utilizando la \textbf{moda} (el valor más frecuente) de la columna.
+    \item \textbf{Tratar Valores Absurdos:} Reemplace el valor absurdo de \texttt{800} en la edad por un \texttt{NaN} usando el método \texttt{.replace()}, y posteriormente impútelo usando la media de la edad. Muestre el DataFrame resultante.
 \end{enumerate}
 
-\subsection*{Parte C: Práctica Autónoma (Reto Colab)}
-\begin{itemize}
-    \item Ingrese a \textbf{Google Colab}.
-    \item Descargue el dataset completo "Heart Disease" desde Kaggle.
-    \item Aplique una limpieza completa (elimine nulos y duplicados).
-    \item Genere un gráfico interactivo utilizando la librería \texttt{plotly.express} comparando la edad vs. colesterol, y envíe el enlace del Notebook generado al docente a través del LMS institucional.
-\end{itemize}
+\subsection*{Reto 3: Desduplicación (10\%)}
+Durante la migración, algunos registros de clientes se insertaron dos veces. 
+\begin{enumerate}
+    \item Utilice el método \texttt{.drop\_duplicates()} de Pandas para eliminar filas idénticas.
+    \item ¿Cuántas filas quedaron en total después de eliminar los duplicados?
+\end{enumerate}
+
+\subsection*{Reto 4: SQL en Pandas (El Arte del Join) (40\%)}
+Los datos demográficos ya están limpios, pero el área de fidelización tiene otra tabla separada con el nivel (Tier) de cada cliente.
+Cree este segundo DataFrame:
+\begin{verbatim}
+tier_data = {
+    'cliente_id': [101, 102, 104, 105, 999],
+    'nivel': ['Gold', 'Silver', 'Platinum', 'Silver', 'Gold']
+}
+df_tier = pd.DataFrame(tier_data)
+\end{verbatim}
+
+\begin{enumerate}
+    \item Realice un \textbf{INNER JOIN} (cruce interno) entre su DataFrame limpio (\texttt{df}) y el nuevo DataFrame (\texttt{df\_tier}) utilizando la columna \texttt{cliente\_id} como llave primaria (\textit{Key}). Utilice el método \texttt{pd.merge()}.
+    \item Realice un \textbf{LEFT JOIN} (cruce por la izquierda). Mantenga todos los clientes de su \texttt{df} original, cruzando con \texttt{df\_tier}. 
+    \item \textbf{Análisis Crítico:} Observe el resultado del Left Join. ¿Qué sucede con los clientes 103 y 106 en la columna \texttt{nivel}? ¿Por qué aparece un \texttt{NaN} ahí, y por qué el cliente 999 de la tabla de Tiers no aparece en absoluto? Explique la lógica de la teoría de conjuntos detrás de esto.
+\end{enumerate}
 
 \vspace{1cm}
 \begin{center}
-    \textit{\textcolor{gray}{"El propósito de la visualización es el entendimiento, no las imágenes." \\ - Ben Shneiderman}}
+    \textit{\textcolor{gray}{`Tu modelo de Inteligencia Artificial solo es tan inteligente como los datos basura que le diste de comer (Garbage In, Garbage Out).'}}
 \end{center}
 
 \end{document}
