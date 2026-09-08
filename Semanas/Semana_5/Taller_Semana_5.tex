@@ -1,0 +1,108 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+
+\definecolor{unabblue}{HTML}{003865}
+\definecolor{unaborange}{HTML}{E85C0B}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codeorange}{rgb}{0.8,0.3,0.0}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{unabblue}{\textbf{Ciencia de Datos - UNAB}}}
+\fancyhead[R]{\textcolor{unaborange}{\textbf{Taller Semana 5}}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+\begin{center}
+    {\huge \textcolor{unabblue}{\textbf{Taller 5: Exploración Activa y Robustez Estadística}}} \\[0.5cm]
+    {\large Docente: Dudbil Olvasada Pabon Riaño} \\[0.2cm]
+    \rule{\textwidth}{1pt}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{\textcolor{unabblue}{1. Objetivo del Taller}}
+Aplicar los conceptos del Análisis Exploratorio de Datos (EDA) siguiendo la filosofía de John Tukey. El estudiante dejará de calcular fórmulas ciegamente para convertirse en un estratega analítico capaz de detectar anomalías y elegir la métrica de localización y dispersión más robusta para objetivos de negocio reales.
+
+\section*{\textcolor{unabblue}{2. Instrucciones Generales}}
+Desarrolle los siguientes retos en un Jupyter Notebook (Google Colab). Todo el código debe estar documentado (usando comentarios o bloques de Markdown) justificando la elección de cada función. Al finalizar, descargue el notebook o suba el enlace a su repositorio. \textbf{No se aceptan respuestas numéricas sin código o sin interpretación crítica ("So What?").}
+
+\vspace{0.5cm}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        \textbf{\textcolor{unabblue}{Misión Analítica: El Arte de Escuchar los Datos}}\\[0.2cm]
+        En este taller actuará como un detective de datos. Antes de probar hipótesis, explorará la estructura, medirá el ruido e identificará correlaciones engañosas.
+    }%
+}
+\vspace{0.5cm}
+
+\subsection*{Reto 1: El Impacto de un Billonario en la Sala (20\%)}
+Elegir una métrica de tendencia central no es una decisión técnica menor, es una decisión estratégica. Analice los siguientes salarios anuales de 10 empleados en una organización (en miles de USD):
+\begin{center}
+    \texttt{[45, 50, 52, 55, 58, 60, 62, 80, 100, 1200]}
+\end{center}
+\begin{enumerate}
+    \item Calcule usando Python (Numpy/Pandas/Scipy): la \textbf{Media}, la \textbf{Mediana} y la \textbf{Media Recortada (Trimmed Mean)} ignorando el 10\% de los extremos.
+    \item \textbf{Análisis Crítico:} Si usted es el Gerente de RRHH y necesita reportar el "Salario Típico" para una oferta de empleo, ¿cuál de las tres métricas utilizaría y por qué? ¿Qué impacto tiene el individuo que gana 1200 en la estadística general?
+\end{enumerate}
+
+\subsection*{Reto 2: Midiendo la Dispersión y el Ruido (20\%)}
+Si la localización nos dice dónde están los datos, la variabilidad nos dice qué tan confiables son. Considere las poblaciones de cinco estados en EE.UU.:
+\begin{center}
+    \texttt{AL: 4,779,736 \quad AK: 710,231 \quad AZ: 6,392,017 \quad AR: 2,915,918 \quad CA: 37,253,956}
+\end{center}
+\begin{enumerate}
+    \item Calcule la \textbf{Desviación Estándar (SD)} (asegúrese de usar $n-1$), el \textbf{Rango Intercuartílico (IQR)} y la \textbf{Desviación Absoluta de la Mediana (MAD)}.
+    \item \textbf{Análisis Crítico:} Explique con sus propias palabras el concepto matemático de "El peligro de los cuadrados" ("The Danger of Squares"). ¿Por qué la Desviación Estándar penaliza tan duramente al estado de California frente a métricas absolutas como el MAD?
+\end{enumerate}
+
+\subsection*{Reto 3: Detectives de Anomalías y la Regla de Tukey (20\%)}
+Utilice los tiempos de carga de una aplicación web (en segundos) registrados durante la madrugada:
+\begin{center}
+    \texttt{[1.2, 1.5, 1.6, 1.8, 2.0, 2.2, 2.5, 3.1, 8.5]}
+\end{center}
+\begin{enumerate}
+    \item Utilizando código Python, calcule el cuartil 1 ($Q1$), el cuartil 3 ($Q3$) y el $IQR$.
+    \item Calcule matemáticamente los Límites de Tukey: 
+    \begin{itemize}
+        \item $Límite Inferior = Q1 - (1.5 \times IQR)$
+        \item $Límite Superior = Q3 + (1.5 \times IQR)$
+    \end{itemize}
+    \item Diseñe un filtro en Pandas (usando DataFrames o Series) que aísle e imprima automáticamente cualquier valor que caiga fuera de estos límites. ¿Qué valor fue catalogado como Outlier?
+\end{enumerate}
+
+\subsection*{Reto 4: Correlaciones Engañosas (20\%)}
+A menudo asumimos que la correlación de Pearson es la métrica definitiva para encontrar relaciones. Dadas las siguientes listas que representan la Inversión en Publicidad ($X$) y las Ventas generadas ($Y$):
+\begin{center}
+    $X =$ \texttt{[1, 2, 3, 4, 5, 6]} \\
+    $Y =$ \texttt{[10, 25, 50, 150, 500, 10000]} (Relación exponencial extrema)
+\end{center}
+\begin{enumerate}
+    \item Calcule el Coeficiente de Correlación de \textbf{Pearson}.
+    \item Calcule el Coeficiente de Correlación de \textbf{Spearman}.
+    \item \textbf{Análisis Crítico:} Explique la enorme diferencia entre ambos resultados. ¿En qué escenario del mundo real recomendaría usar la métrica de Spearman en lugar de Pearson?
+\end{enumerate}
+
+\subsection*{Reto 5: Reto Autónomo con Datos Reales (20\%)}
+Importe la librería \texttt{seaborn} y cargue el conjunto de datos integrado \texttt{tips} usando: \\ \texttt{df = sns.load\_dataset('tips')}
+\begin{enumerate}
+    \item Utilice la función \texttt{df.describe()} para generar la estadística descriptiva básica de la columna \texttt{total\_bill}.
+    \item Agrupe el dataset por el día de la semana (\texttt{day}) y extraiga la \textbf{Mediana} y la \textbf{Asimetría (Skewness)} de la columna \texttt{total\_bill} para cada día.
+    \item ¿Qué día de la semana presenta el sesgo positivo (cola derecha) más alto? ¿Qué significa esto en el contexto de un restaurante?
+\end{enumerate}
+
+\vspace{1cm}
+\begin{center}
+    \textit{\textcolor{gray}{"Dejar de aceptar promedios ciegamente y cuestionar la estructura profunda de la información."}}
+\end{center}
+
+\end{document}
