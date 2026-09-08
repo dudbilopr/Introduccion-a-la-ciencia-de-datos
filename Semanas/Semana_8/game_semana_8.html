@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Gamificado: Border Control (Clasificación)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#003865', 
+                        secondary: '#E85C0B', 
+                        darkbg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            user-select: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #E85C0B;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(232, 92, 11, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        .fade-in { animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .metric-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .metric-val {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col p-4 gap-4 relative">
+
+    <!-- HEADER: HUD Y MÉTRICAS -->
+    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400">
+                <i class="fas fa-shield-halved text-2xl text-blue-200"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Regresión Logística: Border Control</h1>
+                <p class="text-sm text-gray-400 font-mono">Clasificación Binaria, Función Sigmoide & Matriz de Confusión</p>
+            </div>
+        </div>
+
+        <div class="flex gap-6 items-center">
+            <div class="text-center mr-4">
+                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Nivel</p>
+                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
+            </div>
+            
+            <div class="flex gap-2">
+                <div class="metric-box min-w-[90px]">
+                    <div class="text-[10px] text-gray-400 uppercase">Accuracy</div>
+                    <div class="metric-val text-blue-400" id="m-acc">0%</div>
+                </div>
+                <div class="metric-box min-w-[90px]">
+                    <div class="text-[10px] text-gray-400 uppercase">Precision</div>
+                    <div class="metric-val text-purple-400" id="m-prec">0%</div>
+                </div>
+                <div class="metric-box min-w-[90px]">
+                    <div class="text-[10px] text-gray-400 uppercase">Recall</div>
+                    <div class="metric-val text-yellow-400" id="m-rec">0%</div>
+                </div>
+                <div class="metric-box min-w-[90px] border-secondary">
+                    <div class="text-[10px] text-secondary uppercase font-bold">F1-Score</div>
+                    <div class="metric-val text-secondary" id="m-f1">0.00</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA DE JUEGO PRINCIPAL -->
+    <main class="flex-1 flex gap-4 min-h-0 relative z-10">
+        
+        <!-- SIDEBAR DE CONTROLES -->
+        <aside class="w-80 glass-panel rounded-xl p-6 flex flex-col gap-6">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest border-b border-gray-700 pb-2">
+                <i class="fas fa-sliders mr-2"></i>Ecuación de Frontera
+            </h2>
+            
+            <div class="text-center font-mono bg-black/50 p-3 rounded-lg border border-gray-700 shadow-inner">
+                <div class="text-xs text-gray-400 mb-1">$z = w_1 x_1 + w_2 x_2 + b$</div>
+                <div class="text-lg text-white" id="eq-display">z = 0.0x₁ + 1.0x₂ + 0.0</div>
+            </div>
+
+            <div class="flex flex-col gap-5 mt-2">
+                <!-- W1 -->
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="text-sm font-bold text-blue-300">Peso $w_1$ (Eje X)</label>
+                        <span id="val-w1" class="text-gray-300 font-mono text-sm">0.00</span>
+                    </div>
+                    <input type="range" id="slider-w1" min="-5.0" max="5.0" step="0.1" value="0.0">
+                </div>
+                <!-- W2 -->
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="text-sm font-bold text-blue-300">Peso $w_2$ (Eje Y)</label>
+                        <span id="val-w2" class="text-gray-300 font-mono text-sm">1.00</span>
+                    </div>
+                    <input type="range" id="slider-w2" min="-5.0" max="5.0" step="0.1" value="1.0">
+                </div>
+                <!-- Bias B -->
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="text-sm font-bold text-green-300">Sesgo / Bias ($b$)</label>
+                        <span id="val-b" class="text-gray-300 font-mono text-sm">0.00</span>
+                    </div>
+                    <input type="range" id="slider-b" min="-5.0" max="5.0" step="0.1" value="0.0">
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <div class="bg-gray-800/80 p-3 rounded-lg mb-4 text-xs text-gray-300 border border-gray-700">
+                    <p class="mb-1" id="level-hint">Objetivo: Separa las Clases.</p>
+                    <p class="font-bold text-secondary">Requiere F1-Score > <span id="target-f1">0.90</span></p>
+                </div>
+                <button id="btn-classify" class="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-lg transition shadow-[0_0_20px_rgba(232,92,11,0.5)] text-lg border-2 border-orange-400">
+                    <i class="fas fa-bolt mr-2"></i> CLASIFICAR
+                </button>
+            </div>
+        </aside>
+
+        <!-- CANVAS CONTAINER -->
+        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden bg-[#020617]" id="canvas-container">
+            <canvas id="bgCanvas" class="absolute inset-0 w-full h-full block opacity-40"></canvas>
+            <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
+            
+            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 rounded-lg flex gap-4 text-xs font-bold shadow-lg">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div> Clase 0 (Negativo)</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]"></div> Clase 1 (Positivo)</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL GATEKEEPER -->
+    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)] fade-in">
+            <div class="flex items-center gap-4 mb-6 text-red-500">
+                <i class="fas fa-ban text-5xl"></i>
+                <h2 class="text-2xl font-bold" id="gatekeeper-title">CLASIFICACIÓN FALLIDA</h2>
+            </div>
+            <p class="text-gray-300 mb-6 text-lg border-l-4 border-red-500 pl-4" id="question-text">El modelo no alcanzó el umbral requerido. Analiza la teoría para reiniciar:</p>
+            
+            <div class="flex flex-col gap-3" id="options-container">
+                <!-- Inyectado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL END GAME -->
+    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
+            <i class="fas fa-brain text-7xl text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
+            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Experto en Clasificación</h2>
+            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Has dominado la Regresión Logística y las métricas de evaluación de Machine Learning.</p>
+            
+            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+                <i class="fas fa-star text-gray-700"></i>
+            </div>
+
+            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
+                Nuevo Dataset
+            </button>
+        </div>
+    </div>
+
+<script>
+/**
+ * LOGISTIC REGRESSION BORDER CONTROL ENGINE
+ */
+
+const questions = [
+    { q: "La función Sigmoide se utiliza en Regresión Logística porque transforma cualquier número (z) a un rango de:", opts: ["-1 a 1", "0 a infinito", "0 a 1 (representando una probabilidad)", "0 a 100%"], ans: 2 },
+    { q: "En un dataset desbalanceado (99% de pacientes sanos y 1% enfermos), si el modelo predice a TODOS como 'Sanos', ¿Cuál será su Accuracy?", opts: ["1%", "50%", "99% (Pero es engañoso, no sirve)", "0%"], ans: 2 },
+    { q: "¿Qué métrica es mejor para priorizar NO fallar en la detección de positivos (ej. Detectar cáncer, donde un Falso Negativo es fatal)?", opts: ["Precision (Precisión)", "Recall (Sensibilidad)", "Accuracy (Exactitud)", "R-Cuadrado"], ans: 1 },
+    { q: "¿Cuál es el límite (desventaja fundamental) de la Regresión Logística clásica mostrada aquí?", opts: ["Solo genera fronteras de decisión LINEALES (rectas).", "Es demasiado lenta computacionalmente.", "Solo funciona con menos de 100 datos.", "No sirve para clasificación binaria."], ans: 0 },
+    { q: "El F1-Score es una métrica útil porque:", opts: ["Es la media armónica entre Precision y Recall, castigando valores extremos.", "Siempre es mayor que el Accuracy.", "Ignora por completo los Falsos Positivos.", "Transforma datos no lineales en lineales."], ans: 0 }
+];
+
+const state = {
+    canvas: null, ctx: null,
+    bgCanvas: null, bgCtx: null,
+    w: 0, h: 0,
+    
+    level: 1,
+    points: [],
+    
+    // Parámetros del modelo interactivo
+    w1: 0,
+    w2: 1,
+    b: 0,
+    
+    targetF1: 0.90,
+    isXOR: false, // Level 10 trap
+    
+    metrics: { tp:0, tn:0, fp:0, fn:0, acc:0, prec:0, rec:0, f1:0 }
+};
+
+function initGame() {
+    state.canvas = document.getElementById('gameCanvas');
+    state.ctx = state.canvas.getContext('2d');
+    state.bgCanvas = document.getElementById('bgCanvas');
+    state.bgCtx = state.bgCanvas.getContext('2d');
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    // Sliders
+    ['w1', 'w2', 'b'].forEach(param => {
+        document.getElementById(`slider-${param}`).addEventListener('input', (e) => {
+            state[param] = parseFloat(e.target.value);
+            document.getElementById(`val-${param}`).innerText = state[param].toFixed(2);
+            updateEquationDisplay();
+            draw(); // Update line and heatmap in real time
+        });
+    });
+    
+    document.getElementById('btn-classify').addEventListener('click', evaluateModel);
+    
+    generateLevel();
+}
+
+function resizeCanvas() {
+    const rect = state.canvas.parentElement.getBoundingClientRect();
+    state.canvas.width = rect.width;
+    state.canvas.height = rect.height;
+    state.bgCanvas.width = rect.width;
+    state.bgCanvas.height = rect.height;
+    state.w = rect.width;
+    state.h = rect.height;
+    draw();
+}
+
+// Generador Box-Muller
+function randomNormal(mean=0, std=1) {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return z * std + mean;
+}
+
+function generateLevel() {
+    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
+    state.points = [];
+    state.isXOR = false;
+    
+    let n0 = 40, n1 = 40; // Balanced by default
+    let dist = 3.0; // Distance between centers
+    let spread = 0.8;
+    
+    document.getElementById('level-hint').innerText = "Objetivo: Separa las Clases (Azul vs Naranja).";
+    
+    if (state.level <= 3) {
+        // Linearly separable
+        dist = 4.0;
+        spread = 0.6;
+        state.targetF1 = 0.95;
+    } else if (state.level <= 6) {
+        // Noisy, overlapping
+        dist = 2.0;
+        spread = 1.2;
+        state.targetF1 = 0.80; // Harder to get perfect score
+        document.getElementById('level-hint').innerText = "Los datos tienen ruido (Overlapping). Maximiza el F1-Score.";
+    } else if (state.level <= 9) {
+        // Imbalanced dataset
+        n0 = 80;
+        n1 = 10;
+        dist = 3.0;
+        spread = 1.0;
+        state.targetF1 = 0.70; // 0.70 F1 is quite good for imbalanced
+        document.getElementById('level-hint').innerText = "¡Clases Desbalanceadas! El Accuracy miente; confía en el F1-Score.";
+    } else {
+        // Level 10: XOR Problem
+        state.isXOR = true;
+        state.targetF1 = 1.0; // Impossible with linear
+        document.getElementById('level-hint').innerText = "Alerta: Relación No-Lineal compleja.";
+        
+        // Generate XOR
+        for(let i=0; i<30; i++) {
+            state.points.push({x: randomNormal(-3, 1), y: randomNormal(3, 1), label: 0});
+            state.points.push({x: randomNormal(3, 1), y: randomNormal(-3, 1), label: 0});
+            state.points.push({x: randomNormal(-3, 1), y: randomNormal(-3, 1), label: 1});
+            state.points.push({x: randomNormal(3, 1), y: randomNormal(3, 1), label: 1});
+        }
+    }
+    
+    if (!state.isXOR) {
+        // Randomize orientation of centers
+        let angle = Math.random() * Math.PI * 2;
+        let c0x = Math.cos(angle) * dist/2;
+        let c0y = Math.sin(angle) * dist/2;
+        let c1x = -Math.cos(angle) * dist/2;
+        let c1y = -Math.sin(angle) * dist/2;
+        
+        for(let i=0; i<n0; i++) state.points.push({x: randomNormal(c0x, spread), y: randomNormal(c0y, spread), label: 0});
+        for(let i=0; i<n1; i++) state.points.push({x: randomNormal(c1x, spread), y: randomNormal(c1y, spread), label: 1});
+    }
+    
+    document.getElementById('target-f1').innerText = state.targetF1.toFixed(2);
+    
+    // Reset Sliders
+    document.getElementById('slider-w1').value = 0; state.w1 = 0; document.getElementById('val-w1').innerText = "0.00";
+    document.getElementById('slider-w2').value = 1; state.w2 = 1; document.getElementById('val-w2').innerText = "1.00";
+    document.getElementById('slider-b').value = 0; state.b = 0; document.getElementById('val-b').innerText = "0.00";
+    
+    updateEquationDisplay();
+    resetMetrics();
+    draw();
+}
+
+function updateEquationDisplay() {
+    let signW1 = state.w1 >= 0 ? '' : '-';
+    let signW2 = state.w2 >= 0 ? '+' : '-';
+    let signB = state.b >= 0 ? '+' : '-';
+    
+    let eq = `z = ${signW1}${Math.abs(state.w1).toFixed(1)}x₁ ${signW2} ${Math.abs(state.w2).toFixed(1)}x₂ ${signB} ${Math.abs(state.b).toFixed(1)}`;
+    document.getElementById('eq-display').innerText = eq;
+}
+
+function resetMetrics() {
+    document.getElementById('m-acc').innerText = "0%";
+    document.getElementById('m-prec').innerText = "0%";
+    document.getElementById('m-rec').innerText = "0%";
+    document.getElementById('m-f1').innerText = "0.00";
+    document.querySelectorAll('.metric-val').forEach(el => el.classList.remove('animate-pulse'));
+}
+
+function evaluateModel() {
+    // Math: z = w1*x + w2*y + b
+    // prediction = z >= 0 ? 1 : 0
+    
+    let tp = 0, tn = 0, fp = 0, fn = 0;
+    
+    state.points.forEach(p => {
+        let z = (state.w1 * p.x) + (state.w2 * p.y) + state.b;
+        let pred = z >= 0 ? 1 : 0;
+        
+        if (pred === 1 && p.label === 1) tp++;
+        if (pred === 0 && p.label === 0) tn++;
+        if (pred === 1 && p.label === 0) fp++;
+        if (pred === 0 && p.label === 1) fn++;
+    });
+    
+    let total = tp + tn + fp + fn;
+    let acc = (tp + tn) / total;
+    let prec = (tp + fp) > 0 ? tp / (tp + fp) : 0;
+    let rec = (tp + fn) > 0 ? tp / (tp + fn) : 0;
+    let f1 = (prec + rec) > 0 ? 2 * (prec * rec) / (prec + rec) : 0;
+    
+    // Update UI
+    document.getElementById('m-acc').innerText = (acc*100).toFixed(1) + "%";
+    document.getElementById('m-prec').innerText = (prec*100).toFixed(1) + "%";
+    document.getElementById('m-rec').innerText = (rec*100).toFixed(1) + "%";
+    document.getElementById('m-f1').innerText = f1.toFixed(2);
+    
+    document.querySelectorAll('.metric-val').forEach(el => el.classList.add('animate-pulse'));
+    
+    if (f1 >= state.targetF1) {
+        setTimeout(levelUp, 1000);
+    } else {
+        if(state.isXOR && state.level === 10) {
+            triggerGatekeeper("LÍMITE LINEAL (XOR PROBLEM)", "Es matemáticamente IMPOSIBLE separar estos datos con una sola línea recta. ¿Por qué ocurre esto con la Regresión Logística simple?");
+        } else {
+            triggerGatekeeper("METAS NO ALCANZADAS", "Tu modelo tiene demasiados Falsos Positivos o Falsos Negativos (F1-Score insuficiente). Revisa cómo estás trazando la frontera de decisión.");
+        }
+    }
+}
+
+function mapToScreen(x, y) {
+    // Coords from -6 to 6
+    const scale = Math.min(state.w, state.h) / 12;
+    const cx = state.w / 2;
+    const cy = state.h / 2;
+    return {
+        sx: cx + x * scale,
+        sy: cy - y * scale // inverted Y
+    };
+}
+
+function draw() {
+    // 1. Draw Heatmap (Sigmoid Probability Background)
+    drawHeatmap();
+    
+    // 2. Draw Grid and Axes
+    state.ctx.clearRect(0, 0, state.w, state.h);
+    const scale = Math.min(state.w, state.h) / 12;
+    const cx = state.w / 2;
+    const cy = state.h / 2;
+    
+    state.ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    state.ctx.lineWidth = 1;
+    // X and Y lines
+    for(let i=-6; i<=6; i++) {
+        let sc = mapToScreen(i, i);
+        state.ctx.beginPath(); state.ctx.moveTo(sc.sx, 0); state.ctx.lineTo(sc.sx, state.h); state.ctx.stroke();
+        state.ctx.beginPath(); state.ctx.moveTo(0, sc.sy); state.ctx.lineTo(state.w, sc.sy); state.ctx.stroke();
+    }
+    
+    // Center axes
+    state.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    state.ctx.lineWidth = 2;
+    state.ctx.beginPath(); state.ctx.moveTo(cx, 0); state.ctx.lineTo(cx, state.h); state.ctx.stroke();
+    state.ctx.beginPath(); state.ctx.moveTo(0, cy); state.ctx.lineTo(state.w, cy); state.ctx.stroke();
+    
+    // 3. Draw Points
+    state.points.forEach(p => {
+        let sc = mapToScreen(p.x, p.y);
+        state.ctx.beginPath();
+        state.ctx.arc(sc.sx, sc.sy, 6, 0, Math.PI*2);
+        
+        if (p.label === 0) {
+            state.ctx.fillStyle = '#3b82f6'; // Blue
+            state.ctx.shadowColor = '#3b82f6';
+        } else {
+            state.ctx.fillStyle = '#f97316'; // Orange
+            state.ctx.shadowColor = '#f97316';
+        }
+        
+        state.ctx.shadowBlur = 10;
+        state.ctx.fill();
+        state.ctx.strokeStyle = '#fff';
+        state.ctx.lineWidth = 1;
+        state.ctx.stroke();
+        state.ctx.shadowBlur = 0;
+    });
+    
+    // 4. Draw Decision Boundary Line: w1*x + w2*y + b = 0  => y = (-w1/w2)*x - (b/w2)
+    if (Math.abs(state.w2) > 0.01 || Math.abs(state.w1) > 0.01) {
+        state.ctx.strokeStyle = '#fff';
+        state.ctx.lineWidth = 3;
+        state.ctx.setLineDash([5, 5]);
+        state.ctx.shadowBlur = 10;
+        state.ctx.shadowColor = '#fff';
+        
+        state.ctx.beginPath();
+        if (Math.abs(state.w2) > Math.abs(state.w1)) {
+            // Compute Y given X
+            let yLeft = (-state.w1 * (-6) - state.b) / state.w2;
+            let yRight = (-state.w1 * (6) - state.b) / state.w2;
+            let p1 = mapToScreen(-6, yLeft);
+            let p2 = mapToScreen(6, yRight);
+            state.ctx.moveTo(p1.sx, p1.sy);
+            state.ctx.lineTo(p2.sx, p2.sy);
+        } else {
+            // Compute X given Y (prevents vertical line infinite slopes)
+            let xBot = (-state.w2 * (-6) - state.b) / state.w1;
+            let xTop = (-state.w2 * (6) - state.b) / state.w1;
+            let p1 = mapToScreen(xBot, -6);
+            let p2 = mapToScreen(xTop, 6);
+            state.ctx.moveTo(p1.sx, p1.sy);
+            state.ctx.lineTo(p2.sx, p2.sy);
+        }
+        state.ctx.stroke();
+        state.ctx.setLineDash([]);
+        state.ctx.shadowBlur = 0;
+    }
+}
+
+function drawHeatmap() {
+    // We approximate the sigmoid heatmap using a linear gradient perpendicular to the line
+    const ctx = state.bgCtx;
+    ctx.clearRect(0, 0, state.w, state.h);
+    
+    if (Math.abs(state.w1) < 0.01 && Math.abs(state.w2) < 0.01) return;
+    
+    // Vector direction of gradient (w1, w2)
+    // Remember Y is inverted on screen (up is positive y mathematically, but negative y on screen)
+    const norm = Math.sqrt(state.w1*state.w1 + state.w2*state.w2);
+    const ux = state.w1 / norm;
+    const uy = -state.w2 / norm; // invert Y
+    
+    // Distance from origin to line = -b / ||w||
+    const distToLineMath = -state.b / norm; // in math coords
+    const scale = Math.min(state.w, state.h) / 12;
+    const distToLineScreen = distToLineMath * scale;
+    
+    // Center of screen
+    const cx = state.w / 2;
+    const cy = state.h / 2;
+    
+    // Nearest point on line from center
+    const nx = cx + ux * distToLineScreen;
+    const ny = cy + uy * distToLineScreen;
+    
+    // Magnitude affects how steep the sigmoid is. Higher weights = sharper boundary.
+    const spread = 200 / (norm + 0.1); 
+    
+    // Gradient covers [line - spread] to [line + spread]
+    const g = ctx.createLinearGradient(
+        nx - ux * spread, ny - uy * spread, 
+        nx + ux * spread, ny + uy * spread
+    );
+    
+    g.addColorStop(0, "rgba(59, 130, 246, 0.8)"); // Blue (Class 0, when z is very negative)
+    g.addColorStop(0.5, "rgba(15, 23, 42, 0.8)"); // Dark (Decision boundary z=0)
+    g.addColorStop(1, "rgba(249, 115, 22, 0.8)"); // Orange (Class 1, when z is very positive)
+    
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, state.w, state.h);
+}
+
+function levelUp() {
+    if (state.level >= 10) {
+        document.getElementById('end-modal').style.display = 'flex';
+        return;
+    }
+    state.level++;
+    generateLevel();
+}
+
+// --- GATEKEEPER ---
+function triggerGatekeeper(title, desc) {
+    const modal = document.getElementById('gatekeeper-modal');
+    const container = document.getElementById('options-container');
+    
+    document.getElementById('gatekeeper-title').innerText = title;
+    
+    const qIndex = Math.floor(Math.random() * questions.length);
+    const qData = questions[qIndex];
+    
+    document.getElementById('question-text').innerText = `${desc} \n\n Pregunta Teórica: ${qData.q}`;
+    container.innerHTML = '';
+    
+    qData.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-red-500 flex items-start gap-3";
+        btn.innerHTML = `<span class="font-bold text-red-400">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
+        btn.onclick = () => {
+            if(idx === qData.ans) {
+                modal.style.display = 'none';
+                if(state.isXOR) {
+                    // Passed the XOR test, give win screen
+                    document.getElementById('end-modal').style.display = 'flex';
+                }
+            } else {
+                btn.style.borderColor = '#ef4444';
+                btn.style.backgroundColor = 'rgba(239,68,68,0.4)';
+            }
+        };
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = 'flex';
+}
+
+window.onload = initGame;
+</script>
+</body>
+</html>
