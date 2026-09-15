@@ -73,6 +73,15 @@ El curso está estructurado en 16 semanas. El material interactivo se irá publi
   - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_5/quiz_semana_5.html)
   - [Colab Guiado (.ipynb)](./Semanas/Semana_5/Colab_Guiado_Semana_5.ipynb)
 
+### [Semana 6: Correlación y Regresión Lineal](./Semanas/Semana_6)
+- **Conceptos:** Diagramas de Dispersión, Covarianza, Correlación de Pearson, Regresión Lineal Simple (OLS).
+- **Actividad Central:** Laboratorio Gamificado y Pair Programming.
+- **Recursos Públicos:**
+  - [Juego Interactivo (HTML)](./Semanas/Semana_6/game_semana_6.html)
+  - [Presentación Interactiva Web](./Semanas/Semana_6/diapositivas_semana_6.html)
+  - [Actividad EMI Interactiva (HTML)](./Semanas/Semana_6/quiz_semana_6.html)
+  - [Colab Guiado (.ipynb)](./Semanas/Semana_6/Colab_Guiado_Semana_6.ipynb)
+
 *(Las siguientes semanas se habilitarán progresivamente).*
 
 ---

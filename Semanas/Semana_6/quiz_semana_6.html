@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Activity - Week 6: Correlation vs Causation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003865',
+                        secondary: '#E85C0B',
+                        bglight: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 56, 101, 0.1), 0 8px 10px -6px rgba(0, 56, 101, 0.1);
+            border-top: 4px solid #E85C0B;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover {
+            transform: translateX(5px);
+            background-color: #f1f5f9;
+        }
+        .option-btn.selected {
+            border-color: #003865;
+            background-color: #e6f0fa;
+        }
+        .option-btn.correct {
+            border-color: #22c55e;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .option-btn.wrong {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-earth-americas text-4xl text-primary"></i>
+                <div>
+                    <h1 class="text-2xl font-bold text-primary">EMI Challenge</h1>
+                    <p class="text-sm font-semibold text-secondary tracking-widest uppercase">Correlation vs Causation</p>
+                </div>
+            </div>
+            <div class="bg-primary text-white px-4 py-2 rounded-lg shadow-md font-bold">
+                Week 6
+            </div>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="glass-card p-6 md:p-8">
+            
+            <!-- Progress -->
+            <div class="mb-6">
+                <div class="flex justify-between text-sm font-bold text-gray-500 mb-2">
+                    <span>Question <span id="current-q">1</span> of <span id="total-q">3</span></span>
+                    <span>Score: <span id="score" class="text-secondary">0</span></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progress-bar" class="bg-secondary h-2 rounded-full transition-all duration-300" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <!-- Question Area -->
+            <div id="question-area" class="mb-8">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-primary mb-6 leading-relaxed">
+                    If two variables have a Pearson correlation coefficient (r) of -0.92, what does this indicate about their relationship?
+                </h2>
+                
+                <div id="options-container" class="flex flex-col gap-3">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="hidden rounded-lg p-4 mb-6 border-l-4">
+                <h3 id="feedback-title" class="font-bold text-lg mb-1"></h3>
+                <p id="feedback-text" class="text-sm text-gray-700"></p>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-end">
+                <button id="next-btn" class="hidden bg-primary hover:bg-blue-900 text-white font-bold py-2 px-6 rounded shadow transition-colors">
+                    Next Question <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div id="result-container" class="hidden glass-card p-8 text-center">
+            <i class="fa-solid fa-trophy text-6xl text-secondary mb-4"></i>
+            <h2 class="text-3xl font-bold text-primary mb-2">Challenge Completed!</h2>
+            <p class="text-gray-600 mb-6">You've finished the English immersion for this week.</p>
+            
+            <div class="bg-gray-50 rounded-lg p-6 inline-block mx-auto mb-8 border border-gray-200">
+                <p class="text-sm text-gray-500 uppercase tracking-widest mb-1">Final Score</p>
+                <p class="text-5xl font-bold text-primary"><span id="final-score"></span> <span class="text-2xl text-gray-400">/ 3</span></p>
+            </div>
+
+            <div>
+                <button onclick="location.reload()" class="bg-secondary hover:bg-orange-600 text-white font-bold py-3 px-8 rounded shadow-lg transition-colors">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "If two variables have a Pearson correlation coefficient (r) of -0.92, what does this indicate about their relationship?",
+                options: [
+                    "A strong positive linear relationship.",
+                    "A strong negative linear relationship.",
+                    "No linear relationship.",
+                    "A perfect causal relationship."
+                ],
+                correct: 1,
+                feedback: "Correct! An 'r' value close to -1 indicates a strong negative linear relationship. When one variable goes up, the other tends to go down."
+            },
+            {
+                q: "Which of the following scenarios is a classic example of a 'Spurious Correlation'?",
+                options: [
+                    "Higher studying hours lead to better grades.",
+                    "Higher temperature leads to more ice cream sales.",
+                    "Ice cream sales and shark attacks both peak in the summer.",
+                    "Increasing the price of a product reduces its demand."
+                ],
+                correct: 2,
+                feedback: "Exactly! Ice cream sales don't cause shark attacks (or vice versa). They are both caused by a third confounding variable: summer heat."
+            },
+            {
+                q: "In Simple Linear Regression, what does the 'Slope' ($\\beta_1$) represent?",
+                options: [
+                    "The point where the line crosses the Y-axis.",
+                    "The expected change in Y for a one-unit increase in X.",
+                    "The total error between the predicted and actual values.",
+                    "The strength of the non-linear relationship."
+                ],
+                correct: 1,
+                feedback: "Well done! The slope tells us the rate of change. If the slope is 2, Y is expected to increase by 2 units for every 1 unit increase in X."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        const qText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackText = document.getElementById('feedback-text');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreDisplay = document.getElementById('score');
+
+        function loadQuestion() {
+            answered = false;
+            const q = questions[currentQuestion];
+            qText.innerHTML = q.q;
+            optionsContainer.innerHTML = '';
+            
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            progressBar.style.width = ((currentQuestion + 1) / questions.length) * 100 + '%';
+            
+            feedbackArea.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded border border-gray-200 font-medium text-gray-700 bg-white flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <i class="fa-solid fa-circle-check opacity-0 icon-status"></i>`;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(index, btn) {
+            if (answered) return;
+            answered = true;
+            
+            const q = questions[currentQuestion];
+            const buttons = optionsContainer.children;
+            
+            for (let b of buttons) {
+                b.disabled = true;
+                b.classList.remove('hover:bg-gray-50');
+            }
+
+            if (index === q.correct) {
+                btn.classList.add('correct');
+                btn.querySelector('.icon-status').classList.remove('opacity-0');
+                score++;
+                scoreDisplay.textContent = score;
+                
+                feedbackArea.classList.remove('hidden', 'border-red-500', 'bg-red-50');
+                feedbackArea.classList.add('border-green-500', 'bg-green-50');
+                feedbackTitle.textContent = "Great job!";
+                feedbackTitle.className = "font-bold text-lg mb-1 text-green-700";
+                feedbackText.textContent = q.feedback;
+            } else {
+                btn.classList.add('wrong');
+                btn.querySelector('.icon-status').classList.remove('fa-circle-check', 'opacity-0');
+                btn.querySelector('.icon-status').classList.add('fa-circle-xmark');
+                
+                buttons[q.correct].classList.add('correct');
+                buttons[q.correct].querySelector('.icon-status').classList.remove('opacity-0');
+
+                feedbackArea.classList.remove('hidden', 'border-green-500', 'bg-green-50');
+                feedbackArea.classList.add('border-red-500', 'bg-red-50');
+                feedbackTitle.textContent = "Not quite.";
+                feedbackTitle.className = "font-bold text-lg mb-1 text-red-700";
+                feedbackText.textContent = `The correct answer was: "${q.options[q.correct]}". ${q.feedback}`;
+            }
+
+            nextBtn.classList.remove('hidden');
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.innerHTML = 'See Results <i class="fa-solid fa-flag-checkered ml-2"></i>';
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById('quiz-container').classList.add('hidden');
+                document.getElementById('result-container').classList.remove('hidden');
+                document.getElementById('final-score').textContent = score;
+            }
+        });
+
+        // Init
+        loadQuestion();
+    </script>
+</body>
+</html>
