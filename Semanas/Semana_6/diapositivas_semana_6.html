@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Ciencia de Datos - Semana 6</title>
+    <title>Ciencia de Datos - Semana 6: Análisis Bivariado</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
@@ -14,111 +14,88 @@
 
     <style>
         :root {
-            --data-blue: #003865;
-            --data-orange: #E85C0B;
-            --cyber-dark: #050510;
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff007f;
+            --bg-night: #0A1128;
+            --bg-deep: #0F172A;
+            --data-primary: #003865;
+            --data-accent: #E85C0B;
+            --data-neon: #38BDF8;
+            --border-fine: #1E293B;
+            --status-ok: #22C55E;
+            --status-alert: #EF4444;
+            --text-light: #F8FAFC;
         }
 
         body { font-family: 'Inter', sans-serif; }
 
+        .reveal, .reveal .slide-background, .reveal .slide-background-content {
+            background-color: var(--bg-night) !important;
+            color: var(--text-light) !important;
+        }
+
         .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            color: var(--data-blue);
+            color: var(--text-light);
             text-transform: none;
             font-weight: 800;
         }
 
         .reveal h2 {
-            border-bottom: 3px solid var(--data-orange);
+            border-bottom: 3px solid var(--data-neon);
             display: inline-block;
             padding-bottom: 8px;
             margin-bottom: 30px;
         }
 
-        .accent { color: var(--data-orange) !important; font-weight: bold; }
-        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
+        .accent { color: var(--data-accent) !important; font-weight: bold; }
+        .neon-accent { color: var(--data-neon) !important; }
 
-        .reveal .controls, .reveal .progress { color: var(--data-orange); }
+        .reveal .controls, .reveal .progress { color: var(--data-accent); }
 
         .icon-container {
             font-size: 5rem;
-            color: var(--data-orange);
+            color: var(--data-neon);
             margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
         }
         
         .box-glass {
-            background: rgba(240, 244, 248, 0.9);
-            border-left: 6px solid var(--data-blue);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid var(--data-neon);
+            border-top: 1px solid var(--border-fine);
+            border-right: 1px solid var(--border-fine);
+            border-bottom: 1px solid var(--border-fine);
             padding: 25px;
             border-radius: 8px;
             text-align: left;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             margin-top: 15px;
-            color: #333;
+            color: var(--text-light);
             font-size: 0.9em;
         }
         
         .box-accent {
             background: rgba(232, 92, 11, 0.05);
-            border-left: 6px solid var(--data-orange);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid var(--data-accent);
+            border-top: 1px solid var(--border-fine);
+            border-right: 1px solid var(--border-fine);
+            border-bottom: 1px solid var(--border-fine);
             padding: 25px;
             border-radius: 8px;
             text-align: left;
-            box-shadow: 0 8px 16px rgba(232, 92, 11, 0.1);
+            box-shadow: 0 10px 20px rgba(232, 92, 11, 0.1);
             margin-top: 15px;
-            color: #333;
+            color: var(--text-light);
             font-size: 0.9em;
         }
 
-        .callout-tip {
-            background: #e6f7ff;
-            border-left: 5px solid var(--data-blue);
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-        
         .callout-warning {
-            background: #fdf2f2;
-            border-left: 5px solid #d9534f;
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 5px solid var(--status-alert);
             padding: 15px;
             border-radius: 4px;
             margin-top: 20px;
             font-size: 0.85em;
-        }
-
-        /* Dark Mode / Cyber Mode slides */
-        .reveal.cyber-mode,
-        .reveal.cyber-mode .slide-background,
-        .reveal.cyber-mode .slide-background-content {
-            background-color: var(--cyber-dark) !important;
-        }
-
-        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
-            color: #fff !important;
-        }
-
-        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
-
-        .reveal.cyber-mode .box-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border-left: 6px solid var(--neon-cyan);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
         }
 
         .split-layout {
@@ -128,90 +105,46 @@
         .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
         .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;
         }
         
         .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
         }
 
         .formula-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            border: 3px dashed var(--data-orange);
+            background: var(--bg-deep);
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 2px dashed var(--data-accent);
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin: 20px auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
             width: fit-content;
+            color: var(--text-light);
         }
 
-        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
+        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; color: var(--data-neon); }
 
         .quote-container {
-            position: relative;
-            padding: 30px 40px;
-            background: #f9f9f9;
-            border-left: 8px solid var(--data-blue);
-            font-style: italic;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-            text-align: left;
+            position: relative; padding: 30px 40px; background: var(--bg-deep);
+            border-left: 8px solid var(--data-neon); font-style: italic; font-size: 1.1rem;
+            margin: 15px 0; text-align: left; border-radius: 4px;
         }
         .quote-container::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            font-size: 6rem;
-            color: rgba(0, 56, 101, 0.1);
-            font-family: Georgia, serif;
+            content: '"'; position: absolute; top: -10px; left: 10px; font-size: 6rem;
+            color: rgba(56, 189, 248, 0.1); font-family: Georgia, serif;
         }
-        .quote-author {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            font-style: normal;
-            color: var(--data-orange);
-            text-align: right;
-        }
-
-        .reveal .slides section {
-            max-height: 95vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 10px;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
 
         .plotly-container {
-            width: 100%;
-            height: 300px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            margin-top: 10px;
-            border: 1px solid #eee;
+            width: 100%; height: 320px; background: var(--bg-deep);
+            border-radius: 8px; border: 1px solid var(--border-fine); margin-top: 10px;
         }
         
-        .list-icon {
-            color: var(--data-orange);
-            margin-right: 10px;
-            width: 30px;
-            text-align: center;
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.65em; font-weight: bold;
+            background: var(--data-primary); color: #fff; margin-bottom: 10px;
         }
     </style>
 </head>
@@ -220,70 +153,75 @@
     <div class="reveal">
         <div class="slides">
 
-            <!-- SLIDE 1: PORTADA IMPACTANTE -->
+            <!-- SLIDE 1: PORTADA INSTITUCIONAL -->
             <section>
-                <div class="icon-container">
-                    <i class="fa-solid fa-chart-area"></i>
-                </div>
-                <h1>Ciencia de Datos</h1>
-                <h3>Semana 6: <span class="accent">Correlación y Regresión Lineal</span></h3>
-                <div style="margin-top: 40px; display: inline-block; padding: 10px 20px; background: rgba(0,56,101,0.05); border-radius: 8px; border: 1px solid var(--data-blue);">
-                    <p style="margin: 0;"><small><strong>Docente:</strong> Dudbil Olvasada Pabon Riaño | <strong>Programa:</strong> UNAB</small></p>
+                <div class="box-glass" style="text-align: center; max-width: 800px; margin: 0 auto; padding: 60px 40px;">
+                    <div class="icon-container">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h2 style="border:none; margin-bottom: 10px;">Análisis Bivariado y Modelado Predictivo</h2>
+                    <h3 class="accent" style="font-size: 1.6rem; margin-bottom: 30px;">Correlación de Pearson y Regresión Lineal Simple</h3>
+                    <div style="padding-top: 20px; border-top: 1px solid var(--border-fine);">
+                        <p style="margin: 0; font-size: 1rem; color: #94A3B8;">Semana 6 — Maestría en Ciencia de Datos e Inteligencia Artificial</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- SLIDE 2: TRANSICIÓN -->
+            <!-- SLIDE 2: TRANSICIÓN PARADIGMÁTICA -->
             <section>
-                <h2><i class="fa-solid fa-code-merge"></i> Del Univariado al Bivariado</h2>
+                <h2><i class="fa-solid fa-code-merge"></i> Transición Paradigmática</h2>
                 <div class="split-layout">
                     <div class="box-glass">
-                        <h4 style="color: var(--data-blue);"><i class="fa-solid fa-backward"></i> Recapitulando</h4>
-                        <p>Hasta ahora hemos analizado el comportamiento aislado de una sola variable:</p>
-                        <ul>
-                            <li><strong>Medidas Centrales:</strong> Dónde se agrupan los datos.</li>
-                            <li><strong>Boxplots (IQR/Outliers):</strong> Dispersión robusta.</li>
-                            <li><strong>Histogramas:</strong> Forma y asimetría (Skewness).</li>
+                        <h4 class="neon-accent"><i class="fa-solid fa-chart-column"></i> Análisis Univariado (Sem. 1-5)</h4>
+                        <p>Foco en la distribución de una variable aislada.</p>
+                        <ul style="color: #94A3B8; font-size: 0.9em;">
+                            <li>Distribuciones de Frecuencia.</li>
+                            <li>Medidas de Tendencia Central ($\mu$, Mediana, Moda).</li>
+                            <li>Medidas de Dispersión ($\sigma$, $IQR$, Varianza).</li>
+                            <li>Inspección mediante Histogramas y Boxplots.</li>
                         </ul>
                     </div>
                     <div class="box-accent fragment">
-                        <h4 class="accent"><i class="fa-solid fa-forward"></i> El Siguiente Paso</h4>
-                        <p><strong>¿Qué ocurre cuando analizamos cómo el cambio en una variable afecta a otra?</strong></p>
-                        <p>Pasamos del análisis descriptivo aislado a descubrir el <em>motor</em> oculto de los datos: cómo interactúan las variables entre sí (Análisis Bivariado).</p>
+                        <h4 class="accent"><i class="fa-solid fa-circle-nodes"></i> Análisis Bivariado (Sem. 6)</h4>
+                        <p>Foco en la <strong>interacción funcional</strong> entre dos variables continuas.</p>
+                        <p style="color: #cbd5e1; font-size: 0.9em;">¿Cómo cambia el estado del vector $Y$ condicionado a la modificación de un estado en el vector $X$?</p>
+                        <p style="color: #cbd5e1; font-size: 0.9em;">Transición del análisis descriptivo hacia la <strong>inferencia y el modelado predictivo</strong>.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- SLIDE 3: OBJETIVOS Y AGENDA -->
+            <!-- SLIDE 3: OBJETIVOS DE APRENDIZAJE -->
             <section>
-                <h2><i class="fa-solid fa-bullseye"></i> Objetivos (RAE) y Agenda</h2>
-                <div class="box-glass">
-                    <ul style="list-style-type: none; padding-left: 0;">
-                        <li class="fragment" style="margin-bottom: 15px;">
-                            <i class="fa-solid fa-braille list-icon"></i> <strong>1. Interpretar Scatter Plots</strong> (Gráficos de Dispersión).
-                        </li>
-                        <li class="fragment" style="margin-bottom: 15px;">
-                            <i class="fa-solid fa-calculator list-icon"></i> <strong>2. Calcular e interpretar el Coeficiente de Pearson ($r$)</strong> y sus límites.
-                        </li>
-                        <li class="fragment" style="margin-bottom: 15px;">
-                            <i class="fa-solid fa-chart-line list-icon"></i> <strong>3. Formular el modelo de Regresión Lineal Simple</strong> para predicción.
-                        </li>
-                        <li class="fragment" style="margin-bottom: 15px;">
-                            <i class="fa-solid fa-skull-crossbones list-icon"></i> <strong>4. Identificar falacias comunes</strong> (Correlación vs. Causalidad).
-                        </li>
-                    </ul>
+                <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje Esperados (RAE)</h2>
+                <div class="grid-4" style="gap: 20px;">
+                    <div class="box-glass" style="padding: 20px;">
+                        <span class="badge" style="background:#2563EB;">Comprender</span>
+                        <p style="margin: 0; font-size: 1.1em;"><strong>RAE 1:</strong> Interpretar la geometría de la dispersión de datos multivariados.</p>
+                    </div>
+                    <div class="box-glass" style="padding: 20px;">
+                        <span class="badge" style="background:#7C3AED;">Analizar</span>
+                        <p style="margin: 0; font-size: 1.1em;"><strong>RAE 2:</strong> Cuantificar la fuerza y dirección lineal mediante el Coeficiente de Pearson ($r$).</p>
+                    </div>
+                    <div class="box-glass" style="padding: 20px;">
+                        <span class="badge" style="background:#D97706;">Aplicar</span>
+                        <p style="margin: 0; font-size: 1.1em;"><strong>RAE 3:</strong> Formular la ecuación de Regresión Lineal mediante Mínimos Cuadrados Ordinarios (OLS).</p>
+                    </div>
+                    <div class="box-glass" style="padding: 20px;">
+                        <span class="badge" style="background:#DC2626;">Evaluar</span>
+                        <p style="margin: 0; font-size: 1.1em;"><strong>RAE 4:</strong> Diagnosticar limitaciones algorítmicas, supuestos de linealidad y falacias de causalidad.</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- SLIDE 4: SCATTER PLOTS -->
+            <!-- SLIDE 4: ANATOMÍA DEL SCATTER PLOT -->
             <section>
-                <h2><i class="fa-solid fa-braille"></i> Scatter Plots (Gráficos de Dispersión)</h2>
+                <h2><i class="fa-solid fa-braille"></i> Anatomía del Scatter Plot</h2>
                 <div class="split-layout">
                     <div class="box-glass" style="justify-content: flex-start;">
-                        <p>La herramienta visual definitiva para análisis continuo.</p>
-                        <p>Mapea dos variables numéricas en un plano cartesiano para revelar patrones, tendencias y agrupaciones.</p>
-                        <ul style="margin-top: 15px;">
-                            <li><strong class="accent">Eje X:</strong> Variable Independiente (Predictora / Feature). Es la variable que usamos para intentar explicar la otra.</li>
-                            <li><strong class="accent">Eje Y:</strong> Variable Dependiente (Respuesta / Target). Es la variable que queremos predecir o entender.</li>
+                        <p>El gráfico de dispersión representa geométricamente pares ordenados $(x_i, y_i)$ en un plano cartesiano ortogonal.</p>
+                        <ul style="margin-top: 15px; color: #cbd5e1;">
+                            <li><strong class="neon-accent">Eje Horizontal ($X$):</strong> Variable Independiente (Predictor / Feature). Vector de entrada.</li>
+                            <li><strong class="accent">Eje Vertical ($Y$):</strong> Variable Dependiente (Criterio / Target). Vector de respuesta condicionada.</li>
                         </ul>
                     </div>
                     <div>
@@ -294,83 +232,75 @@
 
             <!-- SLIDE 5: COVARIANZA VS CORRELACIÓN -->
             <section>
-                <h2><i class="fa-solid fa-scale-balanced"></i> Covarianza vs. Correlación</h2>
+                <h2><i class="fa-solid fa-square-root-variable"></i> Covarianza vs. Correlación</h2>
                 <div class="split-layout">
                     <div class="box-glass">
-                        <h3 class="accent">Covarianza ($Cov$)</h3>
-                        <p>Nos indica la <strong>dirección</strong> de la relación lineal.</p>
-                        <ul>
-                            <li><strong>Positiva (+):</strong> Ambas variables suben.</li>
-                            <li><strong>Negativa (-):</strong> Una sube, la otra baja.</li>
-                        </ul>
-                        <div class="callout-warning">
-                            <strong style="color:#d9534f;">Problema:</strong> Su valor depende de la escala de los datos (ej. metros vs milímetros). No es comparable entre datasets.
+                        <h4 class="neon-accent">Covarianza</h4>
+                        <div class="formula-card" style="font-size: 1.1rem; padding: 15px; margin: 15px auto;">
+                            $$Cov(X,Y) = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{n-1}$$
                         </div>
+                        <p style="font-size: 0.9em; color:#94A3B8;">Mide la variabilidad conjunta. Identifica dirección pero es sensible a la escala de medición.</p>
                     </div>
                     <div class="box-accent fragment">
-                        <h3 class="accent">Correlación de Pearson ($r$)</h3>
-                        <p>Resuelve el problema de la escala dividiendo la covarianza por las desviaciones estándar ($s$).</p>
-                        <div class="formula-card" style="font-size: 1.4rem; padding: 15px; margin: 15px auto;">
-                            $$r = \frac{Cov(x,y)}{s_x s_y}$$
+                        <h4 class="accent">Correlación de Pearson ($r$)</h4>
+                        <div class="formula-card" style="font-size: 1.1rem; padding: 15px; margin: 15px auto; border-color: var(--data-neon);">
+                            $$r_{XY} = \frac{Cov(X,Y)}{s_X s_Y}$$
                         </div>
-                        <p><strong>Estandariza la medida exactamente entre -1 y 1.</strong></p>
+                        <p style="font-size: 0.9em; color:#94A3B8;">Adimensionaliza la medida, estandarizando los límites teóricos estables entre $-1 \le r \le +1$.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- SLIDE 6: LA ESCALA DE PEARSON Y SUS LÍMITES -->
+            <!-- SLIDE 6: ESCALA DE PEARSON -->
             <section>
-                <h2><i class="fa-solid fa-ruler-horizontal"></i> La Escala de Pearson</h2>
+                <h2><i class="fa-solid fa-ruler-horizontal"></i> Escala de Pearson y Trampas</h2>
                 <div class="grid-3">
-                    <div class="box-glass" style="text-align: center; padding: 15px;">
-                        <h4 style="color:#28a745; margin-bottom:5px;">$r \approx 1$</h4>
-                        <p style="font-size: 0.8em; font-weight:bold;">Correlación Positiva Fuerte</p>
-                        <p style="font-size: 0.75em; margin-bottom:10px;">Ej: Horas de estudio vs. Calificación.</p>
-                        <div id="plotR1" style="height:120px; width:100%;"></div>
+                    <div class="box-glass" style="text-align: center; padding: 10px;">
+                        <h4 style="color:var(--status-ok); margin-bottom:5px;">$r \approx +1$</h4>
+                        <p style="font-size: 0.75em; color: #94A3B8;">Correlación Positiva Fuerte</p>
+                        <div id="plotR1" style="height:110px; width:100%;"></div>
                     </div>
-                    <div class="box-glass" style="text-align: center; padding: 15px;">
-                        <h4 style="color:#6c757d; margin-bottom:5px;">$r \approx 0$</h4>
-                        <p style="font-size: 0.8em; font-weight:bold;">Correlación Nula</p>
-                        <p style="font-size: 0.75em; margin-bottom:10px;">Ej: Estatura vs. Sueldo.</p>
-                        <div id="plotR0" style="height:120px; width:100%;"></div>
+                    <div class="box-glass" style="text-align: center; padding: 10px;">
+                        <h4 style="color:#64748B; margin-bottom:5px;">$r \approx 0$</h4>
+                        <p style="font-size: 0.75em; color: #94A3B8;">Ausencia Lineal</p>
+                        <div id="plotR0" style="height:110px; width:100%;"></div>
                     </div>
-                    <div class="box-glass" style="text-align: center; padding: 15px;">
-                        <h4 style="color:#d9534f; margin-bottom:5px;">$r \approx -1$</h4>
-                        <p style="font-size: 0.8em; font-weight:bold;">Correlación Negativa Fuerte</p>
-                        <p style="font-size: 0.75em; margin-bottom:10px;">Ej: Temperatura ext. vs. Calefacción.</p>
-                        <div id="plotRM1" style="height:120px; width:100%;"></div>
+                    <div class="box-glass" style="text-align: center; padding: 10px;">
+                        <h4 style="color:var(--status-alert); margin-bottom:5px;">$r \approx -1$</h4>
+                        <p style="font-size: 0.75em; color: #94A3B8;">Correlación Negativa Fuerte</p>
+                        <div id="plotRM1" style="height:110px; width:100%;"></div>
                     </div>
                 </div>
                 <div class="callout-warning fragment">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #d9534f;"></i> <strong style="color: #d9534f;">Limitación Crítica:</strong> Pearson SOLO detecta relaciones <strong>LINEALES</strong>. Relaciones no lineales perfectas (como una parábola $Y = X^2$) darán un $r \approx 0$, aunque haya una dependencia exacta.
+                    <i class="fa-solid fa-circle-exclamation"></i> <strong>LIMITACIÓN FUNDAMENTAL DE PEARSON:</strong>
+                    Mide EXCLUSIVAMENTE dependencias lineales. Relaciones funcionales perfectas no lineales (ej. $Y = X^2$) producen $r \approx 0.00$. (Referencia: Cuarteto de Anscombe).
                 </div>
             </section>
 
             <!-- SLIDE 7: REGRESIÓN LINEAL SIMPLE -->
             <section>
                 <h2><i class="fa-solid fa-calculator"></i> Regresión Lineal Simple</h2>
-                <p style="text-align: center;">De la descripción a la predicción.</p>
                 
-                <div class="formula-card fragment">
+                <div class="formula-card fragment" style="border-color: var(--data-neon); width: 80%;">
                     $$\hat{y} = \beta_0 + \beta_1 x$$
                 </div>
                 
-                <div class="grid-4 fragment">
+                <div class="grid-4 fragment" style="gap: 10px; margin-top: 10px;">
                     <div class="box-glass" style="padding: 15px;">
-                        <h4 class="accent text-center" style="margin:0;">$\hat{y}$ (Y-hat)</h4>
-                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">El valor predicho o estimado por el modelo (Target).</p>
+                        <h4 class="neon-accent text-center" style="margin:0;">$\hat{y}$</h4>
+                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Valor estimado poblacional del modelo (Target).</p>
                     </div>
                     <div class="box-glass" style="padding: 15px;">
-                        <h4 class="accent text-center" style="margin:0;">$x$</h4>
-                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Nuestra variable de entrada conocida (Feature).</p>
+                        <h4 class="neon-accent text-center" style="margin:0;">$x$</h4>
+                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Dato de entrada observable (Feature).</p>
                     </div>
                     <div class="box-glass" style="padding: 15px;">
                         <h4 class="accent text-center" style="margin:0;">$\beta_0$ (Intercepto)</h4>
-                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Punto de corte en el Eje Y. El valor de $Y$ cuando $X = 0$.</p>
+                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Punto de corte en Eje Y ($Y$ cuando $X = 0$).</p>
                     </div>
                     <div class="box-glass" style="padding: 15px;">
                         <h4 class="accent text-center" style="margin:0;">$\beta_1$ (Pendiente)</h4>
-                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Tasa de cambio de Y por cada unidad adicional de X.</p>
+                        <p style="text-align:center; font-size: 0.85em; margin-top:10px;">Tasa de cambio ($\Delta Y / \Delta X$).</p>
                     </div>
                 </div>
             </section>
@@ -379,93 +309,54 @@
             <section>
                 <h2><i class="fa-solid fa-minimize"></i> Mínimos Cuadrados Ordinarios (OLS)</h2>
                 <div class="split-layout">
-                    <div class="box-glass">
-                        <h3 style="color: var(--data-blue);">¿Cómo encuentra el algoritmo la "mejor línea"?</h3>
-                        <p>Existen infinitas líneas posibles que podrían atravesar los datos. El algoritmo <strong>OLS (Ordinary Least Squares)</strong> busca matemáticamente la línea óptima.</p>
-                        <p><strong>El objetivo:</strong> Minimizar la suma de las distancias <em>al cuadrado</em> (errores o residuales) entre los puntos reales de los datos y la recta de predicción.</p>
+                    <div>
+                        <div id="plotOLS" class="plotly-container" style="height: 380px;"></div>
                     </div>
-                    <div class="fragment">
-                        <div id="plotOLS" class="plotly-container" style="height: 350px;"></div>
+                    <div class="box-glass">
+                        <h4 class="neon-accent">Optimización de Parámetros</h4>
+                        <p>El algoritmo OLS busca iterativa/analíticamente los parámetros $(\beta_0, \beta_1)$ que minimizan la Suma de Errores Cuadráticos ($SSE$).</p>
+                        <div class="formula-card" style="font-size: 1.1rem; padding: 10px; margin: 15px 0;">
+                            $$SSE = \sum_{i=1}^{n} e_i^2 = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+                        </div>
+                        <p style="font-size: 0.85em; color: #94A3B8;">Los residuos $e_i$ son representados visualmente como la distancia vertical entre la observación empírica empírica y la recta teórica.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- SLIDE 9: FALACIAS -->
+            <!-- SLIDE 9: FALACIAS ESTADÍSTICAS -->
             <section>
-                <h2><i class="fa-solid fa-skull"></i> Falacias: Correlación $\neq$ Causalidad</h2>
+                <h2><i class="fa-solid fa-triangle-exclamation"></i> Falacias: Correlación $\neq$ Causalidad</h2>
                 
                 <div class="quote-container">
-                    "El número de personas que se ahogan cayendo en piscinas se correlaciona con la cantidad de películas donde aparece Nicolas Cage ($r = 0.66$)."
-                    <span class="quote-author">— Spurious Correlations (Tyler Vigen)</span>
+                    "La tasa de mortalidad por ahogamiento en piscinas se correlaciona con la cantidad de películas de Nicolas Cage estrenadas al año ($r = 0.66$)."
+                    <span class="quote-author">— Spurious Correlations (T. Vigen)</span>
                 </div>
                 
-                <div class="box-glass fragment">
-                    <h3 class="accent">Variables de Confusión y Casualidad</h3>
-                    <p>Una alta correlación matemática no prueba que A cause a B. Generalmente se debe a:</p>
-                    <ul>
-                        <li><strong>Variable de Confusión (Confounding Variable):</strong> Una tercera variable no medida afecta a ambas simultáneamente. 
-                        <br><small><em>Ej: Las ventas de helado y los ataques de tiburón suben juntos. Causa real: El calor del verano.</em></small></li>
-                        <li><strong>Casualidad Estadística (Spurious):</strong> En conjuntos masivos de datos, algunas variables se moverán juntas puramente por azar matemático.</li>
+                <div class="box-accent fragment">
+                    <h4 class="accent">El Peligro de las Variables de Confusión</h4>
+                    <p style="color: #cbd5e1;">Una correlación robusta no infiere relación mecanicista.</p>
+                    <ul style="color: #cbd5e1; font-size: 0.9em; margin-top: 10px;">
+                        <li><strong>Variable de Confusión ($Z$):</strong> Entidad no observada o modelada que afecta simultáneamente a $X$ e $Y$.</li>
+                        <li><strong>Ejemplo Clásico:</strong> Consumo de helado ($X$) y frecuencia de ataques de tiburón ($Y$). La variable de confusión $Z$ es el <em>clima estival</em>.</li>
                     </ul>
                 </div>
             </section>
 
-            <!-- SLIDE 10: PAIR PROGRAMMING (CYBER DARK) -->
-            <section data-state="cyber-mode">
-                <h2><i class="fa-solid fa-terminal"></i> Pair Programming (Python)</h2>
-                <div class="box-glass">
-                    <h3 class="cyber-accent"><i class="fa-solid fa-rocket"></i> Misión Práctica</h3>
-                    <p style="font-family: 'Fira Code', monospace; color: #8892b0;">> INICIANDO ENTORNO COLAB...</p>
-                    <ul style="margin-top: 20px;">
-                        <li><i class="fa-solid fa-chevron-right" style="color: var(--neon-cyan);"></i> Generar <strong>Heatmaps</strong> de matrices de correlación con <code>Seaborn</code>.</li>
-                        <li><i class="fa-solid fa-chevron-right" style="color: var(--neon-cyan);"></i> Crear <strong>Scatter Plots</strong> interactivos con <code>Plotly</code> para explorar dependencias.</li>
-                        <li><i class="fa-solid fa-chevron-right" style="color: var(--neon-cyan);"></i> Implementar nuestro primer modelo de <strong>Regresión Lineal Simple</strong> usando <code>Scikit-Learn</code>.</li>
-                    </ul>
-                    <div style="margin-top: 30px; text-align: center;">
-                        <span style="font-family: 'Courier New', monospace; font-size: 1.2rem; color: var(--neon-cyan); border-right: 10px solid var(--neon-cyan); animation: blink 1s step-end infinite;">
-                            import sklearn.linear_model as lm
-                        </span>
-                    </div>
-                </div>
-                <style>@keyframes blink { 50% { border-color: transparent; } }</style>
-            </section>
-
-            <!-- SLIDE 11: GLOSARIO Y CONCLUSIONES -->
+            <!-- SLIDE 10: PUENTE DE CONEXIÓN -->
             <section>
-                <h2><i class="fa-solid fa-list-check"></i> Síntesis y Glosario</h2>
+                <h2><i class="fa-solid fa-satellite-dish"></i> Entornos de Integración Práctica</h2>
                 <div class="split-layout">
-                    <div class="box-glass">
-                        <h4 class="accent"><i class="fa-solid fa-language"></i> Glosario EMI</h4>
-                        <table style="width: 100%; font-size: 0.8em; border-collapse: collapse;">
-                            <tr style="border-bottom: 1px solid #ccc;">
-                                <td style="padding: 8px;"><strong>Scatter Plot</strong></td>
-                                <td>Gráfico de dispersión</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ccc;">
-                                <td style="padding: 8px;"><strong>Correlation Coefficient</strong></td>
-                                <td>Coeficiente de correlación</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ccc;">
-                                <td style="padding: 8px;"><strong>Linear Regression</strong></td>
-                                <td>Regresión Lineal</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ccc;">
-                                <td style="padding: 8px;"><strong>Slope / Intercept</strong></td>
-                                <td>Pendiente / Intercepto</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px;"><strong>Spurious Correlation</strong></td>
-                                <td>Correlación espuria</td>
-                            </tr>
-                        </table>
+                    <div class="box-glass" style="text-align: center; padding: 40px;">
+                        <i class="fa-solid fa-terminal" style="font-size: 4rem; color: var(--data-neon); margin-bottom: 20px;"></i>
+                        <h4>Laboratorio Analítico</h4>
+                        <p style="font-size: 0.9em; color: #94A3B8; margin-bottom: 20px;">Implementación práctica en Python utilizando <code>Scikit-Learn</code> y <code>Seaborn</code>.</p>
+                        <a href="Colab_Guiado_Semana_6.ipynb" target="_blank" style="display:inline-block; padding: 10px 20px; background: var(--data-neon); color: var(--bg-night); text-decoration: none; font-weight: bold; border-radius: 4px;">Abrir IPYNB 6</a>
                     </div>
-                    <div class="box-accent">
-                        <h4 class="accent"><i class="fa-solid fa-key"></i> Puntos Clave</h4>
-                        <ul>
-                            <li style="margin-bottom: 10px;"><strong>Pearson ($r$)</strong> estandariza la covarianza pero <em>solo mide relaciones lineales</em>.</li>
-                            <li style="margin-bottom: 10px;"><strong>Correlación $\neq$ Causalidad</strong> (Cuidado con las variables de confusión).</li>
-                            <li><strong>Regresión Lineal Simple</strong> traza la recta predictiva minimizando los errores (distancias) al cuadrado (OLS).</li>
-                        </ul>
+                    <div class="box-accent" style="text-align: center; padding: 40px;">
+                        <i class="fa-solid fa-gamepad" style="font-size: 4rem; color: var(--data-accent); margin-bottom: 20px;"></i>
+                        <h4>Simulador de Calibración</h4>
+                        <p style="font-size: 0.9em; color: #94A3B8; margin-bottom: 20px;">Motor interactivo para entrenamiento de intuición estadística visual (Gatekeeper).</p>
+                        <a href="game_semana_6.html" target="_blank" style="display:inline-block; padding: 10px 20px; background: var(--data-accent); color: var(--bg-night); text-decoration: none; font-weight: bold; border-radius: 4px;">Lanzar Game 6</a>
                     </div>
                 </div>
             </section>
@@ -479,7 +370,7 @@
     
     <script>
         Reveal.initialize({
-            hash: true, transition: 'slide', controls: true, progress: true,
+            hash: true, transition: 'fade', controls: true, progress: true,
             margin: 0.1, minScale: 0.2, maxScale: 2.0,
             mathjax2: {
                 mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
@@ -492,75 +383,59 @@
             plugins: [ RevealHighlight, RevealMath.MathJax2 ]
         });
 
-        // Generador de Datos
-        function generateData(n, slope, noise, offset=0, curve=false) {
+        const darkConfig = { 
+            margin: {l: 10, r: 10, t: 10, b: 20}, 
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', 
+            xaxis: {showgrid: true, gridcolor: '#1E293B', zeroline:false, showticklabels:false}, 
+            yaxis: {showgrid: true, gridcolor: '#1E293B', zeroline:false, showticklabels:false} 
+        };
+        const miniConfig = Object.assign({}, darkConfig, { margin: {l: 0, r: 0, t: 0, b: 0}, xaxis: {showgrid:false}, yaxis: {showgrid:false} });
+
+        function generateData(n, slope, noise, offset=0) {
             let x = [], y = [];
             for (let i = 0; i < n; i++) {
                 let xVal = Math.random() * 100;
                 x.push(xVal);
-                if (curve) {
-                    y.push( Math.pow(xVal - 50, 2) / 10 + (Math.random() - 0.5) * noise );
-                } else {
-                    y.push(slope * xVal + (Math.random() - 0.5) * noise + offset);
-                }
+                y.push(slope * xVal + (Math.random() - 0.5) * noise + offset);
             }
             return {x, y};
         }
 
-        // Gráficos Plotly
-        function drawPlotlyGraphs() {
-            const layoutBase = { 
-                margin: {l: 10, r: 10, t: 10, b: 10}, 
-                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', 
-                xaxis: {showgrid: false, zeroline:false, showticklabels:false}, 
-                yaxis: {showgrid: false, zeroline:false, showticklabels:false} 
-            };
-            
-            const layoutMini = Object.assign({}, layoutBase, { margin: {l: 0, r: 0, t: 0, b: 0} });
-
-            // Slide 4: Scatter Plot General
+        function drawGraphs() {
             let dataDemo = generateData(120, 1.5, 40, 10);
-            Plotly.newPlot('plotScatter', [{ x: dataDemo.x, y: dataDemo.y, mode: 'markers', marker: {color: '#003865', size: 8} }], layoutBase, {displayModeBar: false});
+            Plotly.newPlot('plotScatter', [{ x: dataDemo.x, y: dataDemo.y, mode: 'markers', marker: {color: '#38BDF8', size: 6} }], darkConfig, {displayModeBar: false});
 
-            // Slide 6: Pearson R
             let dPos = generateData(60, 1, 20);
-            Plotly.newPlot('plotR1', [{ x: dPos.x, y: dPos.y, mode: 'markers', marker: {color: '#28a745', size: 5} }], layoutMini, {displayModeBar: false});
+            Plotly.newPlot('plotR1', [{ x: dPos.x, y: dPos.y, mode: 'markers', marker: {color: '#22C55E', size: 4} }], miniConfig, {displayModeBar: false});
             
             let dNull = generateData(60, 0, 150);
-            Plotly.newPlot('plotR0', [{ x: dNull.x, y: dNull.y, mode: 'markers', marker: {color: '#6c757d', size: 5} }], layoutMini, {displayModeBar: false});
+            Plotly.newPlot('plotR0', [{ x: dNull.x, y: dNull.y, mode: 'markers', marker: {color: '#64748B', size: 4} }], miniConfig, {displayModeBar: false});
             
             let dNeg = generateData(60, -1, 20, 100);
-            Plotly.newPlot('plotRM1', [{ x: dNeg.x, y: dNeg.y, mode: 'markers', marker: {color: '#d9534f', size: 5} }], layoutMini, {displayModeBar: false});
+            Plotly.newPlot('plotRM1', [{ x: dNeg.x, y: dNeg.y, mode: 'markers', marker: {color: '#EF4444', size: 4} }], miniConfig, {displayModeBar: false});
 
-            // Slide 8: OLS Error Minimization
-            let dOLS = generateData(30, 0.8, 30, 20);
-            let tracePts = { x: dOLS.x, y: dOLS.y, mode: 'markers', name: 'Datos', marker: {color: '#003865', size: 8} };
+            let dOLS = generateData(30, 0.8, 40, 20);
+            let tracePts = { x: dOLS.x, y: dOLS.y, mode: 'markers', name: 'Datos', marker: {color: '#38BDF8', size: 7} };
             let regLineX = [0, 100];
-            let regLineY = [20, 100]; // Approx best fit for slope 0.8, offset 20
-            let traceLine = { x: regLineX, y: regLineY, mode: 'lines', name: 'Línea de Ajuste', line: {color: '#E85C0B', width: 3} };
+            let regLineY = [20, 100];
+            let traceLine = { x: regLineX, y: regLineY, mode: 'lines', name: 'Línea Ajuste', line: {color: '#E85C0B', width: 3} };
             
-            // Draw error lines (residuals)
             let shapes = [];
             for(let i=0; i<dOLS.x.length; i++) {
-                let x_i = dOLS.x[i];
-                let y_real = dOLS.y[i];
-                let y_pred = 20 + 0.8 * x_i;
+                let y_pred = 20 + 0.8 * dOLS.x[i];
                 shapes.push({
-                    type: 'line', x0: x_i, y0: y_real, x1: x_i, y1: y_pred,
-                    line: { color: 'rgba(217, 83, 79, 0.5)', width: 1.5, dash: 'dot' }
+                    type: 'line', x0: dOLS.x[i], y0: dOLS.y[i], x1: dOLS.x[i], y1: y_pred,
+                    line: { color: 'rgba(239, 68, 68, 0.6)', width: 1.5, dash: 'dot' }
                 });
             }
             
-            let layoutOLS = Object.assign({}, layoutBase, {shapes: shapes, showlegend: false});
+            let layoutOLS = Object.assign({}, darkConfig, {shapes: shapes, showlegend: false});
             Plotly.newPlot('plotOLS', [tracePts, traceLine], layoutOLS, {displayModeBar: false});
         }
 
-        Reveal.on('ready', event => { drawPlotlyGraphs(); });
-
+        Reveal.on('ready', event => { drawGraphs(); });
         Reveal.on('slidechanged', event => {
-            if ([3, 5, 7].includes(event.indexh)) {
-                window.dispatchEvent(new Event('resize'));
-            }
+            if ([3, 5, 7].includes(event.indexh)) window.dispatchEvent(new Event('resize'));
         });
     </script>
 </body>

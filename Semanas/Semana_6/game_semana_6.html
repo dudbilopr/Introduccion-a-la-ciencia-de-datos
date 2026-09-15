@@ -2,604 +2,547 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratorio Gamificado: Scatter Plot Navigator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Simulador: Calibración OLS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { 
-                        primary: '#003865', 
-                        secondary: '#E85C0B', 
-                        darkbg: '#0f172a',
-                        radar: 'rgba(0, 56, 101, 0.4)'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { 
-            background: #0f172a; 
-            color: white; 
-            font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
-            user-select: none;
+        :root {
+            --bg-deep: #0A1128;
+            --bg-panel: #0F172A;
+            --primary: #003865;
+            --accent: #E85C0B;
+            --data-neon: #38BDF8;
+            --success: #22C55E;
+            --alert: #EF4444;
+            --border: #1E293B;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
         }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
+
+        header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #E85C0B;
-            cursor: pointer;
-            margin-top: -10px;
-            box-shadow: 0 0 15px rgba(232, 92, 11, 0.9);
-            border: 2px solid white;
+
+        .title-area h1 { font-size: 1.2rem; color: var(--data-neon); margin-bottom: 4px; }
+        .title-area p { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .hud { display: flex; gap: 20px; }
+        .hud-item {
+            background: rgba(0, 56, 101, 0.4);
+            border: 1px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px 20px;
+            text-align: center;
         }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: linear-gradient(to right, #ef4444, #94a3b8, #22c55e);
-            border-radius: 2px;
+        .hud-item span { display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .hud-item strong { font-size: 1.2rem; font-family: 'Fira Code', monospace; }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
         }
-        .fade-in { animation: fadeIn 0.3s forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        
-        #radar-overlay {
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
-            pointer-events: none;
+
+        canvas {
+            background: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            cursor: crosshair;
         }
-        
-        .scan-line {
+
+        .controls {
             position: absolute;
-            width: 200%;
-            height: 2px;
-            background: rgba(96, 165, 250, 0.5);
-            top: 50%; left: -50%;
-            animation: scan 4s linear infinite;
-            box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
-            transform-origin: center;
+            bottom: 30px;
+            display: flex;
+            gap: 15px;
         }
-        @keyframes scan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        button {
+            background: var(--primary);
+            color: var(--text-main);
+            border: 1px solid var(--data-neon);
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        button:hover { background: var(--data-neon); color: var(--bg-deep); }
+        button:disabled { background: #333; border-color: #555; color: #777; cursor: not-allowed; }
+
+        .btn-accent { background: var(--accent); border-color: #ff7a29; }
+        .btn-accent:hover { background: #ff7a29; color: #fff; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 17, 40, 0.85);
+            backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: var(--bg-panel);
+            border-top: 4px solid var(--alert);
+            border-radius: 8px;
+            width: 90%; max-width: 600px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal-content.success-modal { border-top-color: var(--success); }
+
+        .modal-header { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; color: var(--alert); }
+        .success-modal .modal-header { color: var(--success); }
+        
+        .modal-body { font-size: 1rem; color: var(--text-main); line-height: 1.5; margin-bottom: 20px; }
+        
+        .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            text-align: left; padding: 12px; font-weight: normal; color: var(--text-muted);
+        }
+        .option-btn:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--data-neon); color: var(--text-main); }
+        
+        .feedback { display: none; padding: 15px; border-radius: 4px; font-size: 0.9rem; margin-bottom: 20px; }
+        .feedback.correct { display: block; background: rgba(34, 197, 94, 0.1); border-left: 4px solid var(--success); }
+        .feedback.wrong { display: block; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--alert); }
+
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--bg-panel); border-left: 4px solid var(--data-neon);
+            padding: 15px 25px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+        }
+        .toast.show { transform: translateX(0); }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col p-4 gap-4 relative">
+<body>
 
-    <!-- HEADER: HUD Y MÉTRICAS -->
-    <header class="glass-panel w-full p-4 rounded-xl flex justify-between items-center z-10">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center border-2 border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.8)]">
-                <i class="fas fa-satellite-dish text-2xl text-blue-200"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold text-white tracking-wide">Scatter Plot Navigator</h1>
-                <p class="text-sm text-gray-400 font-mono">Análisis Exploratorio de Datos (EDA) & Correlación</p>
-            </div>
+    <header>
+        <div class="title-area">
+            <h1><i class="fa-solid fa-satellite-dish"></i> Simulador: Calibración OLS</h1>
+            <p>Laboratorio Analítico Espacial</p>
         </div>
-
-        <div class="flex gap-8 items-center">
-            <div class="text-center">
-                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Sector (Nivel)</p>
-                <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
-            </div>
-            <div class="text-center">
-                <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Integridad del Escudo</p>
-                <div class="w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
-                    <div id="health-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 100%;"></div>
-                    <span id="health-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold drop-shadow-md">100%</span>
-                </div>
-            </div>
+        <div class="hud">
+            <div class="hud-item"><span>Nivel Actual</span><strong id="lvl-display" style="color:var(--data-neon)">1 / 10</strong></div>
+            <div class="hud-item"><span>Tolerancia de Error</span><strong id="tol-display" style="color:var(--accent)">Alto</strong></div>
+            <div class="hud-item"><span>Precisión Estimada</span><strong id="acc-display">-- %</strong></div>
         </div>
     </header>
 
-    <!-- ÁREA DE JUEGO PRINCIPAL -->
-    <main class="flex-1 flex flex-col gap-4 min-h-0 relative z-10">
-        
-        <!-- CANVAS CONTAINER -->
-        <div class="flex-1 glass-panel rounded-xl relative overflow-hidden bg-[#020617] flex items-center justify-center border border-blue-900/50" id="canvas-container">
-            <canvas id="gameCanvas" class="absolute inset-0 w-full h-full block"></canvas>
-            
-            <div id="radar-overlay" class="absolute inset-0"></div>
-            <div class="scan-line"></div>
-            
-            <!-- Target UI -->
-            <div class="absolute top-4 left-4 glass-panel p-3 rounded text-xs font-mono text-blue-300">
-                <div>Eje X: <span class="text-white">Variable Independiente (Feature)</span></div>
-                <div>Eje Y: <span class="text-white">Variable Dependiente (Target)</span></div>
-                <div class="mt-2 text-gray-400">Escaneo de Nube de Puntos detectado...</div>
-                <div id="margin-display" class="mt-1 text-secondary font-bold">Margen de Error Permitido: ±0.15</div>
-            </div>
-        </div>
-
-        <!-- CONSOLA DE MANDO -->
-        <div class="glass-panel w-full p-6 rounded-xl flex items-center gap-8 border-t-4 border-secondary">
-            
-            <div class="flex-1">
-                <div class="flex justify-between items-end mb-2">
-                    <div>
-                        <h3 class="text-lg font-bold text-white"><i class="fas fa-crosshairs text-secondary mr-2"></i>Calibrar Coeficiente de Correlación de Pearson ($r$)</h3>
-                        <p class="text-xs text-gray-400">Estima visualmente la relación lineal de la nube de datos (De -1.0 Inversa a 1.0 Directa).</p>
-                    </div>
-                    <div class="text-3xl font-mono font-bold text-white" id="r-value">0.00</div>
-                </div>
-                
-                <div class="relative pt-4 pb-2">
-                    <div class="flex justify-between text-xs font-bold text-gray-500 absolute w-full top-0">
-                        <span>-1.0 (Inversa Perfecta)</span>
-                        <span>0.0 (Sin Correlación)</span>
-                        <span>1.0 (Directa Perfecta)</span>
-                    </div>
-                    <input type="range" id="slider-r" min="-1.00" max="1.00" step="0.01" value="0.00">
-                </div>
-            </div>
-
-            <button id="btn-fire" class="bg-secondary hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-[0_0_20px_rgba(232,92,11,0.6)] flex items-center gap-3 text-xl border-2 border-orange-400 group">
-                <i class="fas fa-bolt text-yellow-300 group-hover:animate-pulse"></i> DISPARAR LÁSER
-            </button>
+    <main>
+        <canvas id="plotCanvas" width="800" height="500"></canvas>
+        <div class="controls">
+            <button id="btn-clear" onclick="clearUserLine()"><i class="fa-solid fa-eraser"></i> Limpiar Trazo</button>
+            <button id="btn-validate" class="btn-accent" onclick="validateCalibration()" disabled><i class="fa-solid fa-microchip"></i> Validar Estimación</button>
+            <button id="btn-next" onclick="nextLevel()" style="display:none;"><i class="fa-solid fa-forward-step"></i> Siguiente Nivel</button>
         </div>
     </main>
 
-    <!-- MODAL GATEKEEPER -->
-    <div id="gatekeeper-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
-        <div class="glass-panel max-w-2xl w-full p-8 rounded-2xl border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.2)] fade-in">
-            <div class="flex items-center gap-4 mb-6 text-red-500">
-                <i class="fas fa-radiation text-5xl animate-spin-slow"></i>
-                <h2 class="text-2xl font-bold">¡SISTEMAS CRÍTICOS: SESGO DETECTADO!</h2>
+    <!-- Modal Gatekeeper -->
+    <div id="gatekeeperModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><i class="fa-solid fa-shield-halved"></i> GATEKEEPER INTERVENCIÓN</div>
+            <div class="modal-body">
+                <p>La estimación ha superado el umbral de tolerancia crítica. El sistema requiere calibración manual de conceptos estadísticos antes de proceder.</p>
+                <br>
+                <p id="gk-question" style="font-weight:bold; color:var(--data-neon);"></p>
             </div>
-            <p class="text-gray-300 mb-6 text-lg border-l-4 border-red-500 pl-4" id="question-text">El fallo al estimar la correlación ha dañado los escudos. Responde para reiniciar los sistemas:</p>
-            
-            <div class="flex flex-col gap-3" id="options-container">
-                <!-- Inyectado via JS -->
-            </div>
+            <div id="gk-options" class="options"></div>
+            <div id="gk-feedback" class="feedback"></div>
+            <button id="btn-gk-continue" onclick="closeGatekeeper()" style="display:none; width:100%;"><i class="fa-solid fa-rotate-right"></i> Recalibrar y Reintentar</button>
         </div>
     </div>
 
-    <!-- MODAL END GAME -->
-    <div id="end-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden items-center justify-center z-50">
-        <div class="glass-panel max-w-xl w-full p-8 rounded-2xl text-center fade-in">
-            <i class="fas fa-globe text-7xl text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]"></i>
-            <h2 class="text-4xl font-bold text-white mb-2" id="end-title">Sector Asegurado</h2>
-            <p class="text-xl text-gray-300 mb-6" id="end-subtitle">Tienes una intuición experta para el Análisis Exploratorio (EDA).</p>
-            
-            <div class="flex justify-center gap-2 mb-8 text-4xl" id="stars-container">
-                <i class="fas fa-star text-gray-700"></i>
-                <i class="fas fa-star text-gray-700"></i>
-                <i class="fas fa-star text-gray-700"></i>
+    <!-- Modal Victoria -->
+    <div id="victoryModal" class="modal-overlay">
+        <div class="modal-content success-modal" style="text-align: center;">
+            <div class="modal-header"><i class="fa-solid fa-award" style="font-size:3rem;"></i><br>ANÁLISIS COMPLETADO</div>
+            <div class="modal-body">
+                <p>Has demostrado una calibración heurística excepcional frente a sistemas lineales, heterocedásticos y no lineales.</p>
+                <br>
+                <p style="color:var(--text-muted); font-size:0.9rem;">El modelo OLS (Mínimos Cuadrados Ordinarios) es la herramienta fundamental, pero la intuición del Analista de Datos es lo que previene catástrofes inferenciales.</p>
             </div>
-
-            <button onclick="location.reload()" class="bg-primary hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition border border-blue-400 shadow-[0_0_15px_rgba(0,56,101,0.5)]">
-                Nuevo Patrullaje
-            </button>
+            <button onclick="location.reload()" style="width:100%;" class="btn-accent"><i class="fa-solid fa-power-off"></i> Reiniciar Sistema</button>
         </div>
     </div>
 
-<script>
-/**
- * SCATTER PLOT NAVIGATOR ENGINE
- */
+    <div id="toast" class="toast">
+        <strong id="toast-title" style="color:var(--data-neon); display:block; margin-bottom:5px;">Info</strong>
+        <span id="toast-msg">Mensaje</span>
+    </div>
 
-// Banco de Preguntas (Gatekeeper)
-const questions = [
-    { q: "El axioma de oro en Ciencia de Datos es: 'Correlación NO implica...'", opts: ["Varianza.", "Causalidad.", "Regresión.", "Normalidad."], ans: 1 },
-    { q: "Un Coeficiente de Correlación de Pearson (r) de -0.9 indica que:", opts: ["No hay ninguna relación entre las variables.", "A medida que X aumenta, Y disminuye fuertemente.", "El modelo tiene un error del 90%.", "A medida que X aumenta, Y aumenta fuertemente."], ans: 1 },
-    { q: "¿Qué sucede con el coeficiente de correlación de Pearson si hay un valor atípico (Outlier) extremo en los datos?", opts: ["Nada, Pearson es completamente robusto a outliers.", "Se transforma en Correlación de Spearman.", "Puede alterarse drásticamente (sesgarse), engañando al analista.", "Siempre se vuelve 0.0."], ans: 2 },
-    { q: "Si los puntos forman un patrón de parábola (U) perfecta en el Scatter Plot, el coeficiente de correlación lineal de Pearson (r) será cercano a:", opts: ["1.0", "-1.0", "0.0, porque mide relación LINEAL, no curvas.", "0.5"], ans: 2 },
-    { q: "Para variables categóricas u ordinales que no cumplen supuestos de normalidad, en lugar de Pearson, usamos:", opts: ["Correlación de Spearman.", "Transformación Box-Cox.", "Z-Score.", "Regresión Lineal Simple."], ans: 0 }
-];
+    <script>
+        const canvas = document.getElementById('plotCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const margin = 50;
 
-// Estado
-const state = {
-    canvas: null, ctx: null,
-    w: 0, h: 0,
-    points: [],
-    particles: [],
-    
-    // Nivel y Lógica
-    level: 1,
-    trueR: 0, // Correlación real generada
-    guessR: 0, // Estimación del jugador
-    errorMargin: 0.15,
-    health: 100,
-    
-    // Animación Láser
-    isFiring: false,
-    fireTimer: 0,
-    fireSuccess: false,
-    
-    lastTime: 0,
-    cameraScale: 1
-};
+        let points = [];
+        let trueOLS = { m: 0, b: 0 };
+        let userLine = { start: null, end: null, drawing: false };
+        let currentLevel = 1;
+        let isValidated = false;
 
-class DataPoint {
-    constructor(x, y, isOutlier=false) {
-        this.nx = x; // Normalized X (-1 to 1)
-        this.ny = y; // Normalized Y (-1 to 1)
-        this.isOutlier = isOutlier;
-        this.pulsePhase = Math.random() * Math.PI * 2;
-        this.destroyed = false;
-    }
-    
-    // Convert to screen coordinates
-    getScreenCoords(cw, ch) {
-        const scale = Math.min(cw, ch) * 0.4;
-        return {
-            x: cw/2 + this.nx * scale,
-            y: ch/2 - this.ny * scale // Y is inverted on screen
-        };
-    }
-}
+        // Dataset configs per level
+        const levels = [
+            { id: 1, n: 20, slope: 1, noise: 10, offset: 20, desc: "Iniciación", tol: 25, type: "linear" },
+            { id: 2, n: 30, slope: -1, noise: 15, offset: 80, desc: "Correlación Inversa", tol: 20, type: "linear" },
+            { id: 3, n: 40, slope: 0.5, noise: 15, offset: 30, desc: "Pendiente Suave", tol: 15, type: "linear" },
+            { id: 4, n: 60, slope: 1.2, noise: 30, offset: 10, desc: "Mayor Dispersión", tol: 15, type: "linear" },
+            { id: 5, n: 80, slope: -0.8, noise: 40, offset: 90, desc: "Ruido Incrementado", tol: 15, type: "linear" },
+            { id: 6, n: 100, slope: 0.2, noise: 50, offset: 40, desc: "Correlación Débil", tol: 15, type: "linear" },
+            { id: 7, n: 50, slope: 1, noise: 10, offset: 20, desc: "Outliers Extremos", tol: 12, type: "outliers" },
+            { id: 8, n: 80, slope: -1, noise: 15, offset: 80, desc: "Apalancamiento Severo", tol: 10, type: "outliers_lever" },
+            { id: 9, n: 150, slope: 1, noise: 0, offset: 20, desc: "Heterocedasticidad", tol: 10, type: "hetero" },
+            { id: 10, n: 100, slope: 0, noise: 5, offset: 20, desc: "Trampa No Lineal", tol: 10, type: "parabola" }
+        ];
 
-class Particle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.color = color;
-        this.vx = (Math.random() - 0.5) * 500;
-        this.vy = (Math.random() - 0.5) * 500;
-        this.life = 1.0;
-    }
-    update(dt) {
-        this.x += this.vx * dt;
-        this.y += this.vy * dt;
-        this.life -= dt * 2;
-    }
-    draw(ctx) {
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, 4, 4);
-        ctx.globalAlpha = 1.0;
-    }
-}
-
-function initGame() {
-    state.canvas = document.getElementById('gameCanvas');
-    state.ctx = state.canvas.getContext('2d');
-    
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    
-    // Controles
-    const sliderR = document.getElementById('slider-r');
-    sliderR.addEventListener('input', (e) => {
-        state.guessR = parseFloat(e.target.value);
-        let displayStr = state.guessR.toFixed(2);
-        if(state.guessR > 0) displayStr = "+" + displayStr;
-        
-        const valElem = document.getElementById('r-value');
-        valElem.innerText = displayStr;
-        
-        // Color feedback on slider thumb based on value (Blue -, Gray 0, Orange +)
-        if(state.guessR < -0.1) valElem.className = "text-3xl font-mono font-bold text-blue-400";
-        else if(state.guessR > 0.1) valElem.className = "text-3xl font-mono font-bold text-secondary";
-        else valElem.className = "text-3xl font-mono font-bold text-gray-400";
-    });
-    
-    document.getElementById('btn-fire').addEventListener('click', fireLaser);
-    
-    generateLevel();
-    
-    state.lastTime = performance.now();
-    requestAnimationFrame(gameLoop);
-}
-
-function resizeCanvas() {
-    const rect = state.canvas.parentElement.getBoundingClientRect();
-    state.canvas.width = rect.width;
-    state.canvas.height = rect.height;
-    state.w = rect.width;
-    state.h = rect.height;
-}
-
-// Generador de números aleatorios normales (Box-Muller)
-function randomNormal() {
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random();
-    while(v === 0) v = Math.random();
-    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-}
-
-function generateLevel() {
-    document.getElementById('level-display').innerHTML = `${state.level} <span class="text-sm text-gray-500">/ 10</span>`;
-    state.points = [];
-    
-    // Difficulty Settings
-    let numPoints = 50 + (state.level * 10);
-    state.errorMargin = 0.15 - (state.level * 0.01);
-    document.getElementById('margin-display').innerText = `Margen de Error Permitido: ±${state.errorMargin.toFixed(2)}`;
-    
-    // Determinar Correlación Real
-    // Level 10: Non-linear trap
-    if (state.level === 10) {
-        state.trueR = 0;
-        for(let i=0; i<numPoints; i++) {
-            let x = (Math.random() * 2) - 1; // -1 to 1
-            let y = (x * x * 2 - 1) + (randomNormal() * 0.1); // Parabola + noise
-            state.points.push(new DataPoint(x, y));
-        }
-    } else {
-        // Linear generation using Cholesky Decomposition logic
-        // For levels 1-3: Strong correlations. Levels 4-6: Weak.
-        let strength = (Math.random() > 0.5 ? 1 : -1);
-        if(state.level <= 3) state.trueR = strength * (0.7 + Math.random() * 0.25); // 0.7 to 0.95
-        else if(state.level <= 6) state.trueR = strength * (0.3 + Math.random() * 0.3); // 0.3 to 0.6
-        else state.trueR = strength * (0.1 + Math.random() * 0.8); // Random 7-9
-        
-        let hasOutliers = (state.level >= 7);
-        
-        for(let i=0; i<numPoints; i++) {
-            let u = randomNormal();
-            let v = randomNormal();
-            
-            // Transform to get desired correlation
-            let x = u;
-            let y = state.trueR * u + Math.sqrt(1 - state.trueR*state.trueR) * v;
-            
-            // Normalize to roughly -1 to 1 visually
-            x = x * 0.3; 
-            y = y * 0.3;
-            
-            state.points.push(new DataPoint(x, y));
-        }
-        
-        // Add extreme outliers to mess with visual perception
-        if (hasOutliers) {
-            for(let i=0; i<3; i++) {
-                let ox = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random()*0.2);
-                let oy = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random()*0.2);
-                state.points.push(new DataPoint(ox, oy, true));
+        // Gatekeeper questions (Bloom's Taxonomy)
+        const questions = [
+            {
+                q: "¿Qué debilidad algorítmica expone la presencia de Outliers extremos en Mínimos Cuadrados Ordinarios (OLS)?",
+                opts: ["Ninguna, OLS es robusto.", "Aumentan desproporcionadamente la varianza y arrastran la pendiente debido al término cuadrático del error.", "Anulan el intercepto forzándolo a cero."],
+                ans: 1,
+                feedback: "Correcto. Como OLS minimiza el error AL CUADRADO, un outlier penaliza excesivamente al modelo, obligando a la recta a desviarse para compensarlo."
+            },
+            {
+                q: "Si la nube de puntos dibuja una parábola perfecta (U), ¿cuál será aproximadamente el Coeficiente de Correlación de Pearson?",
+                opts: ["r = 1.0", "r = -1.0", "r ≈ 0.0"],
+                ans: 2,
+                feedback: "Exacto. Pearson SOLO mide dependencia lineal. Una relación simétrica no lineal cancela la covarianza cruzada arrojando cero."
+            },
+            {
+                q: "¿Qué implica la Heterocedasticidad en el análisis de residuos?",
+                opts: ["Que los residuos siguen una distribución normal.", "Que la varianza de los residuos NO es constante a lo largo del eje X (forma de embudo).", "Que no hay correlación entre variables."],
+                ans: 1,
+                feedback: "Correcto. Cuando el error (ruido) crece o decrece conforme avanza X, se viola el supuesto de homocedasticidad."
+            },
+            {
+                q: "El estadístico r de Pearson adimensionaliza la Covarianza dividiéndola por:",
+                opts: ["La varianza de Y.", "El producto de las Desviaciones Estándar de X e Y.", "El número de observaciones (n-1)."],
+                ans: 1,
+                feedback: "Exacto. Al dividir por las desviaciones estándar, se estandariza el límite entre -1 y +1, independizando la métrica de la escala de medida original."
             }
-        }
-    }
-    
-    // Reset Slider visually to 0
-    document.getElementById('slider-r').value = 0;
-    document.getElementById('slider-r').dispatchEvent(new Event('input'));
-}
+        ];
 
-function fireLaser() {
-    if(state.isFiring) return;
-    
-    document.getElementById('btn-fire').disabled = true;
-    state.isFiring = true;
-    state.fireTimer = 2.0; // Seconds animation
-    
-    // Calculate Error
-    let diff = Math.abs(state.trueR - state.guessR);
-    state.fireSuccess = (diff <= state.errorMargin);
-    
-    if(!state.fireSuccess) {
-        // If fail, ship takes damage based on error
-        let dmg = Math.min(30, Math.max(10, diff * 30));
-        applyDamage(dmg);
-    }
-}
-
-function applyDamage(amount) {
-    state.health -= amount;
-    if (state.health <= 0) state.health = 0;
-    
-    const bar = document.getElementById('health-bar');
-    const pct = state.health;
-    bar.style.width = `${pct}%`;
-    document.getElementById('health-text').innerText = `${pct.toFixed(0)}%`;
-    
-    if(pct <= 30) bar.className = "h-full bg-red-500 transition-all duration-300";
-    else if(pct <= 60) bar.className = "h-full bg-yellow-500 transition-all duration-300";
-    
-    // Shake screen
-    state.canvas.style.transform = 'translate(10px, 10px)';
-    setTimeout(() => state.canvas.style.transform = 'translate(-10px, -10px)', 50);
-    setTimeout(() => state.canvas.style.transform = 'translate(0, 0)', 100);
-}
-
-function gameLoop(timestamp) {
-    const dt = Math.min((timestamp - state.lastTime) / 1000, 0.05);
-    state.lastTime = timestamp;
-    
-    update(dt);
-    draw(timestamp);
-    
-    requestAnimationFrame(gameLoop);
-}
-
-function update(dt) {
-    // Particles
-    for (let i = state.particles.length - 1; i >= 0; i--) {
-        state.particles[i].update(dt);
-        if (state.particles[i].life <= 0) state.particles.splice(i, 1);
-    }
-    
-    // Laser Animation logic
-    if (state.isFiring) {
-        state.fireTimer -= dt;
-        
-        // At mid point, destroy points if success, or launch missiles if fail
-        if (state.fireTimer < 1.0 && state.fireTimer + dt >= 1.0) {
-            if (state.fireSuccess) {
-                // Destroy all points
-                state.points.forEach(p => {
-                    const c = p.getScreenCoords(state.w, state.h);
-                    for(let k=0; k<5; k++) state.particles.push(new Particle(c.x, c.y, '#22c55e'));
-                    p.destroyed = true;
-                });
-            } else {
-                // Points attack ship (center)
-                if(state.health <= 0) {
-                    setTimeout(triggerGatekeeper, 500);
+        // Data Generation
+        function generateLevelData(levelDef) {
+            points = [];
+            if (levelDef.type === "linear") {
+                for (let i = 0; i < levelDef.n; i++) {
+                    let x = Math.random() * 100;
+                    let y = levelDef.slope * x + levelDef.offset + (Math.random() - 0.5) * levelDef.noise;
+                    points.push({x, y});
+                }
+            } else if (levelDef.type === "outliers") {
+                for (let i = 0; i < levelDef.n - 3; i++) {
+                    let x = Math.random() * 100;
+                    let y = levelDef.slope * x + levelDef.offset + (Math.random() - 0.5) * levelDef.noise;
+                    points.push({x, y});
+                }
+                points.push({x: 10, y: 90}); points.push({x: 20, y: 95}); points.push({x: 15, y: 85});
+            } else if (levelDef.type === "outliers_lever") {
+                for (let i = 0; i < levelDef.n - 2; i++) {
+                    let x = Math.random() * 80; // keep tight
+                    let y = levelDef.slope * x + levelDef.offset + (Math.random() - 0.5) * levelDef.noise;
+                    points.push({x, y});
+                }
+                points.push({x: 95, y: 90}); points.push({x: 98, y: 95}); // high leverage
+            } else if (levelDef.type === "hetero") {
+                for (let i = 0; i < levelDef.n; i++) {
+                    let x = Math.random() * 100;
+                    let variable_noise = (x / 100) * 40; // noise increases with x
+                    let y = levelDef.slope * x + levelDef.offset + (Math.random() - 0.5) * variable_noise;
+                    points.push({x, y});
+                }
+            } else if (levelDef.type === "parabola") {
+                for (let i = 0; i < levelDef.n; i++) {
+                    let x = Math.random() * 100;
+                    let normX = (x - 50) / 10;
+                    let y = 10 + Math.pow(normX, 2) * 3 + (Math.random() - 0.5) * 5;
+                    points.push({x, y});
                 }
             }
+            // Clip
+            points.forEach(p => { p.y = Math.max(0, Math.min(100, p.y)); });
+            calculateTrueOLS();
         }
-        
-        if (state.fireTimer <= 0) {
-            state.isFiring = false;
-            document.getElementById('btn-fire').disabled = false;
-            if(state.fireSuccess) {
-                setTimeout(levelUp, 500);
+
+        // Math: OLS Calculation
+        function calculateTrueOLS() {
+            let n = points.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            points.forEach(p => {
+                sumX += p.x; sumY += p.y;
+                sumXY += p.x * p.y; sumXX += p.x * p.x;
+            });
+            let m = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            let b = (sumY - m * sumX) / n;
+            trueOLS = { m: m, b: b };
+        }
+
+        // Coordinate transforms
+        function pX(valX) { return margin + (valX / 100) * (width - 2 * margin); }
+        function pY(valY) { return height - margin - (valY / 100) * (height - 2 * margin); }
+        function invX(px) { return Math.max(0, Math.min(100, ((px - margin) / (width - 2 * margin)) * 100)); }
+        function invY(py) { return Math.max(0, Math.min(100, ((height - margin - py) / (height - 2 * margin)) * 100)); }
+
+        // Render
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Grid
+            ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 1;
+            for(let i=0; i<=10; i++) {
+                let gx = pX(i*10); let gy = pY(i*10);
+                ctx.beginPath(); ctx.moveTo(gx, margin); ctx.lineTo(gx, height-margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, gy); ctx.lineTo(width-margin, gy); ctx.stroke();
+                
+                ctx.fillStyle = '#64748B'; ctx.font = '10px Inter';
+                ctx.fillText(i*10, gx - 5, height - margin + 15);
+                if (i>0) ctx.fillText(i*10, margin - 25, gy + 4);
+            }
+            // Axes
+            ctx.strokeStyle = '#F8FAFC'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(margin, margin); ctx.lineTo(margin, height-margin); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(margin, height-margin); ctx.lineTo(width-margin, height-margin); ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#38BDF8'; ctx.font = '12px Inter';
+            ctx.fillText("X (Feature)", width/2, height - 10);
+            ctx.save(); ctx.translate(15, height/2); ctx.rotate(-Math.PI/2);
+            ctx.fillText("Y (Target)", 0, 0); ctx.restore();
+
+            // Points
+            points.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(pX(p.x), pY(p.y), 4, 0, Math.PI*2);
+                ctx.fillStyle = '#38BDF8';
+                ctx.fill();
+            });
+
+            // User Line
+            if (userLine.start && userLine.end) {
+                ctx.beginPath();
+                ctx.moveTo(pX(userLine.start.x), pY(userLine.start.y));
+                ctx.lineTo(pX(userLine.end.x), pY(userLine.end.y));
+                ctx.strokeStyle = '#E85C0B';
+                ctx.setLineDash([5, 5]);
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // True OLS Line (if validated)
+            if (isValidated) {
+                let x0 = 0, y0 = trueOLS.b;
+                let x1 = 100, y1 = trueOLS.m * 100 + trueOLS.b;
+                
+                ctx.beginPath();
+                ctx.moveTo(pX(x0), pY(y0));
+                ctx.lineTo(pX(x1), pY(y1));
+                ctx.strokeStyle = '#22C55E';
+                ctx.lineWidth = 3;
+                ctx.stroke();
             }
         }
-    }
-}
 
-function draw(timestamp) {
-    state.ctx.clearRect(0, 0, state.w, state.h);
-    
-    const cx = state.w / 2;
-    const cy = state.h / 2;
-    const scale = Math.min(state.w, state.h) * 0.4;
-    
-    // Draw Cartesian Axes
-    state.ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    state.ctx.lineWidth = 1;
-    // Grid
-    for(let i=-5; i<=5; i++) {
-        let px = cx + (i/5)*scale;
-        state.ctx.beginPath(); state.ctx.moveTo(px, 0); state.ctx.lineTo(px, state.h); state.ctx.stroke();
-        let py = cy + (i/5)*scale;
-        state.ctx.beginPath(); state.ctx.moveTo(0, py); state.ctx.lineTo(state.w, py); state.ctx.stroke();
-    }
-    // Main axes
-    state.ctx.strokeStyle = 'rgba(96,165,250,0.5)';
-    state.ctx.lineWidth = 2;
-    state.ctx.beginPath(); state.ctx.moveTo(cx, 0); state.ctx.lineTo(cx, state.h); state.ctx.stroke(); // Y
-    state.ctx.beginPath(); state.ctx.moveTo(0, cy); state.ctx.lineTo(state.w, cy); state.ctx.stroke(); // X
-    
-    // Draw Player Guess Laser Line
-    if (state.guessR !== 0 || state.isFiring) {
-        state.ctx.save();
-        state.ctx.translate(cx, cy);
-        
-        // Slope = guessR. Angle = atan(-guessR) because Y is inverted
-        let angle = Math.atan(-state.guessR);
-        
-        if(state.isFiring) {
-            state.ctx.strokeStyle = state.fireSuccess ? '#22c55e' : '#ef4444';
-            state.ctx.lineWidth = 8;
-            state.ctx.shadowColor = state.fireSuccess ? '#22c55e' : '#ef4444';
-            state.ctx.shadowBlur = 20;
-        } else {
-            state.ctx.strokeStyle = '#E85C0B';
-            state.ctx.lineWidth = 3;
-            state.ctx.setLineDash([10, 10]);
+        // Interaction
+        canvas.addEventListener('mousedown', e => {
+            if (isValidated) return;
+            const rect = canvas.getBoundingClientRect();
+            let rawX = e.clientX - rect.left; let rawY = e.clientY - rect.top;
+            userLine.start = { x: invX(rawX), y: invY(rawY) };
+            userLine.end = null;
+            userLine.drawing = true;
+            document.getElementById('btn-validate').disabled = true;
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (userLine.drawing) {
+                const rect = canvas.getBoundingClientRect();
+                userLine.end = { x: invX(e.clientX - rect.left), y: invY(e.clientY - rect.top) };
+                draw();
+            }
+        });
+
+        canvas.addEventListener('mouseup', e => {
+            if (userLine.drawing) {
+                const rect = canvas.getBoundingClientRect();
+                userLine.end = { x: invX(e.clientX - rect.left), y: invY(e.clientY - rect.top) };
+                userLine.drawing = false;
+                if (Math.abs(userLine.start.x - userLine.end.x) > 10) {
+                    document.getElementById('btn-validate').disabled = false;
+                }
+                draw();
+            }
+        });
+
+        function clearUserLine() {
+            if (isValidated) return;
+            userLine = { start: null, end: null, drawing: false };
+            document.getElementById('btn-validate').disabled = true;
+            draw();
         }
-        
-        state.ctx.rotate(angle);
-        state.ctx.beginPath();
-        state.ctx.moveTo(-state.w, 0);
-        state.ctx.lineTo(state.w, 0);
-        state.ctx.stroke();
-        state.ctx.restore();
-    }
 
-    // Draw True Line (Ghost) if fired
-    if (state.isFiring && !state.fireSuccess) {
-        state.ctx.save();
-        state.ctx.translate(cx, cy);
-        let angle = Math.atan(-state.trueR);
-        state.ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-        state.ctx.lineWidth = 2;
-        state.ctx.rotate(angle);
-        state.ctx.beginPath();
-        state.ctx.moveTo(-state.w, 0);
-        state.ctx.lineTo(state.w, 0);
-        state.ctx.stroke();
-        state.ctx.restore();
-        
-        // Draw Text Hint
-        state.ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        state.ctx.font = '14px monospace';
-        state.ctx.fillText(`Error Real: ${state.trueR.toFixed(2)} (Tu estimación: ${state.guessR.toFixed(2)})`, 20, state.h - 20);
-    }
+        // Logic
+        function validateCalibration() {
+            isValidated = true;
+            
+            // Calculate User M and B
+            let dX = userLine.end.x - userLine.start.x;
+            let dY = userLine.end.y - userLine.start.y;
+            let uM = dY / dX;
+            let uB = userLine.start.y - uM * userLine.start.x;
 
-    // Draw Data Points
-    for (let p of state.points) {
-        if(p.destroyed) continue;
-        
-        let c = p.getScreenCoords(state.w, state.h);
-        
-        // Pulsing effect
-        let pulse = Math.sin(timestamp/300 + p.pulsePhase) * 1.5;
-        
-        state.ctx.fillStyle = p.isOutlier ? '#a855f7' : '#60a5fa'; // Purple for outliers, blue for normal
-        if(state.isFiring && !state.fireSuccess && state.fireTimer < 1.0) {
-            state.ctx.fillStyle = '#ef4444'; // Turn red when attacking
-        }
-        
-        state.ctx.beginPath();
-        state.ctx.arc(c.x, c.y, 4 + pulse, 0, Math.PI*2);
-        state.ctx.fill();
-        
-        // Glow
-        state.ctx.shadowBlur = 10;
-        state.ctx.shadowColor = state.ctx.fillStyle;
-        state.ctx.fill();
-        state.ctx.shadowBlur = 0;
-    }
-    
-    // Draw Particles
-    for (let p of state.particles) p.draw(state.ctx);
-}
+            // Simple error metric based on SSE over sampled domain
+            let errUser = 0; let errOLS = 0;
+            for(let x=10; x<=90; x+=10) {
+                let ty = trueOLS.m * x + trueOLS.b;
+                let uy = uM * x + uB;
+                errUser += Math.pow(ty - uy, 2);
+            }
+            
+            let lvlDef = levels[currentLevel - 1];
+            // Normalize error roughly 0-100 where 0 is perfect
+            let errScore = Math.min(100, Math.sqrt(errUser)); 
+            let accuracy = Math.max(0, 100 - (errScore * 2));
+            
+            document.getElementById('acc-display').innerText = accuracy.toFixed(1) + " %";
 
-function levelUp() {
-    if (state.level >= 10) {
-        document.getElementById('end-modal').style.display = 'flex';
-        return;
-    }
-    state.level++;
-    
-    // Restore some health on level up
-    state.health = Math.min(100, state.health + 20);
-    applyDamage(0); // Updates UI
-    
-    generateLevel();
-}
+            draw();
+            
+            document.getElementById('btn-validate').style.display = 'none';
+            document.getElementById('btn-clear').style.display = 'none';
 
-// --- GATEKEEPER ---
-function triggerGatekeeper() {
-    const modal = document.getElementById('gatekeeper-modal');
-    const container = document.getElementById('options-container');
-    
-    const qIndex = Math.floor(Math.random() * questions.length);
-    const qData = questions[qIndex];
-    
-    document.getElementById('question-text').innerText = qData.q;
-    container.innerHTML = '';
-    
-    qData.opts.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = "w-full glass-panel p-4 rounded-lg text-left hover:bg-white/10 transition border border-transparent hover:border-red-500 flex items-start gap-3";
-        btn.innerHTML = `<span class="font-bold text-red-400">${String.fromCharCode(65+idx)}.</span> <span class="text-gray-200">${opt}</span>`;
-        btn.onclick = () => {
-            if(idx === qData.ans) {
-                modal.style.display = 'none';
-                state.health = 50; // Restore to 50%
-                applyDamage(0);
-                generateLevel(); // Retry level with new data
+            if (accuracy >= (100 - lvlDef.tol)) {
+                // Success
+                showToast("Estimación Aprobada", "La calibración es óptima. Procediendo.");
+                document.getElementById('acc-display').style.color = 'var(--success)';
+                document.getElementById('btn-next').style.display = 'block';
             } else {
-                btn.style.borderColor = '#ef4444';
-                btn.style.backgroundColor = 'rgba(239,68,68,0.4)';
+                // Fail - Gatekeeper
+                document.getElementById('acc-display').style.color = 'var(--alert)';
+                setTimeout(triggerGatekeeper, 1000);
             }
-        };
-        container.appendChild(btn);
-    });
-    
-    modal.style.display = 'flex';
-}
+        }
 
-window.onload = initGame;
-</script>
+        function nextLevel() {
+            if (currentLevel === 10) {
+                document.getElementById('victoryModal').style.display = 'flex';
+                return;
+            }
+            currentLevel++;
+            initLevel();
+        }
+
+        // Gatekeeper
+        function triggerGatekeeper() {
+            let q = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('gk-question').innerText = q.q;
+            let optsDiv = document.getElementById('gk-options');
+            optsDiv.innerHTML = '';
+            
+            q.opts.forEach((opt, idx) => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkGatekeeper(idx, q.ans, q.feedback, btn);
+                optsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('gk-feedback').className = 'feedback';
+            document.getElementById('btn-gk-continue').style.display = 'none';
+            document.getElementById('gatekeeperModal').style.display = 'flex';
+        }
+
+        function checkGatekeeper(selected, correct, feedback, btn) {
+            let btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => b.disabled = true);
+            
+            let fDiv = document.getElementById('gk-feedback');
+            fDiv.innerText = feedback;
+            
+            if (selected === correct) {
+                btn.style.borderColor = 'var(--success)'; btn.style.color = 'var(--success)';
+                fDiv.className = 'feedback correct';
+                document.getElementById('btn-gk-continue').style.display = 'block';
+            } else {
+                btn.style.borderColor = 'var(--alert)'; btn.style.color = 'var(--alert)';
+                btns[correct].style.borderColor = 'var(--success)'; btns[correct].style.color = 'var(--success)';
+                fDiv.className = 'feedback wrong';
+                document.getElementById('btn-gk-continue').style.display = 'block';
+            }
+        }
+
+        function closeGatekeeper() {
+            document.getElementById('gatekeeperModal').style.display = 'none';
+            // Restart level
+            initLevel(true);
+        }
+
+        // UI
+        function showToast(title, msg) {
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            let toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function initLevel(retry = false) {
+            let lvlDef = levels[currentLevel - 1];
+            if (!retry) generateLevelData(lvlDef);
+            
+            isValidated = false;
+            userLine = { start: null, end: null, drawing: false };
+            
+            document.getElementById('lvl-display').innerText = currentLevel + " / 10";
+            document.getElementById('tol-display').innerText = `±${lvlDef.tol}%`;
+            document.getElementById('acc-display').innerText = "-- %";
+            document.getElementById('acc-display').style.color = "var(--text-main)";
+            
+            document.getElementById('btn-validate').style.display = 'block';
+            document.getElementById('btn-validate').disabled = true;
+            document.getElementById('btn-clear').style.display = 'block';
+            document.getElementById('btn-next').style.display = 'none';
+
+            if (!retry) showToast(`Nivel ${currentLevel}`, lvlDef.desc);
+            
+            draw();
+        }
+
+        // Startup
+        initLevel();
+
+    </script>
 </body>
 </html>
