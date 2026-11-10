@@ -3,202 +3,283 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Semana 13 · La lonja de los segmentos | Introducción a la Ciencia de Datos</title>
+<title>Semana 13 · ¿Existen los grupos? | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/puntos/puntos.css">
 <link rel="stylesheet" href="../assets/puntos/cine.css">
 <link rel="stylesheet" href="../assets/puntos/curso.css">
 <style>
-  /* Mundo: lonja de un distribuidor mayorista. Nadie etiquetó a los clientes; los puestos aparecen cuando se mide bien la distancia. */
-  :root { --fondo: #16110c; --fondo-2: #2a2018; --tinta: #f6efe4; --tinta-2: #c4b29a; --regla: rgba(196,178,154,.24); --punto: #8a7357; --compra: #ff7a1f; --acento-texto: #ffa263; --fresco: #9ad36a; }
+  /* Mundo: expediente de investigación en una lonja mayorista. Cada escena es una pregunta que la literatura ya se hizo; los datos de 440 clientes la responden. */
+  :root { --fondo: #16110c; --fondo-2: #2a2018; --tinta: #f6efe4; --tinta-2: #c4b29a; --regla: rgba(196,178,154,.24); --punto: #8a7357; --compra: #ff7a1f; --acento-texto: #ffa263; --fresco: #9ad36a; --papel: #f3ead9; }
   :root[data-tema="claro"] { --fondo: #f8f4ec; --fondo-2: #ece4d5; --tinta: #2a1f14; --tinta-2: #6a5844; --regla: rgba(42,31,20,.2); --punto: #b39d80; --compra: #e85c0b; --acento-texto: #b94504; --fresco: #3f7d18; }
-  .rot { font: 700 23px Georgia, serif; letter-spacing: .1em; color: var(--fresco); text-transform: uppercase; }
+  .rot { font: 700 22px Georgia, serif; letter-spacing: .1em; color: var(--fresco); text-transform: uppercase; }
   svg text { font-family: inherit; }
   .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-f { fill: var(--fresco); font-weight: 800; }
-  .caja { background: var(--fondo-2); padding: 34px 40px; border: 3px solid var(--punto); border-top: 10px solid var(--fresco); }
-  .dist { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-  .dist div { background: var(--fondo-2); padding: 22px 22px 26px; border-bottom: 6px solid var(--fresco); }
-  .dist b { display: block; font-size: 28px; } .dist .c { display: block; font: 800 58px 'Schibsted Grotesk', sans-serif; color: var(--acento-texto); margin: 6px 0; } .dist span { display: block; font-size: 23px; color: var(--tinta-2); line-height: 1.2; }
-  .formula { font: 700 30px Consolas, monospace; background: var(--fondo-2); padding: 18px 24px; border-left: 6px solid var(--compra); }
-  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--fresco); min-height: 270px; }
-  .glosa .ico { font-size: 48px; color: var(--fresco); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .ficha { background: var(--papel); color: #2a1f14; padding: 34px 42px; box-shadow: 0 30px 70px rgba(0,0,0,.45); }
+  .ficha .rot { color: #3f7d18; } .ficha p, .ficha li, .ficha b { color: #2a1f14; } .ficha .acento { color: #b94504; }
+  .pregunta { font: italic 700 64px Georgia, serif; line-height: 1.1; }
+  .ecu { font-size: 40px; background: var(--fondo-2); padding: 18px 32px; border-left: 8px solid var(--compra); }
+  .mano { border-collapse: collapse; font-size: 24px; font-variant-numeric: tabular-nums; }
+  .mano th, .mano td { color: var(--tinta); font-style: normal; font-family: 'Schibsted Grotesk', sans-serif; padding: 7px 14px; border-bottom: 1px solid var(--regla); text-align: right; }
+  .mano th { color: var(--tinta-2); font-weight: 600; } .mano td:first-child, .mano th:first-child { text-align: left; }
+  .mano th, .mano td { font-size: 23px !important; line-height: 1.15 !important; }
+  .mano td span { font-size: 15px !important; white-space: nowrap; font-family: 'Schibsted Grotesk', sans-serif; }
+  .mano .g0 { color: var(--compra); font-weight: 800; } .mano .g1 { color: var(--fresco); font-weight: 800; }
+  .voto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .voto div { background: var(--fondo-2); padding: 26px; font-size: 30px; border-top: 6px solid var(--punto); }
+  .voto b { display: block; font-size: 56px; color: var(--fresco); }
+  .familias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .familias > div { background: var(--fondo-2); padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 8px; border-bottom: 6px solid var(--fresco); }
+  .familias .ico { font-size: 52px; color: var(--fresco); } .familias b { font-size: 29px; } .familias span { font-size: 22px; color: var(--tinta-2); line-height: 1.22; } .familias em { font-size: 22px; color: var(--acento-texto); font-style: normal; font-weight: 700; }
+  .videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .videos a { display: block; background: var(--fondo-2); text-decoration: none; color: var(--tinta); }
+  .videos img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .videos div { padding: 10px 12px 14px; } .videos b { display: block; font-size: 20px; line-height: 1.15; } .videos span { font-size: 17px; color: var(--tinta-2); }
+  .katex { font-size: 1em; }
 </style>
 </head>
-<body data-cine="grua">
+<body data-cine="paneo">
 <div id="escenario">
 <div id="reflector"></div>
 <canvas id="lienzo" aria-hidden="true"></canvas>
 
-<!-- 1 Portada -->
+<!-- 1 Portada: la pregunta de investigación -->
 <section class="esc">
   <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
-  <div style="position:absolute;left:88px;top:90px;width:760px">
-    <p class="rot">La lonja de los segmentos · Semana 13</p>
-    <h1 style="font-size:96px;margin-top:16px;line-height:1.03">Nadie etiquetó a estos clientes. <span class="acento">Los grupos están ahí.</span></h1>
-    <p class="sec" style="font-size:28px;margin-top:22px">Aprendizaje no supervisado: distancias, K-means, siluetas y validación.</p>
-    <p class="sec" style="font-size:24px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  <div style="position:absolute;left:88px;top:96px;width:780px">
+    <p class="rot">Expediente de investigación · Semana 13</p>
+    <p class="pregunta" style="margin-top:20px">¿Existen los grupos, <span class="acento">o los inventa el algoritmo?</span></p>
+    <p class="sec" style="font-size:27px;margin-top:24px">Análisis de conglomerados con 440 clientes reales de un distribuidor mayorista: distancia, K-means, validación, otros métodos y estabilidad.</p>
+    <p class="sec" style="font-size:23px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
   </div>
-  <aside class="notas">Cada punto es uno de los 440 clientes reales de un distribuidor mayorista de Portugal, proyectado en dos dimensiones (componentes principales, 71 % de la variación). El color es el grupo que encuentra K-means con k = 2, sin mirar ninguna etiqueta.</aside>
+  <aside class="notas">La pregunta parafrasea el título de un artículo real: Hennig (2015), "What are the true clusters?", Pattern Recognition Letters. Los puntos son los 440 clientes proyectados en dos componentes principales (71 % de la variación); el color es el grupo de K-means con k = 2. Al final de la sesión se vuelve a esta pregunta con evidencia.</aside>
 </section>
 
-<!-- 2 Agenda -->
+<!-- 2 Ruta de aprendizaje como mapa de dependencias -->
 <section class="esc">
-  <p class="rot" style="position:absolute;left:88px;top:62px">Jornada de la lonja</p>
-  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
-  <aside class="notas">La guía pide un taller de segmentación con siluetas y la presentación de perfiles en GitHub. El reto gamificado de centroides sirve de calentamiento.</aside>
+  <p class="rot" style="position:absolute;left:88px;top:56px">Ruta de hoy: cada idea necesita la anterior</p>
+  <svg id="ruta" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:110px;width:1600px;height:760px" role="img" aria-label="Mapa de dependencias: distancia, objetivo, algoritmo, elegir k, validar, otros métodos, estabilidad y decisión"></svg>
+  <aside class="notas">7:00 apuesta · 7:10 distancia · 7:30 objetivo y algoritmo a mano · 8:05 pausa · 8:20 EMI · 8:30 elegir k y validar · 8:55 simulador y taller · 9:40 otros métodos y estabilidad · 9:55 cierre. Cada nodo lleva la referencia que lo sustenta.</aside>
 </section>
 
 <!-- 3 Resultados de aprendizaje -->
 <section class="esc">
-  <div class="caja" style="position:absolute;left:150px;top:80px;width:1300px">
+  <div class="ficha" style="position:absolute;left:150px;top:80px;width:1300px">
     <p class="rot">Resultados de aprendizaje del syllabus</p>
-    <h2 style="font-size:52px;margin:14px 0 28px">Esta es la semana del corazón del curso: el análisis de conglomerados.</h2>
-    <div style="display:grid;grid-template-columns:110px 1fr;gap:22px 18px;align-items:center">
-      <b class="acento" style="font-size:40px">1.1</b><p style="font-size:30px">Calcula distancias de Minkowski: euclidiana, Manhattan y suprema.</p>
-      <b class="acento" style="font-size:40px">2.2</b><p style="font-size:30px">Conoce fortalezas y debilidades del agrupamiento jerárquico.</p>
-      <b class="acento" style="font-size:40px">3.1</b><p style="font-size:30px">Comprende la validación de agrupaciones y la calidad del agrupamiento.</p>
-      <b class="acento" style="font-size:40px">3.3</b><p style="font-size:30px">Sabe evaluar la estabilidad y la tendencia al agrupamiento.</p>
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:22px 18px;align-items:center;margin-top:22px">
+      <b class="acento" style="font-size:42px">1.1</b><p style="font-size:30px">Calcula distancias de Minkowski: euclidiana, Manhattan y suprema.</p>
+      <b class="acento" style="font-size:42px">2.1</b><p style="font-size:30px">Comprende los algoritmos jerárquicos aglomerativos.</p>
+      <b class="acento" style="font-size:42px">3.1</b><p style="font-size:30px">Comprende la validación y la calidad del agrupamiento.</p>
+      <b class="acento" style="font-size:42px">3.3</b><p style="font-size:30px">Sabe evaluar la estabilidad y la tendencia al agrupamiento.</p>
+    </div>
+    <p style="font-size:24px;margin-top:26px">Es la semana que más resultados del syllabus reúne: el curso se diseñó alrededor del análisis de conglomerados.</p>
+  </div>
+  <aside class="notas">RAE del syllabus 19001, resumidos. El resumen del syllabus dice: métodos de partición como k-means, jerárquicos como BIRCH y de densidad como DBSCAN/OPTICS, más validación.</aside>
+</section>
+
+<!-- 4 Apuesta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:1424px">
+    <p class="rot">Apuesta antes de la teoría</p>
+    <h2 style="font-size:56px;margin:10px 0 34px">Le pido a K-means 5 grupos en datos que no tienen ninguno. ¿Qué hace?</h2>
+    <div class="voto">
+      <div class="paso"><b>A</b>Avisa que no hay grupos.</div>
+      <div class="paso"><b>B</b>Devuelve menos de 5.</div>
+      <div class="paso"><b>C</b>Devuelve exactamente 5, siempre.</div>
+    </div>
+    <p class="paso" style="font-size:32px;margin-top:36px">Respuesta: <b class="acento">C</b>. "It will always produce a result with exactly k clusters, giving a (false) suggestion of success."</p>
+    <p class="paso sec" style="font-size:24px;margin-top:10px">Schubert (2023), SIGKDD Explorations, 25(1), introducción.</p>
+  </div>
+  <aside class="notas">Que voten con la mano antes de cada paso. La cita es textual del artículo (texto completo en el vault). Es la idea que organiza la sesión: el algoritmo no puede negarse a agrupar; la validación es responsabilidad nuestra.</aside>
+</section>
+
+<!-- 5 Distancia de Minkowski -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:760px;display:flex;flex-direction:column;gap:20px">
+    <p class="rot">RAE 1.1 · Antes de agrupar, medir</p>
+    <h2 style="font-size:50px;line-height:1.06">"Cerca" depende de la regla con que se mide</h2>
+    <div class="ecu">$$d_p(a,b)=\Big(\sum_{i=1}^{6}|a_i-b_i|^p\Big)^{1/p}$$</div>
+    <p class="paso" style="font-size:28px">Clientes 1 y 2, gasto en logaritmo y estandarizado: Manhattan <b class="acento">2,602</b>, euclidiana <b class="acento">1,721</b>, suprema <b class="acento">1,643</b>.</p>
+    <p class="paso sec" style="font-size:24px">La suprema la decide una sola categoría: congelados (214 frente a 1.762 u. m.).</p>
+  </div>
+  <svg id="bolas" class="diagrama" viewBox="0 0 680 720" style="position:absolute;left:880px;top:90px;width:680px;height:720px" role="img" aria-label="Los puntos a distancia 1 del centro con p igual a 1, 2 e infinito: un rombo, un círculo y un cuadrado"></svg>
+  <aside class="notas">La figura muestra el "círculo unidad" de cada distancia: todos los puntos a distancia 1 del centro. Rombo para p = 1, círculo para p = 2, cuadrado para p infinito. Siempre se cumple Manhattan ≥ euclidiana ≥ suprema. K-means usa la euclidiana al cuadrado.</aside>
+</section>
+
+<!-- 6 El objetivo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px">
+    <p class="rot">Lo que K-means minimiza</p>
+    <h2 style="font-size:54px;margin:10px 0 30px">K-means es un problema de mínimos cuadrados, como la regresión de la semana 10</h2>
+    <div class="ecu" style="max-width:1100px">$$\mathrm{SSE}(X,C)=\sum_{x\in X}\ \min_{c\in C}\ \lVert x-c\rVert^2$$</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px">
+      <p class="paso" style="font-size:29px">Con <b>un</b> centro, el óptimo es fácil: el promedio de los datos.</p>
+      <p class="paso" style="font-size:29px">Con <b>varios</b> centros, encontrar el óptimo es un problema <b class="acento">NP-difícil</b>: los algoritmos prácticos solo llegan a un óptimo local.</p>
     </div>
   </div>
-  <aside class="notas">RAE textuales del syllabus (código 19001). El 3.3 se trabaja en el reto autónomo de la guía (estabilidad con distintas semillas).</aside>
+  <p class="pie">Schubert (2023), ecuación 1 y sección 2, que cita a Aloise y otros (2009) para la NP-dificultad. Steinley (2006) sintetiza 50 años de variantes del criterio.</p>
+  <aside class="notas">A la SSE también se le llama inercia o suma de cuadrados dentro de los grupos (WCSS); son tres nombres del mismo número que scikit-learn muestra como inertia_. Conexión: en regresión se minimiza la suma de residuos al cuadrado; aquí, la distancia al cuadrado a su centro.</aside>
 </section>
 
-<!-- 4 Caso -->
+<!-- 7 Lloyd a mano -->
 <section class="esc">
-  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:22px">
-    <p class="rot">El caso</p>
-    <h2 style="font-size:54px;line-height:1.06">440 clientes, gasto anual en seis categorías</h2>
-    <p class="paso" style="font-size:29px">Frescos, lácteos, abarrotes, congelados, detergentes y papel, y delicatessen. En unidades monetarias: la fuente no dice cuál.</p>
-    <p class="paso" style="font-size:29px">Además, el canal: <b>298 Horeca</b> (hoteles, restaurantes, cafés) y <b>142 minoristas</b>.</p>
-    <p class="paso" style="font-size:29px">El canal <b class="acento">no se le muestra</b> al algoritmo. Se guarda para comprobar después si los grupos tienen sentido.</p>
-  </div>
-  <svg id="gasto" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Gasto anual de frescos: media 12.000, mediana 8.504, máximo 112.151"></svg>
-  <aside class="notas">Wholesale customers, Margarida Cardoso (2013), UCI, CC BY 4.0. Región: 77 Lisboa, 47 Oporto, 316 otra. Usar una etiqueta conocida para validar un agrupamiento se llama validación externa.</aside>
+  <div style="position:absolute;left:88px;top:40px;width:1424px"><p class="rot">El algoritmo de Lloyd (1982), a mano</p><h2 style="font-size:46px;margin-top:6px">Seis clientes reales, dos variables, dos centros: 1. asignar, 2. mover, repetir</h2></div>
+  <div style="position:absolute;left:88px;top:180px;width:880px"><table class="mano" id="tablaMano"></table></div>
+  <svg id="manoSvg" class="diagrama" viewBox="0 0 560 560" style="position:absolute;left:1000px;top:170px;width:540px;height:540px" role="img" aria-label="Los seis clientes en log de abarrotes y log de frescos, con los centroides antes y después de moverse"></svg>
+  <p class="paso" id="manoTexto" style="position:absolute;left:88px;top:740px;width:1424px;font-size:26px"></p>
+  <aside class="notas">Clientes 1 a 6 del archivo, en logaritmo natural de abarrotes y de frescos, sin estandarizar para que la cuenta se pueda seguir. Centros iniciales: los clientes 1 y 4. Paso 1: distancia de cada cliente a cada centro y asignación al más cercano. Paso 2: cada centro pasa al promedio de sus clientes. La segunda asignación es idéntica: el algoritmo convergió. La SSE bajó de 1,368 a 1,159. Que lo verifiquen con calculadora.</aside>
 </section>
 
-<!-- 5 Distancias -->
+<!-- 8 Convergencia y mínimos locales -->
 <section class="esc">
-  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">RAE 1.1 · Medir la similitud</p><h2 style="font-size:50px;margin-top:6px">¿Qué tan lejos están los clientes 1 y 2? Depende de cómo se mida</h2></div>
-  <p class="formula paso" style="position:absolute;left:88px;top:200px;width:1424px">d<sub>p</sub>(a, b) = ( Σ |a<sub>i</sub> − b<sub>i</sub>|<sup>p</sup> )<sup>1/p</sup> &nbsp;&nbsp; p = 1 Manhattan · p = 2 euclidiana · p → ∞ suprema</p>
-  <div class="dist" style="position:absolute;left:88px;right:88px;top:330px">
-    <div class="paso"><b>Manhattan</b><span class="c">2,602</span><span>Suma de diferencias: camina por las calles.</span></div>
-    <div class="paso"><b>Euclidiana</b><span class="c">1,721</span><span>Línea recta: la de K-means.</span></div>
-    <div class="paso"><b>Suprema</b><span class="c">1,643</span><span>Solo la mayor diferencia: aquí, congelados.</span></div>
-    <div class="paso"><b>Coseno</b><span class="c">0,576</span><span>Similitud del perfil, no de la cantidad.</span></div>
-  </div>
-  <p class="paso sec" style="position:absolute;left:88px;top:700px;width:1424px;font-size:26px">Calculadas sobre el logaritmo del gasto, estandarizado. Cliente 1: 214 en congelados; cliente 2: 1.762. Las otras categorías se parecen mucho más.</p>
-  <aside class="notas">Siempre Manhattan ≥ euclidiana ≥ suprema. Para atributos categóricos (canal, región) se usan otras medidas, como la de Gower para tipos mixtos; está en el reto autónomo.</aside>
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Dos propiedades del algoritmo</p><h2 style="font-size:48px;margin-top:6px">Cada paso nunca empeora la SSE… pero el final depende de dónde se empezó</h2></div>
+  <svg id="converge" class="diagrama" viewBox="0 0 700 600" style="position:absolute;left:60px;top:190px;width:700px;height:600px" role="img" aria-label="La inercia baja de 3.690,9 a 1.848,1 en seis iteraciones"></svg>
+  <svg id="locales" class="diagrama" viewBox="0 0 760 600" style="position:absolute;left:800px;top:190px;width:760px;height:600px" role="img" aria-label="Veinte inicios al azar con k igual a 5 terminan en 19 inercias distintas, de 1.271,3 a 1.318,0"></svg>
+  <aside class="notas">Izquierda: los 440 clientes, k = 2, un inicio al azar (semilla 42): 3.690,9; 1.921,0; 1.874,8; 1.854,8; 1.848,2; 1.848,1. Asignar no puede subir la SSE (cada punto va a su centro más cercano) y mover tampoco (el promedio minimiza la suma de cuadrados). Derecha: k = 5 con 20 inicios al azar de una sola corrida: 19 valores distintos. Por eso scikit-learn repite la corrida (n_init) y usa k-means++ por defecto; Celebi y otros (2013) comparan métodos de inicio.</aside>
 </section>
 
-<!-- 6 Escala -->
+<!-- 9 La escala -->
 <section class="esc">
   <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:24px">
-    <p class="rot">La trampa de la escala</p>
-    <h2 style="font-size:54px;line-height:1.06">Sin logaritmo, K-means aparta a 36 clientes enormes y mete a 404 en un solo grupo</h2>
-    <p class="paso" style="font-size:30px">El gasto es muy asimétrico: unos pocos clientes compran diez veces más. La distancia euclidiana los persigue.</p>
-    <p class="paso" style="font-size:30px">Con logaritmo y estandarización: grupos de <b class="acento">252</b> y <b class="acento">188</b>.</p>
+    <p class="rot">La preparación decide</p>
+    <h2 style="font-size:52px;line-height:1.06">Sin logaritmo, K-means persigue a los clientes gigantes</h2>
+    <p class="paso" style="font-size:29px">Frescos: media <b>12.000</b>, mediana <b>8.504</b>, máximo <b class="acento">112.151</b> u. m.</p>
+    <p class="paso" style="font-size:29px">Solo estandarizado: grupos de <b class="acento">36 y 404</b>. Con logaritmo: <b class="acento">252 y 188</b>.</p>
+    <p class="paso sec" style="font-size:24px">"Users should first consider whether k-means is even the right choice for their problem at all, and pay more attention to data preprocessing, too." Schubert (2023)</p>
   </div>
-  <svg id="escala" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Tamaño de los grupos sin logaritmo, 36 y 404, y con logaritmo, 252 y 188"></svg>
-  <aside class="notas">Acuerdo con el canal (índice de Rand ajustado): 0,167 sin logaritmo y 0,514 con logaritmo. La preparación de los datos pesa más que el algoritmo. Conecta con limpieza (semana 4) y descriptiva (semana 5).</aside>
+  <svg id="escala" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Tamaños de los grupos sin y con logaritmo"></svg>
+  <aside class="notas">Rand ajustado contra el canal: 0,167 sin logaritmo y 0,514 con logaritmo. La cita es textual de la introducción de Schubert (2023). Conecta con descriptiva (asimetría, semana 5) y limpieza (semana 4).</aside>
 </section>
 
-<!-- 7 Elegir k -->
+<!-- 10 Elegir k -->
 <section class="esc">
-  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">¿Cuántos grupos?</p><h2 style="font-size:50px;margin-top:6px">El codo no se ve claro; la silueta sí elige: k = 2</h2></div>
-  <svg id="k" class="diagrama" viewBox="0 0 1500 640" style="position:absolute;left:50px;top:170px;width:1500px;height:640px" role="img" aria-label="Inercia y silueta para k de 2 a 8"></svg>
-  <aside class="notas">Inercia: 1.848 con k = 2, baja suave hasta 1.027 con k = 8; no hay un codo evidente. Silueta: 0,29 con k = 2, 0,258 con k = 3 y menos de 0,2 desde k = 4. Una silueta de 0,29 indica estructura débil: los grupos existen, pero se tocan. Rousseeuw (1987).</aside>
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">¿Cuántos grupos?</p><h2 style="font-size:44px;margin-top:6px">El codo no se ve; dos criterios eligen 2 y otro elige 3. Los criterios también discrepan</h2></div>
+  <svg id="criterios" class="diagrama" viewBox="0 0 1500 600" style="position:absolute;left:50px;top:180px;width:1500px;height:600px" role="img" aria-label="Inercia, silueta, Calinski-Harabasz y Davies-Bouldin para k de 2 a 8"></svg>
+  <p class="pie">Schubert (2023) recomienda dejar el codo y usar Calinski-Harabasz, BIC o Gap (Tibshirani, Walther y Hastie, 2001). Silueta: Rousseeuw (1987).</p>
+  <aside class="notas">Silueta: mayor es mejor; máximo en k = 2 (0,290). Calinski-Harabasz: mayor es mejor; máximo en k = 2 (187,7). Davies-Bouldin: menor es mejor; mínimo en k = 3 (1,346, apenas por debajo de 1,353 en k = 2). La lección no es "use tal índice": la elección de k es una decisión argumentada, no un número que la máquina entrega.</aside>
 </section>
 
-<!-- 8 Perfiles -->
+<!-- 11 La silueta, desde su fórmula -->
 <section class="esc">
-  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Perfiles descubiertos</p><h2 style="font-size:50px;margin-top:6px">Un puesto compra frescos y congelados; el otro, abarrotes y papel</h2></div>
-  <svg id="perfiles" class="diagrama" viewBox="0 0 1424 620" style="position:absolute;left:88px;top:180px;width:1424px;height:620px" role="img" aria-label="Medianas de gasto por grupo en las seis categorías"></svg>
-  <aside class="notas">Medianas exactas, grupo A (252): frescos 10.347,5, lácteos 1.871, abarrotes 2.406, congelados 2.225, detergentes y papel 327,5, delicatessen 749,5. Grupo B (188): 5.406,5, 7.690,5, 11.527, 1.061,5, 4.495, 1.388,5. En la gráfica se redondean. Se reportan medianas porque el gasto es asimétrico.</aside>
+  <div style="position:absolute;left:88px;top:60px;width:1424px">
+    <p class="rot">RAE 3.1 · Validación interna</p>
+    <h2 style="font-size:52px;margin:10px 0 26px">La silueta compara, para cada cliente, su grupo con el grupo vecino</h2>
+    <div class="ecu" style="max-width:900px">$$s(i)=\frac{b(i)-a(i)}{\max\{a(i),\,b(i)\}}\qquad -1\le s(i)\le 1$$</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:30px">
+      <p class="paso" style="font-size:27px"><b>a(i):</b> distancia media a los de su propio grupo.</p>
+      <p class="paso" style="font-size:27px"><b>b(i):</b> distancia media al grupo más cercano que no es el suyo.</p>
+      <p class="paso" style="font-size:27px"><b class="acento">0,290</b> con k = 2: estructura débil; los grupos se tocan.</p>
+    </div>
+  </div>
+  <p class="pie">Rousseeuw, P. J. (1987). Journal of Computational and Applied Mathematics, 20, 53-65. Es el trabajo más citado de esta bibliografía.</p>
+  <aside class="notas">El simulador calcula la silueta con esta fórmula y da 0,290 con las etiquetas del cuaderno: el mismo valor de scikit-learn. Valores negativos indican clientes que estarían mejor en otro grupo.</aside>
 </section>
 
-<!-- 9 Validación -->
+<!-- 12 Validación externa -->
 <section class="esc">
   <div style="position:absolute;left:88px;top:54px;width:740px;display:flex;flex-direction:column;gap:22px">
-    <p class="rot">RAE 3.1 · Validar</p>
-    <h2 style="font-size:52px;line-height:1.06">El algoritmo nunca vio el canal, y casi lo reconstruye</h2>
-    <p class="paso" style="font-size:29px">Grupo A: <b>244</b> Horeca y <b>8</b> minoristas. Grupo B: <b>54</b> Horeca y <b>134</b> minoristas.</p>
-    <p class="paso" style="font-size:29px">Índice de Rand ajustado: <b class="acento">0,514</b> (0 = azar, 1 = idéntico). Jerárquico de Ward: 0,415.</p>
-    <p class="paso" style="font-size:29px">DBSCAN no encuentra dos segmentos: con radio 1,5 ve un solo grupo y <b>44 clientes atípicos</b>.</p>
-    <p class="paso sec" style="font-size:25px">Cada método responde una pregunta distinta: particiones, jerarquías o densidad.</p>
+    <p class="rot">Validación externa</p>
+    <h2 style="font-size:50px;line-height:1.06">El algoritmo nunca vio el canal, y casi lo reconstruye</h2>
+    <p class="paso" style="font-size:28px">Grupo A: <b>244</b> Horeca y <b>8</b> minoristas. Grupo B: <b>54</b> Horeca y <b>134</b> minoristas.</p>
+    <p class="paso" style="font-size:28px">Índice de Rand ajustado: <b class="acento">0,514</b>. Corrige el acuerdo que se esperaría por azar (Hubert y Arabie, 1985).</p>
+    <p class="paso sec" style="font-size:24px">Cuidado: que coincida con el canal no prueba que sea "el" agrupamiento verdadero. Solo dice que captura una estructura que ya se conocía.</p>
   </div>
   <svg id="cruce" class="diagrama" viewBox="0 0 680 700" style="position:absolute;left:870px;top:100px;width:680px;height:700px" role="img" aria-label="Cruce de grupos con canal"></svg>
-  <aside class="notas">Validación interna: silueta. Validación externa: índice de Rand ajustado contra el canal (Hubert y Arabie, 1985). DBSCAN con min_samples = 8 sobre los datos en logaritmo estandarizados: radio 1,0 da 2 grupos y 146 de ruido; 1,5 da 1 grupo y 44; 2,0 da 1 grupo y 16.</aside>
+  <aside class="notas">La validación interna (silueta, Calinski-Harabasz) no usa información externa; la externa compara con una etiqueta conocida. En la práctica casi nunca hay etiqueta: por eso el canal es un regalo de este caso.</aside>
 </section>
 
-<!-- 10 EMI -->
+<!-- 13 Familias de métodos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Más allá de K-means</p><h2 style="font-size:50px;margin-top:6px">Cuatro familias, cuatro ideas distintas de lo que es un grupo</h2></div>
+  <div class="familias" style="position:absolute;left:88px;right:88px;top:200px">
+    <div class="paso"><i class="ico" data-i="target"></i><b>Partición</b><span>Grupos compactos alrededor de un centro. K-means, k-medoides.</span><em>Aquí: Rand 0,514</em><span>Lloyd (1982); Steinley (2006)</span></div>
+    <div class="paso"><i class="ico" data-i="git-merge"></i><b>Jerárquicos</b><span>Une pares paso a paso y deja un dendrograma. Ward minimiza el aumento de varianza.</span><em>Aquí: Rand 0,415</em><span>Ward (1963); Murtagh y Contreras (2011)</span></div>
+    <div class="paso"><i class="ico" data-i="scan-search"></i><b>Densidad</b><span>Regiones densas separadas por vacío; marca el ruido. DBSCAN, HDBSCAN.</span><em>Aquí: 1 grupo y 44 de ruido</em><span>Schubert y otros (2017); Campello y otros (2013)</span></div>
+    <div class="paso"><i class="ico" data-i="sigma"></i><b>Basados en modelos</b><span>Mezcla de distribuciones; el número de grupos se elige con BIC.</span><em>Tema de cápsula</em><span>Fraley y Raftery (1998)</span></div>
+  </div>
+  <aside class="notas">DBSCAN con radio 1,5 y 8 vecinos sobre los datos en logaritmo estandarizados: un solo grupo denso y 44 clientes atípicos. No contradice a K-means: responde otra pregunta. BIRCH (lo menciona el syllabus) es un método jerárquico para datos muy grandes; puede ser tema de cápsula en la semana 14.</aside>
+</section>
+
+<!-- 14 Estabilidad -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:680px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">RAE 3.3 · Estabilidad</p>
+    <h2 style="font-size:52px;line-height:1.06">Si quito al azar el 20 % de los clientes, ¿cambian los grupos?</h2>
+    <p class="paso" style="font-size:28px">50 submuestras del 80 %. Con k = 2, el acuerdo medio con la partición completa es <b class="acento">0,951</b>.</p>
+    <p class="paso" style="font-size:28px">Con k = 3 la media es 0,892, pero en el peor caso cae a <b class="acento">0,322</b>: el tercer grupo es frágil.</p>
+    <p class="paso sec" style="font-size:24px">La estabilidad es otro argumento para elegir k (von Luxburg, 2010), y se puede medir grupo por grupo (Hennig, 2007).</p>
+  </div>
+  <svg id="estable" class="diagrama" viewBox="0 0 760 720" style="position:absolute;left:800px;top:80px;width:760px;height:720px" role="img" aria-label="Distribución del índice de Rand ajustado en 50 submuestras para k igual a 2, 3 y 4"></svg>
+  <aside class="notas">Cada punto es una submuestra: se reagrupa el 80 % y se compara con la partición de todos los clientes en esos mismos clientes. Con k = 4, media 0,789. Von Luxburg (2010) advierte que la estabilidad tampoco es garantía: es una evidencia más.</aside>
+</section>
+
+<!-- 15 Línea de tiempo de la investigación -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">De dónde viene lo que hoy se usa</p><h2 style="font-size:46px;margin-top:6px">60 años de investigación detrás de una línea de scikit-learn</h2></div>
+  <svg id="linea" class="diagrama" viewBox="0 0 1600 700" style="position:absolute;left:0;top:170px;width:1600px;height:700px" role="img" aria-label="Línea de tiempo de 1963 a 2023 con los trabajos fundamentales del agrupamiento"></svg>
+  <aside class="notas">Todos los trabajos de la línea tienen DOI verificado contra Crossref; la bibliografía comentada está en la guía de investigación. El artículo de Lloyd circuló como informe de los Laboratorios Bell antes de su publicación en 1982; se usa la fecha de publicación.</aside>
+</section>
+
+<!-- 16 ¿Qué es un grupo verdadero? -->
+<section class="esc">
+  <div class="ficha" style="position:absolute;left:150px;top:70px;width:1300px">
+    <p class="rot">Volvamos a la pregunta de la portada</p>
+    <p style="font-size:44px;line-height:1.18;font-weight:700;margin:16px 0 22px">"Clustering becomes scientific not through uniqueness but through transparent and open communication."</p>
+    <p style="font-size:22px;margin-bottom:24px">Hennig, C. (2015). What are the true clusters? Pattern Recognition Letters, 64, 53-62, resumen.</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:18px 16px;align-items:center;border-top:2px solid #c9b99f;padding-top:20px">
+      <i class="ico paso" data-i="target" style="font-size:50px;color:#3f7d18"></i><p class="paso" style="font-size:29px">Para el distribuidor, ¿qué sería un buen grupo: clientes con la misma logística, con la misma oferta, con el mismo riesgo?</p>
+      <i class="ico paso" data-i="file-text" style="font-size:50px;color:#3f7d18"></i><p class="paso" style="font-size:29px">Su perfil de segmentos debe decir qué preparación, qué distancia, qué k, qué validación y qué estabilidad.</p>
+    </div>
+  </div>
+  <aside class="notas">Cita textual del resumen del artículo (verificado en Crossref y en el PDF del vault). Es el cierre conceptual: no hay agrupamiento "verdadero" fuera de un propósito.</aside>
+</section>
+
+<!-- 17 Videos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Para estudiar en casa</p><h2 style="font-size:46px;margin:6px 0 24px">Ocho videos verificados, del más intuitivo al más riguroso</h2>
+    <div class="videos" id="videos"></div>
+  </div>
+  <aside class="notas">Todos confirmados con la ficha oficial de YouTube (oEmbed) el 2026-11-10: título, canal y duración reales. La guía de investigación trae para cada uno qué mirar y una pregunta. Orden sugerido: StatQuest, luego Ligdi González o Rocío Chávez en español, luego MIT.</aside>
+</section>
+
+<!-- 18 EMI -->
 <section class="esc" data-cine="pagina">
-  <div class="caja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
-    <p class="rot">English immersion · 10 minutes · read the data card</p>
-    <p style="font-size:50px;line-height:1.18;font-weight:700;margin:22px 0 18px">“The data set refers to clients of a wholesale distributor. It includes the annual spending in <span class="acento">monetary units (m.u.)</span> on diverse product categories.”</p>
-    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Wholesale customers, UCI Machine Learning Repository</p>
-    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
-      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Why can't we say “euros” when we report a cluster profile?</p>
-      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Describe group B to a sales manager in two sentences.</p>
-      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Explain the difference between “cluster” and “class”.</p>
+  <div class="ficha" style="position:absolute;left:120px;top:60px;width:1360px">
+    <p class="rot">English immersion · 10 minutes · read a research letter</p>
+    <p style="font-size:42px;line-height:1.2;font-weight:700;margin:20px 0 16px">“This letter is a call to stop using the elbow method altogether, because it severely lacks theoretic support, and we want to encourage <span class="acento">educators</span> to discuss the problems of the method.”</p>
+    <p style="font-size:22px;margin-bottom:22px">Schubert, E. (2023). Stop using the elbow criterion for k-means. SIGKDD Explorations, 25(1), abstract.</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:18px 16px;align-items:center;border-top:2px solid #c9b99f;padding-top:20px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:#3f7d18"></i><p class="paso" style="font-size:30px">Look at our inertia curve. Can you see an elbow? Explain in one sentence.</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:#3f7d18"></i><p class="paso" style="font-size:30px">Which alternatives does the author recommend? Name two.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:#3f7d18"></i><p class="paso" style="font-size:30px">Debate: “The number of clusters is a decision, not a discovery.” Agree or disagree.</p>
     </div>
   </div>
-  <aside class="notas">Resumen textual de la ficha de UCI, verificado por su API. La unidad monetaria no se especifica: los perfiles se reportan en "unidades monetarias".</aside>
+  <aside class="notas">Texto textual del resumen. Respuesta a la segunda pregunta: el criterio de Calinski-Harabasz (VRC), el BIC y el estadístico Gap (conclusión del artículo).</aside>
 </section>
 
-<!-- 11 Taller -->
+<!-- 19 Taller y simulador -->
 <section class="esc">
-  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios del taller de segmentación"></svg>
-  <a class="boton" href="Guia_Laboratorio_Semana13.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
-  <aside class="notas">Entrega: perfil de cada segmento en el README del repositorio de GitHub del equipo, con su gráfica y sus límites. Punto de control: silueta 0,29 con k = 2 y tamaños 252 y 188.</aside>
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Simulador, taller y lectura guiada"></svg>
+  <a class="boton" href="simulador_agrupamiento.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir el simulador</a>
+  <a class="boton" href="Guia_Laboratorio_Semana13.html" target="_blank" rel="noopener" style="position:absolute;left:400px;bottom:76px">Guía del taller</a>
+  <a class="boton" href="Investigacion_Semana13.html" target="_blank" rel="noopener" style="position:absolute;left:660px;bottom:76px">Guía de investigación</a>
+  <aside class="notas">Primero 15 minutos de simulador con los retos de su página; luego el taller en Colab. La lectura guiada de Schubert (2023) es el trabajo independiente.</aside>
 </section>
 
-<!-- 12 Glosario -->
+<!-- 20 Síntesis -->
 <section class="esc">
-  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Rótulos de la lonja</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
-    <div class="glosa">
-      <div><i class="ico" data-i="group"></i><b>Conglomerado</b><span>Grupo de objetos parecidos entre sí.</span></div>
-      <div><i class="ico" data-i="ruler"></i><b>Minkowski</b><span>Familia de distancias según p.</span></div>
-      <div><i class="ico" data-i="compass"></i><b>Coseno</b><span>Similitud de dirección, no de tamaño.</span></div>
-      <div><i class="ico" data-i="crosshair"></i><b>Centroide</b><span>Promedio de un grupo en K-means.</span></div>
-      <div><i class="ico" data-i="layers"></i><b>Inercia</b><span>Suma de distancias al cuadrado a su centroide.</span></div>
-      <div><i class="ico" data-i="contrast"></i><b>Silueta</b><span>Cohesión contra separación, de −1 a 1.</span></div>
-      <div><i class="ico" data-i="git-merge"></i><b>Jerárquico</b><span>Une grupos paso a paso: dendrograma.</span></div>
-      <div><i class="ico" data-i="scan-search"></i><b>DBSCAN</b><span>Grupos por densidad; marca el ruido.</span></div>
-      <div><i class="ico" data-i="git-compare"></i><b>Rand ajustado</b><span>Acuerdo entre dos particiones, corregido por azar.</span></div>
-      <div><i class="ico" data-i="sliders-horizontal"></i><b>Estandarizar</b><span>Restar la media y dividir por la desviación.</span></div>
-    </div>
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Síntesis</p><h2 style="font-size:48px;margin-top:6px">Un agrupamiento se defiende con cinco decisiones explícitas</h2></div>
+  <svg id="sintesis" class="diagrama" viewBox="0 0 1600 700" style="position:absolute;left:0;top:170px;width:1600px;height:700px" role="img" aria-label="Cinco decisiones: preparación, distancia, método y k, validación y estabilidad, cada una con la evidencia de hoy"></svg>
+  <aside class="notas">Pregunta de salida: ¿qué haría distinto el equipo de ventas con los grupos A y B? Semana 14: cápsulas; BIRCH, HDBSCAN o mezclas gaussianas son buenos temas.</aside>
+</section>
+
+<!-- 21 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:40px;width:1424px" class="bib">
+    <p class="rot">Bibliografía verificada (DOI en Crossref)</p>
+    <div style="columns:2;column-gap:40px;margin-top:10px" id="bib"></div>
   </div>
-  <aside class="notas">Estos términos son los del syllabus: medidas de proximidad, métodos de partición, jerárquicos y de densidad, y validación.</aside>
-</section>
-
-<!-- 13 Cierre -->
-<section class="esc">
-  <div class="caja" style="position:absolute;left:180px;top:90px;width:1240px;border-top-color:var(--compra)">
-    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
-    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para segmentar con honestidad</h2>
-    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
-      <i class="ico paso" data-i="ruler" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>La distancia decide el grupo:</b> escala, transforma y elige la medida a propósito.</p>
-      <i class="ico paso" data-i="contrast" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>Valida dos veces:</b> por dentro (silueta) y, si se puede, contra algo conocido.</p>
-      <i class="ico paso" data-i="file-text" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>Un perfil es una hipótesis,</b> no una verdad: dilo con medianas y con sus límites.</p>
-    </div>
-    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 14: aplicaciones especializadas. Cada equipo enseña una técnica al grupo.</p>
-  </div>
-  <aside class="notas">Pregunta de salida: ¿qué haría distinto el equipo de ventas con estos dos segmentos?</aside>
-</section>
-
-<!-- 14 Fuentes -->
-<section class="esc">
-  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
-    <p class="rot">Libro de la lonja</p>
-    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
-    <p>Cardoso, M. (2013). <em>Wholesale customers</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5030X" target="_blank" rel="noopener">doi:10.24432/C5030X</a></p>
-    <p>Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation and validation of cluster analysis. <em>Journal of Computational and Applied Mathematics</em>, 20, 53-65. <a href="https://doi.org/10.1016/0377-0427(87)90125-7" target="_blank" rel="noopener">doi:10.1016/0377-0427(87)90125-7</a></p>
-    <p>Hubert, L. y Arabie, P. (1985). Comparing partitions. <em>Journal of Classification</em>, 2, 193-218. <a href="https://doi.org/10.1007/BF01908075" target="_blank" rel="noopener">doi:10.1007/BF01908075</a></p>
-    <p>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2.ª ed.), sección 14.3. Springer.</p>
-    <p>scikit-learn. <em>Clustering</em>. <a href="https://scikit-learn.org/stable/modules/clustering.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
-    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
-  </div>
-  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s13.json. El taller de K-Means en Excel con Mall Customers ya dictado se conserva como práctica de cálculo; su origen no está documentado.</aside>
+  <aside class="notas">Búsqueda en OpenAlex, Crossref, Semantic Scholar, ERIC, arXiv y DOAJ (10 consultas, 1.894 registros únicos, 1.611 tras el filtro temático); selección manual de 20. Método completo en la guía de investigación.</aside>
 </section>
 
 <div id="haz"></div>
@@ -207,67 +288,124 @@
 <div id="contador"></div>
 <div id="notas"></div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script src="../assets/puntos/iconos.js"></script>
 <script src="../assets/puntos/curso.js"></script>
 <script src="../assets/puntos/ds.js"></script>
 <script src="cifras.js"></script>
+<script src="recursos_semana13.js"></script>
 <script>
 (function () {
-  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  var C = window.CIFRAS, S = C.resumen, P = S.profundo, R = window.RECURSOS13, num = DS.num, ic = CUR.ic;
   var colG = function (g) { return g ? 'var(--fresco)' : 'var(--compra)'; };
-  /* Portada: proyección PCA real coloreada por grupo */
+  if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }] });
+  /* Portada */
   var xs = C.pca.map(function (p) { return p[0]; }), ys = C.pca.map(function (p) { return p[1]; });
-  var d = DS.dispersion({ x: 900, y: 120, w: 620, h: 660, xd: [DS.min(xs) - .3, DS.max(xs) + .3], yd: [DS.min(ys) - .3, DS.max(ys) + .3], xt: [], yt: [], xs: xs, ys: ys, r: 7, op: .85, col: function (i) { return colG(C.grupo[i]); } });
+  var d = DS.dispersion({ x: 920, y: 120, w: 600, h: 660, xd: [DS.min(xs) - .3, DS.max(xs) + .3], yd: [DS.min(ys) - .3, DS.max(ys) + .3], xt: [], yt: [], xs: xs, ys: ys, r: 7, op: .85, col: function (i) { return colG(C.grupo[i]); } });
   CUR.poner('portada', d.s.replace(/<line[^>]*\/>/g, ''));
-  CUR.poner('agenda', DS.agenda([['7:00', 'Calentamiento', 'crosshair'], ['7:15', 'Distancias', 'ruler'], ['7:40', 'K-means', 'group'], ['8:10', 'Pausa', 'coffee'], ['8:25', 'English', 'languages'], ['8:35', 'Taller', 'flask-conical'], ['9:35', 'Perfiles', 'presentation'], ['9:55', 'Cierre', 'flag']], 5, { color: 'var(--fresco)', forma: 'escalera' }));
-  /* Asimetría de frescos */
-  var a = S.asimetria_fresh, Y = DS.esc(0, 0, 115000, 680, 40), g = '';
-  [0, 25000, 50000, 75000, 100000].forEach(function (v) { g += '<line x1="140" x2="680" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--regla)"/>' + DS.txt(128, Y(v) + 8, num(v), 't-eje', ' text-anchor="end"'); });
-  [['Mediana', a.mediana, 'var(--fresco)'], ['Media', a.media, 'var(--acento-texto)'], ['Máximo', a.max, 'var(--compra)']].forEach(function (f, i) {
-    var x = 200 + i * 160;
-    g += '<rect class="paso-capa" x="' + x + '" y="' + Y(f[1]) + '" width="110" height="' + (Y(0) - Y(f[1])) + '" fill="' + f[2] + '"/>' + DS.txt(x + 55, Y(f[1]) - 14, num(f[1]), 't-n', ' text-anchor="middle" font-size="27"') + DS.txt(x + 55, 718, f[0], 't-s', ' text-anchor="middle" font-size="25"');
+  /* Ruta de dependencias */
+  var N = [['ruler', 'Distancia', 'RAE 1.1', 150, 360], ['sigma', 'Objetivo', 'SSE', 370, 200], ['repeat', 'Algoritmo', 'Lloyd', 590, 360], ['git-compare', 'Elegir k', 'Schubert 2023', 810, 200], ['contrast', 'Validar', 'RAE 3.1', 1030, 360], ['git-merge', 'Otros métodos', 'Ward, DBSCAN', 1250, 200], ['shuffle', 'Estabilidad', 'RAE 3.3', 1250, 540], ['flag', 'Decisión', 'Hennig 2015', 1460, 370]], r = '';
+  [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [4, 6], [5, 7], [6, 7]].forEach(function (a, k) { var p = N[a[0]], q = N[a[1]]; r += CUR.luz('M' + p[3] + ' ' + p[4] + 'C' + (p[3] + 110) + ' ' + p[4] + ' ' + (q[3] - 110) + ' ' + q[4] + ' ' + q[3] + ' ' + q[4], k * .35, 3.4); });
+  N.forEach(function (n) { r += '<circle cx="' + n[3] + '" cy="' + n[4] + '" r="62" fill="var(--fondo-2)" stroke="var(--fresco)" stroke-width="5"/>' + ic(n[0], n[3] - 34, n[4] - 34, 68, 'var(--fresco)') + DS.txt(n[3], n[4] + 100, n[1], 't-n', ' text-anchor="middle" font-size="28"') + DS.txt(n[3], n[4] + 132, n[2], 't-s', ' text-anchor="middle" font-size="21"'); });
+  CUR.poner('ruta', r);
+  /* Bolas unidad */
+  var b = '', cx0 = 340, cy0 = 330, R0 = 230;
+  b += '<line x1="60" x2="620" y1="' + cy0 + '" y2="' + cy0 + '" stroke="var(--regla)"/><line x1="' + cx0 + '" x2="' + cx0 + '" y1="60" y2="600" stroke="var(--regla)"/>';
+  b += '<g class="paso"><path d="M' + (cx0 + R0) + ' ' + cy0 + 'L' + cx0 + ' ' + (cy0 - R0) + 'L' + (cx0 - R0) + ' ' + cy0 + 'L' + cx0 + ' ' + (cy0 + R0) + 'Z" fill="none" stroke="var(--compra)" stroke-width="6"/>' + DS.txt(cx0 + R0 * .55, cy0 - R0 * .55 - 10, 'p = 1', 't-o', ' font-size="28"') + '</g>';
+  b += '<g class="paso"><circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + R0 + '" fill="none" stroke="var(--fresco)" stroke-width="6"/>' + DS.txt(cx0 + R0 * .72, cy0 - R0 * .72 - 12, 'p = 2', 't-f', ' font-size="28"') + '</g>';
+  b += '<g class="paso"><rect x="' + (cx0 - R0) + '" y="' + (cy0 - R0) + '" width="' + 2 * R0 + '" height="' + 2 * R0 + '" fill="none" stroke="var(--tinta-2)" stroke-width="6" stroke-dasharray="14 10"/>' + DS.txt(cx0 + R0 - 10, cy0 - R0 - 14, 'p = ∞', 't-n', ' font-size="28"') + '</g>';
+  b += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="9" fill="var(--tinta)"/>' + DS.txt(cx0, 650, 'Puntos a distancia 1 del centro', 't-s', ' text-anchor="middle" font-size="24"');
+  CUR.poner('bolas', b);
+  /* Lloyd a mano */
+  var M = P.lloyd_a_mano, p0 = M.pasos[0], p1 = M.pasos[1], th = '<tr><th>Cliente</th><th>log Abarrotes</th><th>log Frescos</th><th>d a C1</th><th>d a C2</th><th>Grupo</th></tr>';
+  M.datos_log.forEach(function (x, i) {
+    th += '<tr><td>' + M.clientes[i] + ' <span style="color:var(--tinta-2);font-size:18px">(' + num(M.datos_um[i][0]) + '; ' + num(M.datos_um[i][1]) + ' u. m.)</span></td><td>' + num(x[0], 3) + '</td><td>' + num(x[1], 3) + '</td><td>' + num(p0.distancias[i][0], 3) + '</td><td>' + num(p0.distancias[i][1], 3) + '</td><td class="g' + p0.asignacion[i] + '">' + (p0.asignacion[i] + 1) + '</td></tr>';
   });
-  g += DS.txt(140, 20, 'Gasto anual en frescos (u. m.)', 't-eje');
-  CUR.poner('gasto', g);
-  /* Escala: tamaños con y sin logaritmo */
-  var e = '', fila = function (y, t, a1, b1, sub) {
+  document.getElementById('tablaMano').innerHTML = th;
+  document.getElementById('manoTexto').innerHTML = 'Mover: C1 pasa de (' + p0.centroides[0].map(function (v) { return num(v, 3); }).join('; ') + ') a <b class="acento">(' + p1.centroides[0].map(function (v) { return num(v, 3); }).join('; ') + ')</b> y C2 a <b class="acento">(' + p1.centroides[1].map(function (v) { return num(v, 3); }).join('; ') + ')</b>. La nueva asignación no cambia: convergió. SSE: ' + num(p0.sse, 3) + ' → <b class="acento">' + num(p1.sse, 3) + '</b>.';
+  var mx = DS.esc(0, 8.25, 9.25, 70, 520), my = DS.esc(0, 8.6, 10.1, 500, 40), m = '';
+  M.datos_log.forEach(function (x, i) { m += '<circle cx="' + mx(x[0]) + '" cy="' + my(x[1]) + '" r="14" fill="' + colG(p0.asignacion[i]) + '"/>' + DS.txt(mx(x[0]) + 20, my(x[1]) + 8, M.clientes[i], 't-n', ' font-size="22"'); });
+  [0, 1].forEach(function (g) {
+    var a0 = p0.centroides[g], a1 = p1.centroides[g];
+    m += '<path d="M' + (mx(a0[0]) - 14) + ' ' + my(a0[1]) + 'l14 -14 14 14 -14 14z" fill="none" stroke="' + colG(g) + '" stroke-width="3" stroke-dasharray="5 4"/>';
+    m += '<g class="paso-capa"><line x1="' + mx(a0[0]) + '" y1="' + my(a0[1]) + '" x2="' + mx(a1[0]) + '" y2="' + my(a1[1]) + '" stroke="' + colG(g) + '" stroke-width="3"/><path d="M' + (mx(a1[0]) - 16) + ' ' + my(a1[1]) + 'l16 -16 16 16 -16 16z" fill="var(--fondo)" stroke="' + colG(g) + '" stroke-width="5"/></g>';
+  });
+  m += DS.txt(70, 545, 'log Abarrotes →', 't-eje', '') + DS.txt(70, 30, '↑ log Frescos', 't-eje', '');
+  CUR.poner('manoSvg', m);
+  /* Convergencia */
+  var sc = P.convergencia_sse, e1 = DS.ejes({ x: 110, y: 40, w: 540, h: 460, xd: [1, sc.length], yd: [1500, 4000], xt: sc.map(function (_, i) { return i + 1; }), yt: [1500, 2500, 3500], xl: 'Iteración', yl: 'Inercia (SSE)' }), s1 = e1.s;
+  s1 += '<path d="' + sc.map(function (v, i) { return (i ? 'L' : 'M') + e1.X(i + 1) + ' ' + e1.Y(v); }).join('') + '" fill="none" stroke="var(--fresco)" stroke-width="6"/>';
+  sc.forEach(function (v, i) { s1 += '<circle cx="' + e1.X(i + 1) + '" cy="' + e1.Y(v) + '" r="9" fill="var(--fresco)"/>'; });
+  s1 += DS.txt(e1.X(1) + 16, e1.Y(sc[0]) + 8, num(sc[0], 1), 't-n', ' font-size="24"') + DS.txt(e1.X(sc.length), e1.Y(sc[sc.length - 1]) - 18, num(sc[sc.length - 1], 1), 't-f', ' text-anchor="end" font-size="26"');
+  CUR.poner('converge', s1);
+  var L = P.minimos_locales_k5, ord = L.inercias.slice().sort(function (a, z) { return a - z; }), e2 = DS.ejes({ x: 120, y: 40, w: 580, h: 460, xd: [0, 21], yd: [1260, 1325], xt: [], yt: [1270, 1290, 1310], xl: '20 inicios al azar, k = 5, ordenados', yl: 'Inercia final' }), s2 = e2.s;
+  ord.forEach(function (v, i) { s2 += '<rect class="paso-capa" x="' + (e2.X(i + 1) - 11) + '" y="' + e2.Y(v) + '" width="22" height="' + (e2.Y(1260) - e2.Y(v)) + '" fill="' + (i ? 'var(--punto)' : 'var(--compra)') + '"/>'; });
+  s2 += '<g class="paso">' + DS.txt(e2.X(1) - 10, e2.Y(1312), 'mejor: ' + num(L.min, 1), 't-o', ' font-size="26"') + '<line x1="' + e2.X(1) + '" x2="' + e2.X(1) + '" y1="' + (e2.Y(1312) + 10) + '" y2="' + (e2.Y(L.min) - 6) + '" stroke="var(--compra)" stroke-width="2"/>' + DS.txt(e2.X(20) + 10, e2.Y(L.max) - 14, num(L.max, 1), 't-n', ' text-anchor="end" font-size="24"') + DS.txt(410, 100, L.distintas + ' finales distintos', 't-f', ' text-anchor="middle" font-size="30"') + '</g>';
+  CUR.poner('locales', s2);
+  /* Escala */
+  var es = '', fila = function (y, t, a1, b1, sub) {
     var s = DS.txt(40, y, t, 't-n', ' font-size="30"') + DS.txt(40, y + 34, sub, 't-s', ' font-size="23"'), k = 0;
     [[a1, 'var(--compra)'], [b1, 'var(--fresco)']].forEach(function (q) { for (var i = 0; i < q[0]; i++, k++) s += '<circle cx="' + (50 + (k % 40) * 15.5) + '" cy="' + (y + 70 + Math.floor(k / 40) * 15.5) + '" r="6" fill="' + q[1] + '"/>'; });
     return s;
   };
-  e += fila(40, 'Sin logaritmo: ' + S.k2_sin_log.tamanos.join(' y '), S.k2_sin_log.tamanos[0], S.k2_sin_log.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2_sin_log.ari, 3));
-  e += '<g class="paso">' + fila(400, 'Con logaritmo: ' + S.k2.tamanos.join(' y '), S.k2.tamanos[0], S.k2.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2.ari, 3)) + '</g>';
-  CUR.poner('escala', e);
-  /* Inercia y silueta */
-  var K = S.curva_k, e1 = DS.ejes({ x: 110, y: 40, w: 560, h: 480, xd: [2, 8], yd: [900, 2000], xt: [2, 3, 4, 5, 6, 7, 8], yt: [1000, 1500, 2000], xl: 'k' }), s1 = e1.s + DS.txt(110, 18, 'Inercia', 't-n', ' font-size="28"');
-  s1 += '<path d="' + K.map(function (q, i) { return (i ? 'L' : 'M') + e1.X(q.k) + ' ' + e1.Y(q.inercia); }).join('') + '" fill="none" stroke="var(--punto)" stroke-width="5"/>';
-  K.forEach(function (q) { s1 += '<circle cx="' + e1.X(q.k) + '" cy="' + e1.Y(q.inercia) + '" r="8" fill="var(--punto)"/>'; });
-  var e2 = DS.ejes({ x: 850, y: 40, w: 560, h: 480, xd: [1.4, 8], yd: [0, .35], xt: [2, 3, 4, 5, 6, 7, 8], yt: [0, .1, .2, .3], fy: function (v) { return num(v, 1); }, xl: 'k' }), s2 = e2.s + DS.txt(850, 18, 'Silueta media', 't-n', ' font-size="28"');
-  K.forEach(function (q) { s2 += '<rect class="paso-capa" x="' + (e2.X(q.k) - 26) + '" y="' + e2.Y(q.silueta) + '" width="52" height="' + (e2.Y(0) - e2.Y(q.silueta)) + '" fill="' + (q.k === 2 ? 'var(--fresco)' : 'var(--punto)') + '"/>'; });
-  s2 += '<g class="paso">' + DS.txt(e2.X(2), e2.Y(K[0].silueta) - 16, num(K[0].silueta, 2), 't-f', ' text-anchor="middle" font-size="30"') + '</g>';
-  CUR.poner('k', s1 + s2);
-  /* Perfiles: medianas por categoría */
-  var M = S.k2.medianas, cats = [['Fresh', 'Frescos'], ['Milk', 'Lácteos'], ['Grocery', 'Abarrotes'], ['Frozen', 'Congelados'], ['Detergents_Paper', 'Detergentes y papel'], ['Delicassen', 'Delicatessen']], Xp = DS.esc(0, 0, 12500, 330, 1340), p = '';
-  cats.forEach(function (c, i) {
-    var y = 20 + i * 96;
-    p += DS.txt(310, y + 52, c[1], 't-n', ' text-anchor="end" font-size="27"');
-    [['grupo_A', 'var(--compra)', 0], ['grupo_B', 'var(--fresco)', 1]].forEach(function (q) {
-      var v = M[q[0]][c[0]], yy = y + 14 + q[2] * 38;
-      p += '<rect class="paso-capa" x="330" y="' + yy + '" width="' + (Xp(v) - 330) + '" height="30" fill="' + q[1] + '"/>' + DS.txt(Xp(v) + 10, yy + 25, num(v), 't-s', ' font-size="22"');
-    });
-  });
-  p += '<rect x="900" y="570" width="24" height="24" fill="var(--compra)"/>' + DS.txt(934, 590, 'Grupo A · ' + S.k2.tamanos[0], 't-s', ' font-size="24"') + '<rect x="1140" y="570" width="24" height="24" fill="var(--fresco)"/>' + DS.txt(1174, 590, 'Grupo B · ' + S.k2.tamanos[1], 't-s', ' font-size="24"');
-  CUR.poner('perfiles', p);
-  /* Cruce con canal: reja de unidades */
-  var X2 = S.k2.cruce_canal, c2 = '', k2 = 0;
+  es += fila(40, 'Solo estandarizado: ' + S.k2_sin_log.tamanos.join(' y '), S.k2_sin_log.tamanos[0], S.k2_sin_log.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2_sin_log.ari, 3));
+  es += '<g class="paso">' + fila(400, 'Con logaritmo: ' + S.k2.tamanos.join(' y '), S.k2.tamanos[0], S.k2.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2.ari, 3)) + '</g>';
+  CUR.poner('escala', es);
+  /* Cuatro criterios para k */
+  var K = S.curva_k, CR = P.criterios_k;
+  var panel = function (x0, tit, vals, mejor, fmt) {
+    var mn = Math.min.apply(null, vals), mxv = Math.max.apply(null, vals), pad = (mxv - mn) * .35 || 1, base = 450;
+    var e = DS.ejes({ x: x0, y: 70, w: 290, h: 380, xd: [1.5, 8.5], yd: [mn - pad, mxv + pad * .6], xt: [2, 4, 6, 8], yt: [] }), s = e.s + DS.txt(x0, 40, tit, 't-n', ' font-size="26"');
+    vals.forEach(function (v, i) { var k = i + 2, f = mejor && k === mejor; s += '<rect class="paso-capa" x="' + (e.X(k) - 15) + '" y="' + e.Y(v) + '" width="30" height="' + (base - e.Y(v)) + '" fill="' + (f ? 'var(--fresco)' : 'var(--punto)') + '"/>'; });
+    if (mejor) s += DS.txt(e.X(mejor), e.Y(vals[mejor - 2]) - 14, fmt(vals[mejor - 2]), 't-f', ' text-anchor="middle" font-size="24"');
+    return s;
+  };
+  var cs = panel(30, 'Inercia: ¿codo?', K.map(function (q) { return q.inercia; }), 0);
+  cs += panel(410, 'Silueta (mayor es mejor)', K.map(function (q) { return q.silueta; }), 2, function (v) { return num(v, 3); });
+  cs += panel(790, 'Calinski-Harabasz (mayor)', CR.map(function (q) { return q.calinski_harabasz; }), 2, function (v) { return num(v, 1); });
+  cs += panel(1170, 'Davies-Bouldin (menor)', CR.map(function (q) { return q.davies_bouldin; }), 3, function (v) { return num(v, 3); });
+  cs += DS.txt(750, 560, 'k de 2 a 8. En verde, el k que elige cada criterio. La inercia siempre baja: no elige.', 't-s', ' text-anchor="middle" font-size="23"');
+  CUR.poner('criterios', cs);
+  /* Cruce con canal */
+  var X2 = S.k2.cruce_canal, c2 = '';
   [['grupo_A', 'Grupo A', 'var(--compra)'], ['grupo_B', 'Grupo B', 'var(--fresco)']].forEach(function (q, j) {
-    var y0 = 30 + j * 340, h = X2[q[0]].Horeca, m = X2[q[0]].Minorista, k = 0;
-    c2 += DS.txt(20, y0, q[1] + ': ' + h + ' Horeca · ' + m + ' minoristas', 't-n', ' font-size="27"');
-    for (var i = 0; i < h + m; i++, k++) c2 += '<rect x="' + (20 + (k % 26) * 24) + '" y="' + (y0 + 20 + Math.floor(k / 26) * 24) + '" width="19" height="19" fill="' + q[2] + '" opacity="' + (i < h ? .95 : .3) + '"' + (i < h ? '' : ' stroke="var(--tinta)" stroke-width="1.5"') + '/>';
+    var y0 = 30 + j * 340, h = X2[q[0]].Horeca, mm = X2[q[0]].Minorista, k = 0;
+    c2 += DS.txt(20, y0, q[1] + ': ' + h + ' Horeca · ' + mm + ' minoristas', 't-n', ' font-size="27"');
+    for (var i = 0; i < h + mm; i++, k++) c2 += '<rect x="' + (20 + (k % 26) * 24) + '" y="' + (y0 + 20 + Math.floor(k / 26) * 24) + '" width="19" height="19" fill="' + q[2] + '" opacity="' + (i < h ? .95 : .3) + '"' + (i < h ? '' : ' stroke="var(--tinta)" stroke-width="1.5"') + '/>';
   });
   c2 += DS.txt(20, 690, 'Lleno: Horeca · vacío: minorista', 't-s', ' font-size="23"');
   CUR.poner('cruce', c2);
-  CUR.poner('taller', DS.ruta([['ruler', 'Mide', 'Minkowski y coseno'], ['sliders-horizontal', 'Prepara', 'Log y escala'], ['group', 'Agrupa', 'K-means y silueta'], ['git-merge', 'Compara', 'Ward y DBSCAN'], ['file-text', 'Publica', 'Perfil en GitHub']], 'Taller de segmentación', 'Equipos · Colab · entrega: perfiles de los segmentos en el README del repositorio', 'var(--fresco)'));
+  /* Estabilidad */
+  var EST = P.estabilidad_80, ey = DS.esc(0, .3, 1, 600, 60), st = '';
+  [.4, .6, .8, 1].forEach(function (v) { st += '<line x1="100" x2="720" y1="' + ey(v) + '" y2="' + ey(v) + '" stroke="var(--regla)"/>' + DS.txt(90, ey(v) + 8, num(v, 1), 't-eje', ' text-anchor="end"'); });
+  ['2', '3', '4'].forEach(function (k, j) {
+    var x = 220 + j * 200;
+    EST[k].valores.forEach(function (v, i) { st += '<circle class="paso-capa" cx="' + (x + ((i * 37) % 60) - 30) + '" cy="' + ey(v) + '" r="8" fill="' + (k === '2' ? 'var(--fresco)' : 'var(--punto)') + '" opacity=".85"/>'; });
+    st += DS.txt(x, 652, 'k = ' + k, 't-n', ' text-anchor="middle" font-size="27"') + DS.txt(x, 686, 'media ' + num(EST[k].media, 3), 't-s', ' text-anchor="middle" font-size="22"');
+  });
+  st += DS.txt(100, 30, 'Rand ajustado con la partición completa', 't-eje');
+  CUR.poner('estable', st);
+  /* Línea de tiempo */
+  var T = [[1963, 'Ward', 'Jerárquico'], [1982, 'Lloyd', 'K-means'], [1985, 'Hubert y Arabie', 'Rand ajustado'], [1987, 'Rousseeuw', 'Silueta'], [1998, 'Fraley y Raftery', 'Modelos y BIC'], [2001, 'Tibshirani y otros', 'Gap'], [2006, 'Steinley', '50 años de K-means'], [2010, 'Jain · von Luxburg', 'Revisión · estabilidad'], [2013, 'Campello y otros', 'HDBSCAN'], [2015, 'Hennig', '¿Grupos verdaderos?'], [2017, 'Schubert y otros', 'DBSCAN revisado'], [2023, 'Schubert', 'Adiós al codo']];
+  var tx = DS.esc(0, 1958, 2028, 90, 1510), ln = '<line x1="70" x2="1530" y1="330" y2="330" stroke="var(--fresco)" stroke-width="6"/>';
+  T.forEach(function (e, i) {
+    var x = tx(e[0]), arriba = i % 2 === 0, y = arriba ? (i % 4 === 0 ? 120 : 230) : (i % 4 === 1 ? 470 : 590);
+    ln += '<g class="paso-capa"><line x1="' + x + '" x2="' + x + '" y1="330" y2="' + (arriba ? y + 40 : y - 60) + '" stroke="var(--regla)" stroke-width="3"/><circle cx="' + x + '" cy="330" r="12" fill="var(--fondo)" stroke="var(--fresco)" stroke-width="5"/>';
+    ln += DS.txt(x, y - 30, e[0], 't-f', ' text-anchor="middle" font-size="25"') + DS.txt(x, y, e[1], 't-n', ' text-anchor="middle" font-size="21"') + DS.txt(x, y + 26, e[2], 't-s', ' text-anchor="middle" font-size="19"') + '</g>';
+  });
+  CUR.poner('linea', ln);
+  /* Videos */
+  document.getElementById('videos').innerHTML = R.videos.map(function (v) { return '<a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="" loading="lazy"><div><b>' + v.titulo + '</b><span>' + v.canal + ' · ' + v.duracion + ' · ' + v.idioma + '</span></div></a>'; }).join('');
+  /* Taller */
+  CUR.poner('taller', DS.ruta([['mouse-pointer-click', 'Simulador', 'Retos 1 a 6'], ['ruler', 'Distancias', 'A mano y con SciPy'], ['group', 'K-means', 'Siluetas y criterios'], ['shuffle', 'Estabilidad', 'Submuestras'], ['book-open', 'Lectura', 'Schubert (2023)']], 'Del simulador al artículo', 'Equipos · simulador propio · Colab · lectura guiada de investigación', 'var(--fresco)'));
+  /* Síntesis */
+  var D5 = [['sliders-horizontal', 'Preparación', 'Rand 0,167 → 0,514'], ['ruler', 'Distancia', 'Minkowski, p = 2'], ['git-compare', 'Método y k', 'k = 2; Davies-Bouldin pide 3'], ['contrast', 'Validación', 'silueta 0,290 · Rand 0,514'], ['shuffle', 'Estabilidad', 'k = 2: 0,951 · k = 3: mín. 0,322']], sy = '';
+  D5.forEach(function (q, i) { var x = 170 + i * 315, y = 300; sy += (i ? CUR.luz('M' + (x - 245) + ' ' + y + 'L' + (x - 70) + ' ' + y, i * .4, 2.6) : '') + '<circle cx="' + x + '" cy="' + y + '" r="72" fill="var(--fondo-2)" stroke="var(--fresco)" stroke-width="6"/>' + ic(q[0], x - 38, y - 38, 76, 'var(--fresco)') + DS.txt(x, y + 118, q[1], 't-n', ' text-anchor="middle" font-size="30"') + DS.txt(x, y + 154, q[2], 't-o', ' text-anchor="middle" font-size="20"'); });
+  sy += DS.txt(800, 560, '"Transparent and open communication" (Hennig, 2015): cada decisión, con su número.', 't-s', ' text-anchor="middle" font-size="26"');
+  CUR.poner('sintesis', sy);
+  /* Bibliografía */
+  document.getElementById('bib').innerHTML = R.articulos.map(function (a) { return '<p style="break-inside:avoid;font-size:17px;line-height:1.2;margin-bottom:6px">' + a.cita + ' <a href="https://doi.org/' + a.doi + '" target="_blank" rel="noopener">doi:' + a.doi + '</a></p>'; }).join('') + '<p style="font-size:16.5px;margin-top:6px">Datos: Cardoso (2013), Wholesale customers, UCI, CC BY 4.0, doi:10.24432/C5030X. Iconos: Lucide (ISC). Fórmulas: KaTeX. Uso de IA declarado en la guía de investigación.</p>';
 })();
 </script>
 <script src="../assets/puntos/cine.js"></script>

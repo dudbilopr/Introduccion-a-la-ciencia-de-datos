@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de agrupamiento | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<style>
+  :root { --l-fondo: #16110c; --l-panel: #241b13; --l-tinta: #f6efe4; --l-tinta2: #c4b29a; --l-regla: rgba(196,178,154,.22); --l-fresco: #9ad36a; --l-naranja: #ff7a1f; }
+  body { background: var(--l-fondo); color: var(--l-tinta); margin: 0; }
+  .sim { max-width: 1320px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 32px) 60px; }
+  .sim h1 { font-size: clamp(26px, 3.4vw, 40px); margin: 0 0 6px; color: var(--l-tinta); }
+  .sim .bajada { color: var(--l-tinta2); font-size: 17px; max-width: 900px; margin: 0 0 18px; }
+  .rejilla { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 22px; align-items: start; }
+  @media (max-width: 980px) { .rejilla { grid-template-columns: minmax(0, 1fr); } }
+  .lienzo { background: #100c08; border: 1px solid var(--l-regla); position: relative; }
+  canvas { width: 100%; height: auto; display: block; }
+  .panel, .lienzo, .rejilla > * { min-width: 0; }
+  .fila button { min-width: 0; }
+  .panel select { max-width: 100%; }
+  .panel { background: var(--l-panel); padding: 18px 18px 20px; border-top: 6px solid var(--l-fresco); }
+  .panel h2 { font-size: 19px; margin: 18px 0 8px; color: var(--l-fresco); text-transform: uppercase; letter-spacing: .06em; }
+  .panel h2:first-child { margin-top: 0; }
+  .panel label { display: block; font-size: 15px; color: var(--l-tinta2); margin: 10px 0 4px; }
+  .panel select, .panel input[type=range] { width: 100%; }
+  .panel select { background: #100c08; color: var(--l-tinta); border: 1px solid var(--l-regla); padding: 6px; font-size: 15px; }
+  .fila { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .fila button { flex: 1 1 auto; background: #100c08; color: var(--l-tinta); border: 1px solid var(--l-fresco); padding: 9px 10px; font: 600 15px 'Schibsted Grotesk', sans-serif; cursor: pointer; }
+  .fila button.pri { background: var(--l-fresco); color: #16110c; }
+  .fila button:hover { filter: brightness(1.15); }
+  .metricas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .metricas div { background: #100c08; padding: 10px 12px; }
+  .metricas b { display: block; font-size: 26px; color: var(--l-naranja); font-variant-numeric: tabular-nums; }
+  .metricas span { font-size: 13px; color: var(--l-tinta2); }
+  .estado { font-size: 15px; color: var(--l-tinta2); min-height: 44px; margin-top: 10px; line-height: 1.35; }
+  .tabla { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; color: var(--l-tinta); }
+  .tabla th, .tabla td { border-bottom: 1px solid var(--l-regla); padding: 4px 6px; text-align: right; }
+  .tabla th:first-child, .tabla td:first-child { text-align: left; }
+  .retos { margin-top: 26px; background: var(--l-panel); padding: 18px 22px; }
+  .retos h2 { color: var(--l-fresco); font-size: 22px; margin: 0 0 8px; }
+  .retos li { margin: 8px 0; font-size: 16px; line-height: 1.4; color: var(--l-tinta); }
+  .nota { font-size: 13px; color: var(--l-tinta2); margin-top: 18px; }
+  .nota a, .retos a { color: var(--l-fresco); }
+  .leyenda { position: absolute; left: 12px; top: 10px; font-size: 13px; color: var(--l-tinta2); background: rgba(16,12,8,.8); padding: 4px 8px; }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Simulador de agrupamiento con 440 clientes reales</h1>
+  <p class="bajada">Mueva los centroides paso a paso, cambie la escala de los datos, pruebe DBSCAN y compare con el canal real, que el algoritmo nunca ve. Datos: Wholesale customers, Cardoso (2013), UCI, CC BY 4.0.</p>
+  <div class="rejilla">
+    <div class="lienzo"><canvas id="c" width="1200" height="820" aria-label="Dispersión de los clientes en las dos variables elegidas, coloreados por grupo"></canvas><div class="leyenda" id="leyenda"></div></div>
+    <div class="panel">
+      <h2>Datos</h2>
+      <label for="prep">Preparación (la distancia se mide en las 6 categorías)</label>
+      <select id="prep"><option value="log">Logaritmo y estandarización</option><option value="std">Solo estandarización</option><option value="crudo">Crudo (u. m.)</option></select>
+      <label for="vx">Eje horizontal</label><select id="vx"></select>
+      <label for="vy">Eje vertical</label><select id="vy"></select>
+      <h2>Método</h2>
+      <select id="metodo" aria-label="Método"><option value="km">K-means</option><option value="db">DBSCAN</option></select>
+      <div id="opKm">
+        <label for="k">Número de grupos k: <b id="kv">2</b></label><input id="k" type="range" min="2" max="8" value="2">
+        <label for="ini">Inicio de los centroides</label>
+        <select id="ini"><option value="pp">k-means++</option><option value="az">Al azar entre los clientes</option></select>
+        <div class="fila"><button id="bIni" type="button">Iniciar</button><button id="bAsig" type="button">1. Asignar</button><button id="bMov" type="button">2. Mover</button></div>
+        <div class="fila"><button id="bCorre" type="button" class="pri">Hasta converger</button><button id="bSemilla" type="button">Otra semilla</button></div>
+      </div>
+      <div id="opDb" hidden>
+        <label for="eps">Radio ε: <b id="epsv">1.5</b></label><input id="eps" type="range" min="0.3" max="3" step="0.1" value="1.5">
+        <label for="mp">Vecinos mínimos: <b id="mpv">8</b></label><input id="mp" type="range" min="2" max="20" value="8">
+        <div class="fila"><button id="bDb" type="button" class="pri">Agrupar con DBSCAN</button></div>
+      </div>
+      <div class="metricas">
+        <div><b id="mIn">–</b><span>Inercia (K-means)</span></div>
+        <div><b id="mSil">–</b><span>Silueta media</span></div>
+        <div><b id="mIt">0</b><span>Iteraciones</span></div>
+        <div><b id="mAri">–</b><span>Rand ajustado con el canal</span></div>
+      </div>
+      <p class="estado" id="estado" aria-live="polite">Pulse Iniciar.</p>
+      <h2>Validación externa</h2>
+      <div class="fila"><button id="bCanal" type="button">Revelar canal real</button></div>
+      <table class="tabla" id="cruce"></table>
+    </div>
+  </div>
+  <section class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>Con logaritmo y estandarización, k = 2 y k-means++, ejecute hasta converger. ¿Cuántos clientes tiene cada grupo? El cuaderno, con su semilla, da 252 y 188; aquí puede salir un reparto muy parecido, porque el inicio es otro.</li>
+      <li>Cambie a "Crudo" sin cambiar nada más. ¿Qué pasa con los tamaños? ¿Por qué la distancia euclidiana persigue a los clientes grandes?</li>
+      <li>Recorra k de 2 a 8 y anote la silueta. ¿Cuál elegiría? ¿Cambia con otra semilla?</li>
+      <li>Use "Al azar entre los clientes" y pulse "Otra semilla" cinco veces. ¿Siempre llega a la misma inercia? Eso es la estabilidad del RAE 3.3.</li>
+      <li>En DBSCAN, mueva ε de 0,5 a 3. ¿Cuándo aparecen dos grupos? ¿Quiénes quedan como ruido?</li>
+      <li>Revele el canal. ¿Qué método se acerca más al canal real? ¿Significa eso que es el mejor agrupamiento?</li>
+    </ol>
+    <p class="nota">La silueta y el índice de Rand ajustado se calculan aquí mismo con las fórmulas de Rousseeuw (1987) y Hubert y Arabie (1985). K-means usa la distancia euclidiana sobre las seis categorías; los ejes solo eligen qué dos mirar. Profundice con los simuladores de <a href="https://www.naftaliharris.com/blog/visualizing-k-means-clustering/" target="_blank" rel="noopener">K-means</a> y <a href="https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/" target="_blank" rel="noopener">DBSCAN</a> de Naftali Harris.</p>
+  </section>
+</div>
+<script src="datos_mayoristas.js"></script>
+<script>
+(function () {
+  'use strict';
+  var NOM = ['Frescos', 'Lácteos', 'Abarrotes', 'Congelados', 'Detergentes y papel', 'Delicatessen'];
+  var COL = ['#ff7a1f', '#9ad36a', '#5fc3ff', '#f2c14e', '#e07bff', '#ff5d73', '#7be0c3', '#c4b29a'];
+  var D = window.MAYORISTAS, n = D.length, canal = D.map(function (r) { return r[0]; });
+  var bruto = D.map(function (r) { return r.slice(2); });
+  var X = [], et = new Array(n).fill(-1), cen = [], rastro = [], it = 0, verCanal = false, semilla = 42, metodo = 'km';
+  var $ = function (id) { return document.getElementById(id); };
+  var cv = $('c'), cx = cv.getContext('2d');
+
+  function azar() { semilla = (semilla * 16807) % 2147483647; return (semilla - 1) / 2147483646; }
+  function preparar() {
+    var p = $('prep').value, M = bruto.map(function (r) { return r.map(function (v) { return p === 'log' ? Math.log(v) : v; }); });
+    if (p !== 'crudo') for (var j = 0; j < 6; j++) {
+      var m = 0, s = 0; M.forEach(function (r) { m += r[j]; }); m /= n;
+      M.forEach(function (r) { s += (r[j] - m) * (r[j] - m); }); s = Math.sqrt(s / n);
+      M.forEach(function (r) { r[j] = (r[j] - m) / s; });
+    }
+    X = M;
+  }
+  function d2(a, b) { var s = 0; for (var j = 0; j < 6; j++) { var t = a[j] - b[j]; s += t * t; } return s; }
+  function iniciar() {
+    preparar(); var k = +$('k').value; cen = []; rastro = []; it = 0; et.fill(-1);
+    if ($('ini').value === 'az') { var usados = {}; while (cen.length < k) { var i = Math.floor(azar() * n); if (!usados[i]) { usados[i] = 1; cen.push(X[i].slice()); } } }
+    else {
+      cen.push(X[Math.floor(azar() * n)].slice());
+      while (cen.length < k) {
+        var dm = X.map(function (x) { return Math.min.apply(null, cen.map(function (c) { return d2(x, c); })); }), tot = dm.reduce(function (a, b) { return a + b; }, 0), u = azar() * tot, acc = 0;
+        for (var q = 0; q < n; q++) { acc += dm[q]; if (acc >= u) { cen.push(X[q].slice()); break; } }
+      }
+    }
+    rastro = cen.map(function (c) { return [c.slice()]; });
+    estado('Centroides iniciales elegidos con ' + ($('ini').value === 'az' ? 'clientes al azar' : 'k-means++') + '. Ahora: 1. Asignar.');
+    metricas(); dibujar();
+  }
+  function asignar() {
+    if (!cen.length) iniciar();
+    var cambios = 0;
+    X.forEach(function (x, i) { var mejor = 0, md = Infinity; cen.forEach(function (c, g) { var d = d2(x, c); if (d < md) { md = d; mejor = g; } }); if (et[i] !== mejor) cambios++; et[i] = mejor; });
+    estado('Cada cliente va al centroide más cercano. Cambiaron de grupo: ' + cambios + '.'); metricas(); dibujar(); return cambios;
+  }
+  function mover() {
+    if (et[0] < 0) asignar();
+    var mov = 0;
+    cen = cen.map(function (c, g) {
+      var m = [0, 0, 0, 0, 0, 0], k = 0;
+      X.forEach(function (x, i) { if (et[i] === g) { k++; for (var j = 0; j < 6; j++) m[j] += x[j]; } });
+      if (!k) return c;
+      m = m.map(function (v) { return v / k; }); mov += Math.sqrt(d2(m, c)); return m;
+    });
+    cen.forEach(function (c, g) { rastro[g].push(c.slice()); });
+    it++; estado('Cada centroide se mueve al promedio de sus clientes. Desplazamiento total: ' + mov.toFixed(3) + '.'); metricas(); dibujar(); return mov;
+  }
+  function correr() {
+    if (!cen.length) iniciar();
+    var guard = 0; while (guard++ < 100) { var c = asignar(); var m = mover(); if (c === 0 && m < 1e-9) break; }
+    var t = cen.map(function (_, g) { return et.filter(function (e) { return e === g; }).length; });
+    estado('Convergió en ' + it + ' iteraciones. Tamaños: ' + t.join(', ') + '.'); metricas(); dibujar();
+  }
+  function dbscan() {
+    preparar(); var eps = +$('eps').value, e2 = eps * eps, mp = +$('mp').value, g = 0;
+    et.fill(-2); cen = []; rastro = []; it = 0;
+    var vec = X.map(function (x) { var v = []; X.forEach(function (y, j) { if (d2(x, y) <= e2) v.push(j); }); return v; });
+    for (var i = 0; i < n; i++) {
+      if (et[i] !== -2) continue;
+      if (vec[i].length < mp) { et[i] = -1; continue; }
+      et[i] = g; var cola = vec[i].slice();
+      while (cola.length) { var q = cola.pop(); if (et[q] === -1) et[q] = g; if (et[q] !== -2) continue; et[q] = g; if (vec[q].length >= mp) cola = cola.concat(vec[q]); }
+      g++;
+    }
+    var ruido = et.filter(function (e) { return e === -1; }).length;
+    estado('DBSCAN encontró ' + g + ' grupo' + (g === 1 ? '' : 's') + ' y ' + ruido + ' clientes de ruido (gris).'); metricas(); dibujar();
+  }
+  function silueta() {
+    var ids = et.map(function (e, i) { return [e, i]; }).filter(function (p) { return p[0] >= 0; });
+    var grupos = {}; ids.forEach(function (p) { (grupos[p[0]] = grupos[p[0]] || []).push(p[1]); });
+    var claves = Object.keys(grupos); if (claves.length < 2) return NaN;
+    var s = 0;
+    ids.forEach(function (p) {
+      var i = p[1], gi = p[0], a = 0, b = Infinity, propio = grupos[gi];
+      if (propio.length < 2) return;
+      propio.forEach(function (j) { if (j !== i) a += Math.sqrt(d2(X[i], X[j])); }); a /= (propio.length - 1);
+      claves.forEach(function (k) { if (+k === gi) return; var m = 0; grupos[k].forEach(function (j) { m += Math.sqrt(d2(X[i], X[j])); }); b = Math.min(b, m / grupos[k].length); });
+      s += (b - a) / Math.max(a, b);
+    });
+    return s / ids.length;
+  }
+  function ari() {
+    var tab = {}, fa = {}, fb = {}, N = 0;
+    et.forEach(function (e, i) { var k = e + '|' + canal[i]; tab[k] = (tab[k] || 0) + 1; fa[e] = (fa[e] || 0) + 1; fb[canal[i]] = (fb[canal[i]] || 0) + 1; N++; });
+    var c2 = function (x) { return x * (x - 1) / 2; }, sI = 0, sA = 0, sB = 0;
+    Object.values(tab).forEach(function (v) { sI += c2(v); }); Object.values(fa).forEach(function (v) { sA += c2(v); }); Object.values(fb).forEach(function (v) { sB += c2(v); });
+    var esp = sA * sB / c2(N), max = (sA + sB) / 2; return (sI - esp) / (max - esp);
+  }
+  function inercia() { var s = 0; X.forEach(function (x, i) { if (et[i] >= 0 && cen[et[i]]) s += d2(x, cen[et[i]]); }); return s; }
+  function num(v, d) { return isNaN(v) ? '–' : v.toFixed(d).replace('.', ','); }
+  function metricas() {
+    var hay = et[0] !== -1 || et.some(function (e) { return e >= 0; });
+    $('mIn').textContent = cen.length && et[0] >= -1 && et.some(function (e) { return e >= 0; }) ? num(inercia(), 1) : '–';
+    $('mSil').textContent = hay ? num(silueta(), 3) : '–';
+    $('mIt').textContent = it;
+    $('mAri').textContent = hay ? num(ari(), 3) : '–';
+    cruce();
+  }
+  function cruce() {
+    var t = $('cruce');
+    if (!verCanal || !et.some(function (e) { return e >= 0; })) { t.innerHTML = ''; return; }
+    var gs = Array.from(new Set(et)).sort(function (a, b) { return a - b; }), h = '<tr><th>Grupo</th><th>Horeca</th><th>Minorista</th></tr>';
+    gs.forEach(function (g) { h += '<tr><td>' + (g < 0 ? 'Ruido' : 'Grupo ' + (g + 1)) + '</td><td>' + et.filter(function (e, i) { return e === g && canal[i] === 1; }).length + '</td><td>' + et.filter(function (e, i) { return e === g && canal[i] === 2; }).length + '</td></tr>'; });
+    t.innerHTML = h;
+  }
+  function estado(s) { $('estado').textContent = s; }
+  function dibujar() {
+    if (!X.length) preparar();
+    var W = cv.width, H = cv.height, m = 70, ix = +$('vx').value, iy = +$('vy').value;
+    var xs = X.map(function (r) { return r[ix]; }), ys = X.map(function (r) { return r[iy]; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var SX = function (v) { return m + (v - x0) / (x1 - x0 || 1) * (W - 2 * m); }, SY = function (v) { return H - m - (v - y0) / (y1 - y0 || 1) * (H - 2 * m); };
+    cx.fillStyle = '#100c08'; cx.fillRect(0, 0, W, H);
+    cx.strokeStyle = 'rgba(196,178,154,.22)'; cx.lineWidth = 1;
+    for (var g = 0; g <= 4; g++) { var gx = m + g * (W - 2 * m) / 4, gy = m + g * (H - 2 * m) / 4; cx.beginPath(); cx.moveTo(gx, m); cx.lineTo(gx, H - m); cx.moveTo(m, gy); cx.lineTo(W - m, gy); cx.stroke(); }
+    cx.fillStyle = '#c4b29a'; cx.font = '22px Schibsted Grotesk, sans-serif';
+    var unidad = $('prep').value === 'crudo' ? ' (u. m.)' : $('prep').value === 'log' ? ' (log, estandarizado)' : ' (estandarizado)';
+    cx.fillText(NOM[ix] + unidad, m, H - 22); cx.save(); cx.translate(26, H - m); cx.rotate(-Math.PI / 2); cx.fillText(NOM[iy] + unidad, 0, 0); cx.restore();
+    X.forEach(function (r, i) {
+      var e = et[i], color = e === -1 ? '#5c5045' : e < -1 ? '#8a7357' : COL[e % COL.length];
+      cx.globalAlpha = .85; cx.beginPath();
+      if (verCanal && canal[i] === 2) { cx.rect(SX(r[ix]) - 6, SY(r[iy]) - 6, 12, 12); } else { cx.arc(SX(r[ix]), SY(r[iy]), 6.5, 0, 6.2832); }
+      cx.fillStyle = color; cx.fill();
+    });
+    cx.globalAlpha = 1;
+    rastro.forEach(function (tr, g) {
+      cx.strokeStyle = COL[g % COL.length]; cx.lineWidth = 3; cx.beginPath();
+      tr.forEach(function (c, k) { var px = SX(c[ix]), py = SY(c[iy]); if (k) cx.lineTo(px, py); else cx.moveTo(px, py); }); cx.stroke();
+    });
+    cen.forEach(function (c, g) {
+      var px = SX(c[ix]), py = SY(c[iy]);
+      cx.fillStyle = '#16110c'; cx.strokeStyle = COL[g % COL.length]; cx.lineWidth = 5;
+      cx.beginPath(); cx.moveTo(px - 16, py); cx.lineTo(px, py - 16); cx.lineTo(px + 16, py); cx.lineTo(px, py + 16); cx.closePath(); cx.fill(); cx.stroke();
+    });
+    $('leyenda').textContent = (metodo === 'km' ? 'Rombos: centroides y su recorrido. ' : 'Gris oscuro: ruido. ') + (verCanal ? 'Círculo: Horeca · cuadrado: minorista.' : '');
+  }
+  NOM.forEach(function (nm, j) { $('vx').add(new Option(nm, j, false, j === 0)); $('vy').add(new Option(nm, j, false, j === 2)); });
+  $('k').oninput = function () { $('kv').textContent = this.value; cen = []; rastro = []; et.fill(-1); it = 0; metricas(); dibujar(); estado('k cambió: pulse Iniciar.'); };
+  $('eps').oninput = function () { $('epsv').textContent = (+this.value).toFixed(1); };
+  $('mp').oninput = function () { $('mpv').textContent = this.value; };
+  $('prep').onchange = function () { preparar(); if (metodo === 'db') dbscan(); else { cen = []; rastro = []; et.fill(-1); it = 0; metricas(); dibujar(); estado('Datos preparados de nuevo: pulse Iniciar.'); } };
+  $('vx').onchange = $('vy').onchange = dibujar;
+  $('metodo').onchange = function () { metodo = this.value; $('opKm').hidden = metodo !== 'km'; $('opDb').hidden = metodo !== 'db'; cen = []; rastro = []; et.fill(-1); it = 0; metricas(); dibujar(); estado(metodo === 'km' ? 'Pulse Iniciar.' : 'Elija ε y vecinos mínimos, y agrupe.'); };
+  $('bIni').onclick = iniciar; $('bAsig').onclick = asignar; $('bMov').onclick = mover; $('bCorre').onclick = correr;
+  $('bSemilla').onclick = function () { semilla = Math.floor(Math.random() * 2147483646) + 1; iniciar(); correr(); };
+  $('bDb').onclick = dbscan;
+  $('bCanal').onclick = function () { verCanal = !verCanal; this.textContent = verCanal ? 'Ocultar canal' : 'Revelar canal real'; cruce(); dibujar(); };
+  window.SIM = { preparar: preparar, ponerEtiquetas: function (a) { et = a.slice(); }, silueta: silueta, ari: ari };
+  preparar(); dibujar();
+})();
+</script>
+</body>
+</html>

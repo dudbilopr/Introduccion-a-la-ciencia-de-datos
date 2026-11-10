@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 13: guía de investigación | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<style>
+  .vids { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin: 14px 0; }
+  .vids article { background: var(--papel-2, #ece9df); padding: 0 0 12px; }
+  .vids img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .vids h3 { font-size: 16px; margin: 10px 12px 4px; line-height: 1.25; }
+  .vids p { font-size: 14.5px; margin: 4px 12px; line-height: 1.35; }
+  .etq { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #00213d; color: #fff; margin-right: 4px; }
+  .metodo { background: #00213d; color: #eaf1f7; padding: 18px 22px; border-radius: 4px; }
+  .metodo b { color: #ff9a63; }
+  .metodo table td, .metodo table th { color: #eaf1f7; border-color: rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Semana 13: lo que la investigación dice sobre agrupar</h1>
+  <p>Guía de estudio independiente. Reúne la búsqueda bibliográfica de la semana, una lectura guiada de un artículo de investigación, ocho videos verificados, el simulador propio y los recursos del mundo para seguir profundizando.</p>
+  <div class="datos-clase"><span><b>Semana</b>13</span><span><b>Tiempo</b>4 a 6 horas de trabajo independiente</span><span><b>Artículos</b>20 con DOI verificado</span><span><b>Videos</b>8</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#ruta">Ruta de estudio</a></li>
+  <li><a href="#lectura">Lectura guiada</a></li>
+  <li><a href="#videos">Videos</a></li>
+  <li><a href="#simulador">Simulador</a></li>
+  <li><a href="#biblio">Bibliografía comentada</a></li>
+  <li><a href="#profundizar">Para profundizar</a></li>
+  <li><a href="#metodo">Método de la búsqueda</a></li>
+</ol></nav>
+<main>
+<section id="ruta">
+  <h2>Ruta de estudio</h2>
+  <ol class="pasos">
+    <li><strong>Intuición (1 hora).</strong> Videos de StatQuest sobre K-means, jerárquico y DBSCAN, o sus equivalentes en español.</li>
+    <li><strong>Práctica (1 hora).</strong> Los seis retos del <a href="simulador_agrupamiento.html">simulador</a> y el <a href="Guia_Laboratorio_Semana13.html">taller en Colab</a>.</li>
+    <li><strong>Investigación (1 a 2 horas).</strong> Lectura guiada de Schubert (2023) y la pregunta de Hennig (2015).</li>
+    <li><strong>Rigor (opcional, 2 horas).</strong> Las clases del MIT de John Guttag y Tamara Broderick, y el capítulo 12 de <em>An Introduction to Statistical Learning</em>.</li>
+  </ol>
+</section>
+
+<section id="lectura">
+  <h2>Lectura guiada: "Stop using the elbow criterion"</h2>
+  <p>Schubert, E. (2023). <em>ACM SIGKDD Explorations Newsletter</em>, 25(1), 36-42. <a href="https://doi.org/10.1145/3606274.3606278" target="_blank" rel="noopener">doi:10.1145/3606274.3606278</a>. Acceso abierto en la biblioteca digital de la ACM. Son siete páginas.</p>
+  <div class="aviso">El autor pide expresamente a los docentes discutir los problemas del método del codo y enseñar alternativas. Esta lectura es esa discusión.</div>
+  <ol class="pasos">
+    <li>Lea el resumen y la introducción. ¿Por qué K-means "always produce[s] a result with exactly k clusters, giving a (false) suggestion of success"? Responda con un ejemplo de clase.</li>
+    <li>Sección 2: escriba la fórmula de la SSE y explique por qué con varios centros el problema es NP-difícil (el autor cita a Aloise y otros, 2009).</li>
+    <li>Compare la curva de inercia de los 440 clientes con lo que el autor dice del codo. ¿Lo ve?</li>
+    <li>De la conclusión, liste las alternativas que recomienda. Calcule una de ellas (Calinski-Harabasz) con <code>sklearn.metrics.calinski_harabasz_score</code>.</li>
+    <li>Escriba un párrafo: ¿la elección de k es un descubrimiento o una decisión? Cite a Schubert (2023) y a Hennig (2015).</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Calinski-Harabasz con los datos del curso (logaritmo y estandarización): 187,7 con k = 2, el máximo entre k = 2 y k = 8. Davies-Bouldin, en cambio, tiene su mínimo en k = 3 (1,346 frente a 1,353 en k = 2): los criterios también discrepan. Alternativas que nombra la conclusión del artículo: el criterio de razón de varianzas de Calinski y Harabasz, el BIC y el estadístico Gap.</p></div></details>
+</section>
+
+<section id="videos">
+  <h2>Videos verificados</h2>
+  <p>Confirmados con la ficha oficial de YouTube el 2026-11-10. Los minutos citados vienen de los capítulos que publicó cada autor.</p>
+  <div class="vids" id="listaVideos"></div>
+</section>
+
+<section id="simulador">
+  <h2>Simulador propio</h2>
+  <p>El <a href="simulador_agrupamiento.html">simulador de agrupamiento</a> corre K-means paso a paso y DBSCAN sobre los 440 clientes reales, con tres preparaciones de los datos, silueta e índice de Rand ajustado calculados en vivo. Se comprobó que su silueta y su Rand ajustado coinciden con scikit-learn (0,290 y 0,514).</p>
+  <p>Simuladores externos: <a href="https://www.naftaliharris.com/blog/visualizing-k-means-clustering/" target="_blank" rel="noopener">Visualizing K-Means Clustering</a> y <a href="https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/" target="_blank" rel="noopener">Visualizing DBSCAN Clustering</a>, de Naftali Harris.</p>
+</section>
+
+<section id="biblio">
+  <h2>Bibliografía comentada</h2>
+  <p>Cada trabajo tiene DOI comprobado contra Crossref. "Qué encontró" resume solo lo que dice su resumen; cuando Crossref no trae resumen, se indica que la descripción sale del título.</p>
+  <div id="tablaBib"></div>
+</section>
+
+<section id="profundizar">
+  <h2>Para profundizar</h2>
+  <div class="tablon"><table>
+    <tr><th>Tipo</th><th>Recurso</th><th>Para qué</th></tr>
+    <tr><td>Libro abierto</td><td><a href="https://www.statlearning.com/" target="_blank" rel="noopener">An Introduction to Statistical Learning</a>, capítulo 12</td><td>Aprendizaje no supervisado: K-means y jerárquico, con laboratorios en Python.</td></tr>
+    <tr><td>Libro abierto</td><td><a href="https://hastie.su.domains/ElemStatLearn/" target="_blank" rel="noopener">The Elements of Statistical Learning</a>, sección 14.3</td><td>Bibliografía base del syllabus; tratamiento formal.</td></tr>
+    <tr><td>Documentación</td><td><a href="https://scikit-learn.org/stable/modules/clustering.html" target="_blank" rel="noopener">scikit-learn: Clustering</a></td><td>Comparación de métodos e índices de evaluación.</td></tr>
+    <tr><td>Curso abierto</td><td><a href="https://ocw.mit.edu/courses/6-0002-introduction-to-computational-thinking-and-data-science-fall-2016/" target="_blank" rel="noopener">MIT OpenCourseWare 6.0002</a></td><td>Curso completo donde está la clase 12 de agrupamiento.</td></tr>
+    <tr><td>Curso abierto</td><td><a href="https://www.edx.org/learn/python/stanford-university-statistical-learning-with-python" target="_blank" rel="noopener">Statistical Learning with Python (Stanford, edX)</a></td><td>Curso de los autores de ISLP; se puede auditar gratis.</td></tr>
+    <tr><td>Datos</td><td><a href="https://www.openml.org/" target="_blank" rel="noopener">OpenML</a> y <a href="https://archive.ics.uci.edu/" target="_blank" rel="noopener">UCI</a></td><td>Otros conjuntos para practicar segmentación.</td></tr>
+    <tr><td>Congreso</td><td><a href="https://kdd.org/" target="_blank" rel="noopener">ACM SIGKDD</a> e <a href="https://icdm2026.neu.edu.cn/" target="_blank" rel="noopener">IEEE ICDM</a></td><td>Donde se publica la investigación en minería de datos y agrupamiento.</td></tr>
+    <tr><td>Competencia</td><td><a href="https://www.kaggle.com/competitions" target="_blank" rel="noopener">Kaggle</a> y <a href="https://www.drivendata.org/competitions/" target="_blank" rel="noopener">DrivenData</a></td><td>Practicar con problemas reales.</td></tr>
+  </table></div>
+  <p>Todos los recursos del mundo, por tipo: <a href="../Recursos/recursos_globales.html">centro de recursos del curso</a>.</p>
+</section>
+
+<section id="metodo">
+  <h2>Método de la búsqueda</h2>
+  <div class="metodo">
+    <p><b>Fecha:</b> 2026-11-10. <b>Período:</b> 1985 a 2026. <b>Bases:</b> OpenAlex, Crossref, Semantic Scholar, ERIC, arXiv y DOAJ. Scopus y CORE no se consultaron porque requieren clave institucional.</p>
+    <p><b>Consultas (10):</b> k-means clustering review; k-means algorithm fifty years; cluster validation silhouette index; choosing number of clusters; customer segmentation clustering; DBSCAN density based clustering; hierarchical clustering Ward linkage; cluster analysis education data science teaching; clustering stability validation; análisis de conglomerados segmentación clientes.</p>
+    <p><b>Filtro temático</b> en título y resumen: cluster, clustering, conglomerado, k-means, DBSCAN o segment.</p>
+    <table>
+      <tr><th>Etapa</th><th class="d">Registros</th></tr>
+      <tr><td>Recuperados</td><td class="d">2.097</td></tr>
+      <tr><td>Únicos tras quitar duplicados</td><td class="d">1.894</td></tr>
+      <tr><td>Tras el filtro temático</td><td class="d">1.611</td></tr>
+      <tr><td>Seleccionados por lectura de título y resumen</td><td class="d">11</td></tr>
+      <tr><td>Trabajos fundamentales agregados a mano (Lloyd, Ward, Jain, Hubert y Arabie, DBSCAN revisado, HDBSCAN, Hennig 2007 y 2015, De Veaux)</td><td class="d">9</td></tr>
+      <tr><td>Total citado, con DOI verificado en Crossref</td><td class="d">20</td></tr>
+      <tr><td>Con versión abierta descargada legalmente</td><td class="d">7</td></tr>
+    </table>
+    <p><b>Uso de IA:</b> Claude ejecutó la búsqueda y la verificación con scripts, propuso la selección y redactó los resúmenes a partir de los resúmenes publicados; el docente revisa la selección. No se usaron sitios de descarga no autorizados.</p>
+  </div>
+</section>
+</main>
+</div>
+<script src="recursos_semana13.js"></script>
+<script>
+(function () {
+  var R = window.RECURSOS13;
+  document.getElementById('listaVideos').innerHTML = R.videos.map(function (v) {
+    return '<article><a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="Miniatura del video ' + v.titulo + '" loading="lazy"></a><h3><a href="' + v.url + '" target="_blank" rel="noopener">' + v.titulo + '</a></h3><p><span class="etq">' + v.nivel + '</span><span class="etq">' + v.idioma + '</span> ' + v.canal + ' · ' + v.duracion + '</p><p><strong>Qué mirar:</strong> ' + v.mirar + '</p><p><strong>Pregunta:</strong> ' + v.pregunta + '</p></article>';
+  }).join('');
+  var temas = [];
+  R.articulos.forEach(function (a) { if (temas.indexOf(a.tema) < 0) temas.push(a.tema); });
+  document.getElementById('tablaBib').innerHTML = temas.map(function (t) {
+    return '<h3>' + t + '</h3><div class="tablon"><table><tr><th>Trabajo</th><th>Qué encontró</th><th>Uso en el curso</th></tr>' + R.articulos.filter(function (a) { return a.tema === t; }).map(function (a) {
+      return '<tr><td>' + a.cita + ' <a href="https://doi.org/' + a.doi + '" target="_blank" rel="noopener">DOI</a>' + (a.abierto_url ? ' · <a href="' + a.abierto_url + '" target="_blank" rel="noopener">versión abierta</a>' : a.abierto ? ' · acceso abierto' : '') + '</td><td>' + a.encontro + '</td><td>' + a.uso + '</td></tr>';
+    }).join('') + '</table></div>';
+  }).join('');
+  window.GUIA_PUNTOS = R.articulos.map(function (a) { return a.abierto ? 1 : 0; });
+})();
+</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>
