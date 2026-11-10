@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 7 · Mapa de rutas del dato | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: mapa de una red de transporte. Cada hipótesis es una ruta; el análisis exploratorio es el viaje. */
+  :root { --fondo: #07131f; --fondo-2: #0f2335; --tinta: #eef4f8; --tinta-2: #9fb3c2; --regla: rgba(159,179,194,.24); --punto: #4d7a99; --compra: #ff7a1f; --acento-texto: #ffa263; --ruta: #35d0ba; }
+  :root[data-tema="claro"] { --fondo: #f5f3ec; --fondo-2: #e7e3d6; --tinta: #0b2435; --tinta-2: #4b6272; --regla: rgba(11,36,53,.2); --punto: #7f9bb0; --compra: #e85c0b; --acento-texto: #b94504; --ruta: #0f8f7e; }
+  .rot { font: 700 23px Consolas, 'Courier New', monospace; letter-spacing: .1em; color: var(--ruta); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; }
+  .t-n { fill: var(--tinta); font-weight: 700; }
+  .t-s { fill: var(--tinta-2); }
+  .t-o { fill: var(--acento-texto); font-weight: 800; }
+  .t-r { fill: var(--ruta); font-weight: 800; }
+  .placa { background: var(--fondo-2); border-left: 8px solid var(--ruta); padding: 26px 30px; }
+  .placa.naranja { border-left-color: var(--compra); }
+  .estaciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .estacion { background: var(--fondo-2); padding: 26px 22px; border-top: 6px solid var(--ruta); display: flex; flex-direction: column; gap: 10px; }
+  .estacion .ico { font-size: 60px; color: var(--ruta); }
+  .estacion b { font-size: 33px; line-height: 1.08; }
+  .estacion span { font-size: 25px; color: var(--tinta-2); line-height: 1.2; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--ruta); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--ruta); }
+  .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; }
+  .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .cita { font-size: 50px; line-height: 1.18; font-weight: 700; }
+  .linea-viva { stroke-dasharray: 6 10; animation: correr 1.6s linear infinite; }
+  @keyframes correr { to { stroke-dashoffset: -32; } }
+  @media (prefers-reduced-motion: reduce) { .linea-viva { animation: none; } }
+</style>
+</head>
+<body data-cine="paneo">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="calendario" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:56px;width:1100px;padding:30px 40px;background:color-mix(in srgb, var(--fondo) 88%, transparent)">
+    <p class="rot">Mapa de rutas del dato · Semana 7</p>
+    <h1 style="font-size:104px;margin-top:14px;line-height:1.02">Antes de modelar, <span class="acento">se le pregunta</span> a los datos.</h1>
+    <p class="sec" style="font-size:27px;margin-top:20px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Cada cuadro del fondo es uno de los 731 días reales del sistema de bicicletas compartidas de Washington D.C. (2011 y 2012); el brillo es el número de alquileres. El cuadro naranja es el 29 de octubre de 2012: 22 alquileres. Pregunte qué pasó ese día antes de decirlo. Hoy: análisis exploratorio, hipótesis y correlación.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Recorrido de hoy</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda como una línea de transporte con ocho estaciones, de 7:00 a 10:00"></svg>
+  <aside class="notas">La mini-hackathon es el corazón de la sesión: 70 minutos en equipos de tres. La galería final reemplaza la "Data Art Walk" de la semana 6 del calendario, que se usó para correlación y regresión. Ajuste los tiempos al grupo.</aside>
+</section>
+
+<!-- 3 Resultado -->
+<section class="esc">
+  <div class="placa" style="position:absolute;left:160px;top:110px;width:1280px">
+    <p class="rot">Resultado de aprendizaje 1.3</p>
+    <h2 style="font-size:58px;margin:16px 0 30px">Realiza cálculo de medidas de correlación entre dos variables: covarianza y coeficiente de correlación.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="lightbulb" style="font-size:64px;color:var(--ruta)"></i><p style="font-size:33px">Formulas una hipótesis que los datos puedan desmentir.</p>
+      <i class="ico" data-i="sigma" style="font-size:64px;color:var(--ruta)"></i><p style="font-size:33px">Calculas covarianza y correlación, y dices qué no significan.</p>
+      <i class="ico" data-i="presentation" style="font-size:64px;color:var(--ruta)"></i><p style="font-size:33px">Defiendes una gráfica en tres minutos ante tus pares.</p>
+    </div>
+  </div>
+  <aside class="notas">RAE textual de la guía de aprendizaje. Esta sesión cuenta como entrega tipo reto (40 % del curso, RAE 2.1 a 2.3 en la guía; aquí se trabaja la base, el 1.3).</aside>
+</section>
+
+<!-- 4 Apuesta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:640px;display:flex;flex-direction:column;gap:26px">
+    <p class="rot">Apuesta antes del dato</p>
+    <h2 style="font-size:60px;line-height:1.06">¿Cuándo se alquilan más bicicletas: en días laborales o en fines de semana y festivos?</h2>
+    <p class="paso" style="font-size:32px">En total, casi igual: <b class="acento">4.585</b> contra <b class="acento">4.330</b> por día.</p>
+    <p class="paso" style="font-size:32px">Pero son dos públicos que se mueven al revés.</p>
+    <p class="paso sec" style="font-size:27px">El promedio total escondía la historia. Separar por grupo es la primera pregunta del análisis exploratorio.</p>
+  </div>
+  <svg id="apuesta" class="diagrama" viewBox="0 0 760 800" style="position:absolute;left:780px;top:50px;width:760px;height:800px" role="img" aria-label="Alquileres promedio por día: usuarios casuales 607 en días laborales y 1.371 en no laborales; registrados 3.978 y 2.959"></svg>
+  <aside class="notas">Pida que levanten la mano por una opción antes del primer paso. Promedios por día, 500 días laborales y 231 no laborales. Casuales: 607 contra 1.371. Registrados: 3.978 contra 2.959. Los casuales son el 13,2 % de los alquileres en días laborales y el 31,7 % en los demás.</aside>
+</section>
+
+<!-- 5 Mapa del dato -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:1424px"><p class="rot">Leer el mapa antes de viajar</p><h2 style="font-size:56px;margin-top:8px">731 días, 16 columnas, ningún vacío. Y dos trampas en la documentación</h2></div>
+  <div class="estaciones" style="position:absolute;left:88px;right:88px;top:230px">
+    <div class="estacion paso"><i class="ico" data-i="calendar-days"></i><b>Calendario</b><span>Fecha, año, mes, día de la semana, festivo, laboral.</span></div>
+    <div class="estacion paso"><i class="ico" data-i="thermometer"></i><b>Clima</b><span>Temperatura, humedad y viento <em>normalizados</em>: hay que desnormalizar.</span></div>
+    <div class="estacion paso"><i class="ico" data-i="bike"></i><b>Conteos</b><span>Casuales + registrados = total. Uno es suma de los otros dos.</span></div>
+    <div class="estacion paso" style="border-top-color:var(--compra)"><i class="ico" data-i="triangle-alert" style="color:var(--compra)"></i><b>Estación</b><span>El Readme dice 1 = primavera; las fechas dicen invierno.</span></div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:690px;width:1424px;font-size:31px">Temperatura real = <span class="mono acento">temp × 41</span> °C. Media del periodo: <b class="acento">20,3 °C</b>, de 2,4 a 35,3.</p>
+  <p class="pie">Fanaee-T y Gama (2013), Bike Sharing Dataset, UCI, CC BY 4.0. Capital Bikeshare, Washington D.C.</p>
+  <aside class="notas">La estación 1 va del 21 de diciembre al 20 de marzo: es invierno. Compruébelo con dteday agrupando por season. Que lo descubran en el taller es mejor que decírselo. La lección: la documentación también se verifica.</aside>
+</section>
+
+<!-- 6 Hipótesis 1: temperatura -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Ruta 1 · Temperatura</p><h2 style="font-size:52px;margin-top:6px">Más calor, más bicicletas… hasta los 30 °C</h2></div>
+  <svg id="temp" class="diagrama" viewBox="0 0 980 700" style="position:absolute;left:60px;top:170px;width:980px;height:700px" role="img" aria-label="Dispersión de 731 días: temperatura contra alquileres, correlación 0,627"></svg>
+  <div style="position:absolute;left:1080px;top:210px;width:440px;display:flex;flex-direction:column;gap:24px">
+    <p style="font-size:30px">Correlación de Pearson <b class="acento" style="font-size:64px;display:block">r = 0,627</b></p>
+    <p class="paso" style="font-size:28px">Covarianza: <b>9.123</b> bicicletas·°C. El número depende de las unidades; <em>r</em> no.</p>
+    <p class="paso" style="font-size:28px">Por rangos: de 25 a 30 °C, <b>5.726</b> al día; de 30 a 35 °C, <b>5.418</b>. La relación se curva.</p>
+    <p class="paso sec" style="font-size:25px">r mide solo la parte recta de una relación. Una curva puede tener r bajo y ser fuerte.</p>
+  </div>
+  <aside class="notas">Cada punto es un día; naranja es 2012. Note que 2012 está por encima de 2011 a la misma temperatura: otra variable (el crecimiento del sistema) mueve la nube. Anscombe (1973) mostró cuatro conjuntos con el mismo r y formas distintas: por eso se grafica siempre.</aside>
+</section>
+
+<!-- 7 Hipótesis 2: clima -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:52px;width:1424px"><p class="rot">Ruta 2 · Clima</p><h2 style="font-size:54px;margin-top:6px">La lluvia corta la demanda a menos de la mitad</h2></div>
+  <svg id="clima" class="diagrama" viewBox="0 0 1424 420" style="position:absolute;left:88px;top:210px;width:1424px;height:420px" role="img" aria-label="Alquileres promedio por clima: despejado 4.877, niebla o nublado 4.036, lluvia o nieve ligera 1.803"></svg>
+  <p class="paso" style="position:absolute;left:88px;top:680px;width:1424px;font-size:31px"><i class="ico" data-i="triangle-alert" style="color:var(--compra);font-size:38px;vertical-align:-6px"></i> Solo <b class="acento">21 días</b> de lluvia o nieve. Ningún día con lluvia fuerte. Un grupo pequeño se señala siempre.</p>
+  <aside class="notas">463 días despejados, 247 con niebla o nubes, 21 con lluvia o nieve ligera. La categoría 4 (lluvia fuerte) existe en la documentación pero no aparece en los datos diarios. Pregunta para el debate: ¿la lluvia causa la caída, o los días de lluvia son además más fríos?</aside>
+</section>
+
+<!-- 8 Hipótesis 3: tiempo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Ruta 3 · Tiempo</p><h2 style="font-size:52px;margin-top:6px">El sistema creció 64,9 % en un año, y un día casi se apagó</h2></div>
+  <svg id="serie" class="diagrama" viewBox="0 0 1500 640" style="position:absolute;left:50px;top:190px;width:1500px;height:640px" role="img" aria-label="Serie diaria de alquileres de 2011 a 2012 con el mínimo de 22 el 29 de octubre de 2012"></svg>
+  <aside class="notas">2011: 1.243.103 alquileres. 2012: 2.049.576. El mínimo, 22, es el 29 de octubre de 2012: el huracán Sandy llegó a la costa este ese día; el Readme del dataset menciona el ejemplo. Toda serie de tiempo tiene tendencia, estacionalidad y eventos; el modelo de la semana 10 tendrá que lidiar con los tres.</aside>
+</section>
+
+<!-- 9 Atípico -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:740px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Ruta 4 · Lo raro</p>
+    <h2 style="font-size:56px;line-height:1.06">La regla del rango intercuartílico no ve el huracán</h2>
+    <p class="paso" style="font-size:30px">Con los 731 días: límite inferior <b class="acento">−1.054</b>. Ningún día es atípico, ni siquiera el de 22 alquileres.</p>
+    <p class="paso" style="font-size:30px">Dentro de cada mes: <b class="acento">26 días</b> atípicos. Ahí están Sandy y el puente de Acción de Gracias de 2012.</p>
+    <p class="paso sec" style="font-size:26px">Atípico no es una propiedad del número: depende de con qué se compara.</p>
+  </div>
+  <svg id="caja" class="diagrama" viewBox="0 0 640 760" style="position:absolute;left:880px;top:70px;width:640px;height:760px" role="img" aria-label="Diagrama de caja de los alquileres diarios: el día de 22 alquileres queda dentro de los bigotes"></svg>
+  <aside class="notas">Q1 = 3.152, Q3 = 5.956, RIC = 2.804; Q1 − 1,5·RIC = −1.054. Por mes y año salen 26 días; entre ellos 29 y 30 de octubre de 2012 y del 22 al 25 de noviembre de 2012. Conecta con la limpieza de la semana 4: no se borra un atípico sin entenderlo.</aside>
+</section>
+
+<!-- 10 Galería -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Galería de visualización</p><h2 style="font-size:54px;margin-top:6px">Tres preguntas, tres formas. Elige la que responde la tuya</h2></div>
+  <svg id="galeria" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:190px;width:1424px;height:560px" role="img" aria-label="Tres miniaturas: histograma de alquileres diarios, cajas por estación y dispersión temperatura contra alquileres"></svg>
+  <p class="paso" style="position:absolute;left:88px;top:790px;width:1424px;font-size:28px">Pitch de 3 minutos: <b>pregunta</b>, <b>gráfica</b>, <b>hallazgo con un número</b>, <b>lo que el dato no permite afirmar</b>.</p>
+  <aside class="notas">Las tres gráficas se dibujaron con los datos reales. Co-evaluación: cada equipo deja una nota a otros dos con la rúbrica de la guía (claridad del título, honestidad de la escala, número correcto). Evite el gráfico de torta para 731 días.</aside>
+</section>
+
+<!-- 11 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="placa" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · critical reading</p>
+    <p class="cita" style="margin:22px 0 18px">“Bike-sharing rental process is <span class="acento">highly correlated</span> to the environmental and seasonal settings.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Fanaee-T and Gama, Readme of the Bike Sharing Dataset, UCI Machine Learning Repository</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--ruta)"></i><p class="paso" style="font-size:33px">Our r for temperature is 0.627. Is that “highly correlated”? Explain in one sentence.</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--ruta)"></i><p class="paso" style="font-size:33px">Name one variable that is correlated with rentals but probably not a cause.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--ruta)"></i><p class="paso" style="font-size:33px">Pitch your hypothesis to a partner: “We expect… because… we will check it with…”.</p>
+    </div>
+    <p class="paso" style="font-size:25px;margin-top:22px;color:var(--tinta-2)"><b>Words:</b> hypothesis · outlier · to correlate · skewed · trend · seasonality · confounder</p>
+  </div>
+  <aside class="notas">Cita textual del Readme incluido en el dataset (Material_Privado/Datos_Originales/bike_sharing/Readme.txt). Cinco minutos en parejas y cinco en plenaria, solo en inglés. La actividad EMI interactiva está en la pestaña Evaluación del aplicativo.</aside>
+</section>
+
+<!-- 12 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco estaciones de la mini-hackathon, de leer el mapa a la galería"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana7.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía de la hackathon</a>
+  <aside class="notas">Equipos de tres: piloto (escribe el código), navegante (lee la guía y revisa los puntos de control), cronista (anota hipótesis y resultados). Rotan en cada estación. Entrega: cuaderno en GitHub y una gráfica con título de conclusión.</aside>
+</section>
+
+<!-- 13 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Señales de la red</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="search"></i><b>EDA</b><span>Análisis exploratorio: mirar antes de modelar.</span></div>
+      <div><i class="ico" data-i="lightbulb"></i><b>Hipótesis</b><span>Afirmación que los datos podrían desmentir.</span></div>
+      <div><i class="ico" data-i="arrow-right-left"></i><b>Covarianza</b><span>Cómo varían juntas dos variables, en sus unidades.</span></div>
+      <div><i class="ico" data-i="spline"></i><b>Correlación r</b><span>Covarianza sin unidades, de −1 a 1. Solo lo lineal.</span></div>
+      <div><i class="ico" data-i="crosshair"></i><b>Atípico</b><span>Valor raro respecto a su grupo de comparación.</span></div>
+      <div><i class="ico" data-i="columns"></i><b>RIC</b><span>Q3 − Q1: el ancho del 50 % central.</span></div>
+      <div><i class="ico" data-i="git-fork"></i><b>Confusora</b><span>Tercera variable que mueve a las dos que comparas.</span></div>
+      <div><i class="ico" data-i="ruler"></i><b>Normalizar</b><span>Dividir por una escala; para leer, se deshace.</span></div>
+      <div><i class="ico" data-i="chart-line"></i><b>Serie de tiempo</b><span>Datos ordenados en el tiempo: tendencia y ciclos.</span></div>
+      <div><i class="ico" data-i="bar-chart-3"></i><b>Distribución</b><span>Qué valores aparecen y con qué frecuencia.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Estos términos entran en la Evaluación auténtica de la semana 8 y reaparecen en inferencia (semana 9) y regresión (semana 10).</aside>
+</section>
+
+<!-- 14 Cierre -->
+<section class="esc">
+  <div class="placa naranja" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para cualquier análisis exploratorio</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="split" style="font-size:62px;color:var(--ruta)"></i><p class="paso" style="font-size:35px"><b>Separa por grupo</b> antes de concluir: el total escondía dos públicos opuestos.</p>
+      <i class="ico paso" data-i="chart-scatter" style="font-size:62px;color:var(--ruta)"></i><p class="paso" style="font-size:35px"><b>Grafica antes de calcular r:</b> una curva no cabe en un solo número.</p>
+      <i class="ico paso" data-i="calendar-x" style="font-size:62px;color:var(--ruta)"></i><p class="paso" style="font-size:35px"><b>Lo raro depende del contexto:</b> compara con su mes, no con dos años.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 8: Evaluación auténtica I. Repasa las semanas 4 a 7 y trae tu cuaderno de hoy.</p>
+  </div>
+  <aside class="notas">Cierre con una pregunta: ¿qué hipótesis de su equipo resultó falsa? Una hipótesis desmentida también es un resultado.</aside>
+</section>
+
+<!-- 15 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Fuentes del recorrido</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Fanaee-T, H. (2013). <em>Bike Sharing</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a></p>
+    <p>Fanaee-T, H. y Gama, J. (2013). Event labeling combining ensemble detectors and background knowledge. <em>Progress in Artificial Intelligence</em>. <a href="https://doi.org/10.1007/s13748-013-0040-3" target="_blank" rel="noopener">doi:10.1007/s13748-013-0040-3</a></p>
+    <p>Anscombe, F. J. (1973). Graphs in Statistical Analysis. <em>The American Statistician</em>, 27(1), 17-21. <a href="https://doi.org/10.1080/00031305.1973.10478966" target="_blank" rel="noopener">doi:10.1080/00031305.1973.10478966</a></p>
+    <p>Tukey, J. W. (1977). <em>Exploratory Data Analysis</em>. Addison-Wesley.</p>
+    <p>pandas. <em>DataFrame.corr</em>. <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.corr.html" target="_blank" rel="noopener">pandas.pydata.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras recalculadas con <span class="mono">cifras_todas.py</span> sobre el archivo original. Uso de IA: Claude ayudó a programar las gráficas y a redactar; el docente revisó cada cifra y cada cita.</p>
+  </div>
+  <aside class="notas">Cifras: Material_Privado/Cifras/cifras_s07.json. El uso de IA se declara, como exige la guía de aprendizaje.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, ic = CUR.ic, luz = CUR.luz, num = DS.num;
+  /* Portada: calendario de calor con los 731 días reales */
+  var cal = '', mx = Math.max.apply(null, C.cnt), lado = 17, paso = 20, x0 = 140, y0 = 570;
+  var inicio = new Date(Date.UTC(2011, 0, 1));
+  C.cnt.forEach(function (v, i) {
+    var f = new Date(inicio.getTime() + i * 864e5), anio = f.getUTCFullYear() - 2011, dSem = f.getUTCDay();
+    var ini = new Date(Date.UTC(f.getUTCFullYear(), 0, 1)), semana = Math.floor(((f - ini) / 864e5 + ini.getUTCDay()) / 7);
+    var x = x0 + semana * paso, y = y0 + anio * (7 * paso + 26) + dSem * paso, sandy = v === S.cnt.min;
+    cal += '<rect x="' + x + '" y="' + y + '" width="' + lado + '" height="' + lado + '" rx="3" fill="' + (sandy ? 'var(--compra)' : 'var(--ruta)') + '" opacity="' + (sandy ? 1 : (.08 + .85 * v / mx).toFixed(2)) + '"/>';
+  });
+  cal += DS.txt(x0 - 16, y0 + 3 * paso + 16, '2011', 't-s', ' text-anchor="end" font-size="22"') + DS.txt(x0 - 16, y0 + 7 * paso + 26 + 3 * paso + 16, '2012', 't-s', ' text-anchor="end" font-size="22"');
+  CUR.poner('calendario', cal);
+
+  /* Agenda como línea de transporte */
+  var E = [['7:00', 'Apuesta', 'dice-5'], ['7:15', 'Mapa del dato', 'map'], ['7:35', 'Cuatro rutas', 'route'], ['8:05', 'Pausa', 'coffee'], ['8:20', 'English', 'languages'], ['8:30', 'Hackathon', 'zap'], ['9:40', 'Galería', 'presentation'], ['9:55', 'Cierre', 'flag']];
+  var a = '', y = 380;
+  a += '<path d="M40 ' + y + 'H1560" stroke="var(--ruta)" stroke-width="14" stroke-linecap="round"/>' + '<path class="linea-viva" d="M40 ' + y + 'H1560" stroke="var(--fondo)" stroke-width="4"/>';
+  E.forEach(function (e, i) {
+    var x = 120 + i * 194, foco = i === 5, arriba = i % 2 === 0;
+    a += '<circle cx="' + x + '" cy="' + y + '" r="' + (foco ? 34 : 24) + '" fill="var(--fondo)" stroke="' + (foco ? 'var(--compra)' : 'var(--ruta)') + '" stroke-width="' + (foco ? 9 : 7) + '"/>';
+    var ty = arriba ? y - 190 : y + 70;
+    a += ic(e[2], x - 34, ty, 68, foco ? 'var(--acento-texto)' : 'var(--ruta)');
+    a += DS.txt(x, ty + (arriba ? 112 : 112), e[0], 't-r', ' text-anchor="middle" font-size="26"') + DS.txt(x, ty + (arriba ? 150 : 150), e[1], 't-n', ' text-anchor="middle" font-size="29"');
+  });
+  CUR.poner('agenda', a);
+
+  /* Apuesta: barras apiladas por tipo de día */
+  var L = S.por_laboral, b = '', base = 640, k = 0.115;
+  [['Laboral', L.laboral], ['Fin de semana o festivo', L.no_laboral]].forEach(function (g, i) {
+    var x = 90 + i * 330, hc = g[1].casual * k, hr = g[1].registrados * k;
+    b += '<rect x="' + x + '" y="' + (base - hr) + '" width="200" height="' + hr + '" fill="var(--punto)"/>';
+    b += '<g class="paso-capa"><rect x="' + x + '" y="' + (base - hr - hc) + '" width="200" height="' + hc + '" fill="var(--compra)"/></g>';
+    b += DS.txt(x + 100, base - hr - hc - 20, num(g[1].cnt), 't-n', ' text-anchor="middle" font-size="38"');
+    b += DS.txt(x + 100, base + 46, g[0], 't-s', ' text-anchor="middle" font-size="25"');
+    b += '<g class="paso">' + DS.txt(x + 100, base - hr - hc / 2 + 11, num(g[1].casual), 't-n', ' text-anchor="middle" font-size="30"') + DS.txt(x + 100, base - hr / 2 + 11, num(g[1].registrados), 't-n', ' text-anchor="middle" font-size="30"') + '</g>';
+  });
+  b += '<rect x="90" y="720" width="24" height="24" fill="var(--compra)"/>' + DS.txt(124, 741, 'Casuales', 't-s', ' font-size="24"') + '<rect x="300" y="720" width="24" height="24" fill="var(--punto)"/>' + DS.txt(334, 741, 'Registrados', 't-s', ' font-size="24"');
+  b += DS.txt(90, 60, 'Alquileres promedio por día', 't-s', ' font-size="24"');
+  CUR.poner('apuesta', b);
+
+  /* Temperatura contra alquileres */
+  var t = DS.dispersion({ x: 120, y: 40, w: 820, h: 560, xd: [0, 36], yd: [0, 9000], xt: [0, 10, 20, 30], yt: [0, 3000, 6000, 9000], xs: C.temp, ys: C.cnt, r: 6,
+    col: function (i) { return i >= 365 ? 'var(--compra)' : 'var(--punto)'; }, xl: 'Temperatura (°C)', yl: 'Alquileres por día' });
+  t.s += '<rect x="700" y="20" width="22" height="22" fill="var(--punto)"/>' + DS.txt(732, 39, '2011', 't-s', ' font-size="22"') + '<rect x="810" y="20" width="22" height="22" fill="var(--compra)"/>' + DS.txt(842, 39, '2012', 't-s', ' font-size="22"');
+  CUR.poner('temp', t.s);
+
+  /* Clima */
+  var cl = S.por_clima;
+  CUR.poner('clima', DS.barras({ x: 430, y: 20, w: 820, alto: 120, fs: 32, filas: [['Despejado · ' + cl['Despejado'].dias + ' días', cl['Despejado'].media], ['Niebla o nublado · ' + cl['Niebla o nublado'].dias, cl['Niebla o nublado'].media], ['Lluvia o nieve · ' + cl['Lluvia o nieve ligera'].dias, cl['Lluvia o nieve ligera'].media, true]] }));
+
+  /* Serie de tiempo */
+  var sr = DS.linea({ x: 110, y: 30, w: 1340, h: 480, xd: [0, 730], yd: [0, 9000], yt: [0, 3000, 6000, 9000], xt: [0, 181, 365, 546, 730], ys: C.cnt, color: 'var(--ruta)', grosor: 2.2,
+    fx: function (v) { return ['ene 2011', 'jul 2011', 'ene 2012', 'jul 2012', 'dic 2012'][[0, 181, 365, 546, 730].indexOf(v)]; } });
+  var iS = C.cnt.indexOf(S.cnt.min), xs = sr.X(iS), ys = sr.Y(S.cnt.min);
+  sr.s += '<g class="paso"><circle cx="' + xs + '" cy="' + ys + '" r="16" fill="none" stroke="var(--compra)" stroke-width="5"/><path d="M' + (xs - 18) + ' ' + ys + 'H' + (xs - 60) + '" fill="none" stroke="var(--compra)" stroke-width="3"/>' + DS.txt(xs - 70, ys - 8, '29 oct 2012: 22 alquileres', 't-o', ' text-anchor="end" font-size="30"') + DS.txt(xs - 70, ys + 28, 'huracán Sandy', 't-s', ' text-anchor="end" font-size="26"') + '</g>';
+  sr.s += DS.txt(sr.X(182), sr.Y(8200), '2011: ' + num(S.anual['2011']), 't-s', ' text-anchor="middle" font-size="26"') + DS.txt(sr.X(548), sr.Y(8800), '2012: ' + num(S.anual['2012']), 't-n', ' text-anchor="middle" font-size="26"');
+  CUR.poner('serie', sr.s);
+
+  /* Diagrama de caja vertical */
+  var q = S.cnt, Y = DS.esc(0, -1500, 9000, 690, 40), cx = 300, cj = '';
+  [-1000, 0, 3000, 6000, 9000].forEach(function (v) { cj += '<line x1="120" x2="560" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--regla)"/>' + DS.txt(110, Y(v) + 8, num(v), 't-eje', ' text-anchor="end"'); });
+  cj += '<line x1="' + cx + '" x2="' + cx + '" y1="' + Y(q.min) + '" y2="' + Y(q.max) + '" stroke="var(--tinta-2)" stroke-width="4"/>';
+  cj += '<rect x="' + (cx - 90) + '" y="' + Y(q.q3) + '" width="180" height="' + (Y(q.q1) - Y(q.q3)) + '" fill="var(--fondo-2)" stroke="var(--ruta)" stroke-width="5"/>';
+  cj += '<line x1="' + (cx - 90) + '" x2="' + (cx + 90) + '" y1="' + Y(q.mediana) + '" y2="' + Y(q.mediana) + '" stroke="var(--ruta)" stroke-width="7"/>';
+  cj += '<g class="paso"><line x1="140" x2="540" y1="' + Y(S.atipicos_iqr.limite_inf) + '" y2="' + Y(S.atipicos_iqr.limite_inf) + '" stroke="var(--compra)" stroke-width="4" stroke-dasharray="12 9"/>' + DS.txt(548, Y(S.atipicos_iqr.limite_inf) + 8, 'límite ' + num(S.atipicos_iqr.limite_inf), 't-o', ' font-size="24"') + '</g>';
+  cj += '<circle cx="' + cx + '" cy="' + Y(q.min) + '" r="13" fill="var(--compra)"/>' + DS.txt(cx + 26, Y(q.min) + 8, '22 · Sandy', 't-o', ' font-size="26"');
+  cj += DS.txt(cx + 110, Y(q.q3) + 8, 'Q3 ' + num(q.q3), 't-s', ' font-size="23"') + DS.txt(cx + 110, Y(q.q1) + 8, 'Q1 ' + num(q.q1), 't-s', ' font-size="23"') + DS.txt(cx - 110, Y(q.mediana) + 8, 'mediana ' + num(q.mediana), 't-s', ' text-anchor="end" font-size="23"');
+  CUR.poner('caja', cj);
+
+  /* Galería: tres miniaturas reales */
+  var g = '';
+  var h = DS.histo({ x: 40, y: 50, w: 380, h: 360, vals: C.cnt, bins: [0, 9000, 500], yt: [], xt: [0, 4500, 9000], color: 'var(--ruta)' });
+  g += h.s + DS.txt(40, 30, '¿Cómo se reparten los días?', 't-n', ' font-size="26"');
+  var est = ['Inv.', 'Prim.', 'Ver.', 'Oto.'], Yb = DS.esc(0, 0, 9000, 410, 50);
+  g += DS.txt(530, 30, '¿Cambia con la estación?', 't-n', ' font-size="26"') + '<line x1="520" x2="900" y1="410" y2="410" stroke="var(--tinta-2)" stroke-width="2"/>';
+  [1, 2, 3, 4].forEach(function (e, i) {
+    var v = C.cnt.filter(function (_, k) { return C.est[k] === e; }).sort(function (m, n) { return m - n; });
+    var qq = function (p) { return v[Math.floor(p * (v.length - 1))]; }, x = 560 + i * 92;
+    g += '<line x1="' + x + '" x2="' + x + '" y1="' + Yb(v[0]) + '" y2="' + Yb(v[v.length - 1]) + '" stroke="var(--tinta-2)" stroke-width="3"/><rect x="' + (x - 28) + '" y="' + Yb(qq(.75)) + '" width="56" height="' + (Yb(qq(.25)) - Yb(qq(.75))) + '" fill="var(--fondo-2)" stroke="var(--ruta)" stroke-width="3"/><line x1="' + (x - 28) + '" x2="' + (x + 28) + '" y1="' + Yb(qq(.5)) + '" y2="' + Yb(qq(.5)) + '" stroke="var(--ruta)" stroke-width="5"/>' + DS.txt(x, 446, est[i], 't-eje', ' text-anchor="middle" font-size="19"');
+  });
+  var d3 = DS.dispersion({ x: 1010, y: 50, w: 380, h: 360, xd: [0, 36], yd: [0, 9000], xt: [0, 18, 36], yt: [], xs: C.temp, ys: C.cnt, r: 3.5, col: function () { return 'var(--ruta)'; } });
+  g += d3.s + DS.txt(1010, 30, '¿Se mueven juntas?', 't-n', ' font-size="26"');
+  g += DS.txt(230, 540, 'Histograma', 't-s', ' text-anchor="middle" font-size="25"') + DS.txt(710, 540, 'Cajas por estación', 't-s', ' text-anchor="middle" font-size="25"') + DS.txt(1200, 540, 'Dispersión', 't-s', ' text-anchor="middle" font-size="25"');
+  CUR.poner('galeria', g);
+
+  /* Taller: estaciones con luz */
+  var T = [['map', 'Mapa', 'Tipos y unidades'], ['split', 'Separa', 'Laboral o no'], ['sigma', 'Correlaciona', 'Covarianza y r'], ['crosshair', 'Lo raro', 'RIC por mes'], ['presentation', 'Galería', 'Pitch de 3 min']], o = '';
+  o += '<text x="88" y="112" font-size="60" font-weight="800" style="fill:var(--tinta)">Mini-hackathon: cinco estaciones, 70 minutos</text><text class="t-s" x="88" y="160" font-size="28">Equipos de tres · Colab · entrega: cuaderno en GitHub y una gráfica con título de conclusión</text>';
+  var pts = T.map(function (_, i) { return [190 + i * 305, 450 + (i % 2 ? -50 : 50)]; });
+  o += luz('M0 500' + CUR.suave(pts).replace(/^M[\d. ]+/, 'L' + pts[0][0] + ' ' + pts[0][1]) + 'L1600 440', 0, 6, 'fuerte');
+  T.forEach(function (e, i) {
+    var p = pts[i];
+    o += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="76" fill="var(--fondo-2)" stroke="var(--ruta)" stroke-width="6"/>' + ic(e[0], p[0] - 40, p[1] - 40, 80, 'var(--ruta)');
+    o += DS.txt(p[0], p[1] + 128, e[1], 't-n', ' text-anchor="middle" font-size="34"') + DS.txt(p[0], p[1] + 166, e[2], 't-s', ' text-anchor="middle" font-size="25"');
+  });
+  CUR.poner('taller', o);
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

@@ -310,54 +310,63 @@
         let isAdmin = false;
         let userProgress = [];
         
+        /* Temario según la guía de aprendizaje. Cada semana declara sus recursos (r); solo se muestran las pestañas que existen.
+           Tipos: s diapositivas, g guía de laboratorio (html), p taller en PDF, m documento Markdown, n cuaderno .ipynb, v cuaderno renderizado, j juegos [[archivo, nombre]], q actividad EMI, x complementos [[archivo, nombre]]. */
+        const S = 'Semanas/Semana_';
         const syllabus = [
-            { b: "Bloque 1: Fundamentos", w: 1, t: "Introducción a la Ciencia de Datos", d: "Definición, ciclo de vida de los datos, roles.", type: "class" },
-            { b: "Bloque 1: Fundamentos", w: 2, t: "Herramientas del Ecosistema", d: "Python o R, Jupyter Notebooks.", type: "class" },
-            { b: "Bloque 1: Fundamentos", w: 3, t: "Adquisición de Datos", d: "Datos estructurados vs. no estructurados.", type: "class" },
-            { b: "Bloque 1: Fundamentos", w: 4, t: "Pandas Avanzado y Visualización de Datos", d: "Limpieza profunda, Matplotlib, Seaborn y Plotly.", type: "class" },
-            { b: "Bloque 2: Análisis Estadístico", w: 5, t: "Estadística Descriptiva", d: "Tendencia central, variabilidad, percentiles.", type: "class" },
-            { b: "Bloque 2: Análisis Estadístico", w: 6, t: "Visualización de Datos", d: "Histogramas, boxplots, dispersión.", type: "class" },
-            { b: "Bloque 2: Análisis Estadístico", w: 7, t: "Análisis Exploratorio (EDA)", d: "Hipótesis y relaciones entre variables.", type: "class" },
-            { b: "Bloque 2: Análisis Estadístico", w: 8, t: "Examen Parcial I", d: "Evaluación de preprocesamiento y descriptiva.", type: "exam" },
-            { b: "Bloque 3: Modelado Predictivo", w: 9, t: "Inferencia Estadística", d: "Población, muestra, intervalos de confianza.", type: "class" },
-            { b: "Bloque 3: Modelado Predictivo", w: 10, t: "Aprendizaje Supervisado (Regresión)", d: "Regresión lineal simple y múltiple.", type: "class" },
-            { b: "Bloque 3: Modelado Predictivo", w: 11, t: "Aprendizaje Supervisado (Clasificación)", d: "Regresión logística y árboles de decisión.", type: "class" },
-            { b: "Bloque 3: Modelado Predictivo", w: 12, t: "Evaluación de Modelos", d: "Matriz de confusión, precisión, recall, validación cruzada.", type: "class" },
-            { b: "Bloque 4: Temas Especiales", w: 13, t: "Aprendizaje No Supervisado", d: "Clustering (K-means).", type: "class" },
-            { b: "Bloque 4: Temas Especiales", w: 14, t: "Aplicaciones Especializadas", d: "Series de tiempo, NLP, análisis de redes.", type: "class" },
-            { b: "Bloque 4: Temas Especiales", w: 15, t: "Ética y Ciencia de Datos Responsable", d: "Privacidad, sesgo, transparencia.", type: "class" },
-            { b: "Bloque 4: Temas Especiales", w: 16, t: "Proyecto Final / Parcial II", d: "Evaluación integral del modelado.", type: "exam" },
+            { b: "Bloque 1: Fundamentos", w: 1, t: "Introducción a la Ciencia de Datos", d: "Definición, ciclo de vida de los datos y roles. Exposición basada en reportes y primeros pasos en GitHub.", type: "class",
+              r: { s: 'diapositivas_semana_1.html', p: 'Taller_Semana_1.pdf', m: 'Guia_Clase1.md', j: [['game_semana_1.html', 'Reto de la semana']], q: 'quiz_semana_1.html' } },
+            { b: "Bloque 1: Fundamentos", w: 2, t: "Ecosistema Python y Colab", d: "Python, pandas, NumPy y Jupyter. Programación en parejas y primer push a GitHub.", type: "class",
+              r: { s: 'diapositivas_semana_2.html', p: 'Taller_Semana_2.pdf', m: 'Guia_Clase2.md', n: 'Colab_Guiado_Semana2.ipynb', j: [['game_semana_2.html', 'Reto de la semana']], q: 'quiz_semana_2.html', x: [['Fundamentos_Python_Semana2.ipynb', 'Cuaderno: fundamentos de Python']] } },
+            { b: "Bloque 1: Fundamentos", w: 3, t: "Estructuras, control y pandas", d: "Listas, diccionarios, ciclos y DataFrames. Analista de supermercado en parejas.", type: "class",
+              r: { s: 'diapositivas_semana_3.html', p: 'Taller_Semana_3.pdf', n: 'Colab_Guiado_Semana_3.ipynb', v: 'Colab_Guiado_Semana_3_render.html', j: [['game_semana_3.html', 'Reto de la semana']], q: 'quiz_semana_3.html' } },
+            { b: "Bloque 1: Fundamentos", w: 4, t: "Limpieza y visualización con pandas", d: "Valores faltantes, atípicos, Matplotlib, Seaborn y Plotly. El explorador de datos.", type: "class",
+              r: { s: 'diapositivas_semana_4.html', p: 'Taller_Semana_4.pdf', n: 'Colab_Guiado_Semana_4.ipynb', v: 'Colab_Guiado_Semana_4_render.html', j: [['game_semana_4.html', 'Data Wrangling Factory']], q: 'quiz_semana_4.html', x: [['Fuentes_de_Datos.md', 'Catálogo de fuentes de datos']] } },
+            { b: "Bloque 2: Análisis estadístico", w: 5, t: "Estadística descriptiva", d: "Tendencia central, dispersión y posición. Storytelling inicial con medidas.", type: "class",
+              r: { s: 'diapositivas_semana_5.html', p: 'Taller_Semana_5.pdf', n: 'Colab_Guiado_Semana_5.ipynb', j: [['game_semana_5.html', 'Galton Board']], q: 'quiz_semana_5.html' } },
+            { b: "Bloque 2: Análisis estadístico", w: 6, t: "Correlación y regresión lineal simple", d: "Dispersión, covarianza, Pearson y mínimos cuadrados.", type: "class",
+              r: { s: 'diapositivas_semana_6.html', m: 'Taller_Semana_6.md', n: 'Colab_Guiado_Semana_6.ipynb', j: [['game_semana_6.html', 'Calibración OLS']], q: 'quiz_semana_6.html' } },
+            { b: "Bloque 2: Análisis estadístico", w: 7, t: "Análisis exploratorio y visualización", d: "Hipótesis, covarianza y correlación con 731 días reales de bicicletas. Mini-hackathon y galería.", type: "class",
+              r: { s: 'diapositivas_semana_7.html', g: 'Guia_Laboratorio_Semana7.html', n: 'Colab_Guiado_Semana_7.ipynb', q: 'quiz_semana_7.html' } },
+            { b: "Bloque 2: Análisis estadístico", w: 8, t: "Evaluación auténtica I", d: "Caso práctico individual con tiempo límite: preprocesamiento, exploración y descriptiva. 20 %.", type: "exam",
+              r: { g: 'Guia_Laboratorio_Semana8.html' } },
+            { b: "Bloque 3: Modelado predictivo", w: 9, t: "Inferencia estadística", d: "Población, muestra, prueba t, intervalo bootstrap y valor p. Debate estructurado.", type: "class",
+              r: { s: 'diapositivas_semana_9.html', g: 'Guia_Laboratorio_Semana9.html', n: 'Colab_Guiado_Semana_9.ipynb', q: 'quiz_semana_9.html', x: [['app_inferencia.html', 'Aplicación interactiva de inferencia']] } },
+            { b: "Bloque 3: Modelado predictivo", w: 10, t: "Aprendizaje supervisado: regresión", d: "Regresión simple y múltiple, residuos y validación en el tiempo. Simulación de demanda.", type: "class",
+              r: { s: 'diapositivas_semana_10.html', g: 'Guia_Laboratorio_Semana10.html', n: 'Colab_Guiado_Semana_10.ipynb', j: [['game_descenso_gradiente.html', 'Descenso de gradiente']], q: 'quiz_semana_10.html' } },
+            { b: "Bloque 3: Modelado predictivo", w: 11, t: "Aprendizaje supervisado: clasificación", d: "Regresión logística, árboles de decisión y matriz de confusión. Reto Salva al cliente.", type: "class",
+              r: { s: 'diapositivas_semana_11.html', g: 'Guia_Laboratorio_Semana11.html', n: 'Colab_Guiado_Semana_11.ipynb', j: [['game_regresion_logistica.html', 'Frontera logística'], ['game_arbol_decision.html', 'Árbol de decisión']], q: 'quiz_semana_11.html' } },
+            { b: "Bloque 3: Modelado predictivo", w: 12, t: "Evaluación de modelos", d: "Línea base, validación cruzada, sesgo y varianza, y la trampa de los duplicados. Beat the baseline.", type: "class",
+              r: { s: 'diapositivas_semana_12.html', g: 'Guia_Laboratorio_Semana12.html', n: 'Colab_Guiado_Semana_12.ipynb', q: 'quiz_semana_12.html' } },
+            { b: "Bloque 4: Temas especiales", w: 13, t: "Aprendizaje no supervisado", d: "Distancias de Minkowski, K-means, siluetas, Ward, DBSCAN y validación. Segmentación de clientes.", type: "class",
+              r: { s: 'diapositivas_semana_13.html', g: 'Guia_Laboratorio_Semana13.html', n: 'Colab_Guiado_Semana_13.ipynb', j: [['game_kmeans.html', 'Cazador de centroides']], q: 'quiz_semana_13.html' } },
+            { b: "Bloque 4: Temas especiales", w: 14, t: "Aplicaciones especializadas", d: "Texto, series de tiempo y redes. Cápsulas de conocimiento en aula invertida.", type: "class",
+              r: { s: 'diapositivas_semana_14.html', g: 'Guia_Laboratorio_Semana14.html', n: 'Colab_Guiado_Semana_14.ipynb', q: 'quiz_semana_14.html' } },
+            { b: "Bloque 4: Temas especiales", w: 15, t: "Ética y ciencia de datos responsable", d: "Sesgo, variables sustitutas, privacidad y reidentificación. Roleplay con la Moral Machine.", type: "class",
+              r: { s: 'diapositivas_semana_15.html', g: 'Guia_Laboratorio_Semana15.html', n: 'Colab_Guiado_Semana_15.ipynb', q: 'quiz_semana_15.html' } },
+            { b: "Bloque 4: Temas especiales", w: 16, t: "Demo Day del proyecto integrador", d: "Pitch tipo Shark Tank con rúbrica pública y evaluación por pares. 40 %.", type: "exam",
+              r: { g: 'Guia_Laboratorio_Semana16.html' } },
         ];
+        const REPO = 'https://github.com/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/';
 
         function renderSidebar() {
             const menuContainer = document.getElementById('courseMenu');
             let html = '';
             let currentBlock = '';
-
             syllabus.forEach((item, index) => {
                 if (item.b !== currentBlock) {
                     html += `<div class="mt-6 mb-2 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase px-3 tracking-wider">${item.b}</div>`;
                     currentBlock = item.b;
                 }
-                
-                const isLocked = false; // Auth check removed temporarily
-                
-                let icon = item.type === 'exam' ? 'fa-pen-nib text-secondary' : 'fa-play-circle text-primary dark:text-blue-400';
-                if (isLocked) icon = 'fa-lock text-gray-300 dark:text-gray-600';
-                
-                const bgHover = isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50 dark:hover:bg-slate-800 cursor-pointer';
-                const borderActive = 'border-l-4 border-transparent hover:border-primary';
-                
+                const icon = item.type === 'exam' ? 'fa-pen-nib text-secondary' : 'fa-play-circle text-primary dark:text-blue-400';
                 html += `
-                    <button onclick="${isLocked ? `showCustomAlert('Debes iniciar sesión para acceder a este contenido.<br><br><small>💡 Tip: Si iniciar con Google falla, prueba con correo y contraseña.</small>', 'warning')` : `loadContent(${index})`}" 
-                            class="w-full text-left p-3 rounded-r-lg ${borderActive} ${bgHover} transition-all flex items-center gap-3 mb-1 group">
+                    <button onclick="loadContent(${index})" class="w-full text-left p-3 rounded-r-lg border-l-4 border-transparent hover:border-primary hover:bg-blue-50 dark:hover:bg-slate-800 cursor-pointer transition-all flex items-center gap-3 mb-1 group">
                         <i class="fas ${icon} text-lg opacity-80 group-hover:opacity-100"></i>
                         <div class="flex-1">
                             <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">Semana ${item.w}:</div>
                             <div class="text-xs text-gray-500 line-clamp-1">${item.t}</div>
                         </div>
-                    </button>
-                `;
+                    </button>`;
             });
             menuContainer.innerHTML = html;
         }
@@ -377,137 +386,65 @@
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
             document.getElementById('btn-' + tabId).classList.add('active');
             document.getElementById('content-' + tabId).classList.add('active');
+        };
+
+        function marco(src, alto) {
+            return `<div class="w-full ${alto} bg-gray-50 dark:bg-slate-900 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700"><iframe src="${src}" width="100%" height="100%" frameborder="0" loading="lazy"></iframe></div>`;
+        }
+        function encabezado(titulo, enlace, texto) {
+            return `<div class="flex justify-between items-center mb-4 flex-wrap gap-3"><h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">${titulo}</h3>${enlace ? `<a href="${enlace}" target="_blank" rel="noopener" class="text-sm text-primary dark:text-blue-300 hover:underline font-semibold"><i class="fas fa-external-link-alt mr-1"></i> ${texto}</a>` : ''}</div>`;
         }
 
         window.loadContent = function(index) {
-            const data = syllabus[index];
+            const data = syllabus[index], r = data.r || {}, base = S + data.w + '/';
             const mainView = document.getElementById('mainContent');
-            
             let btnCompletadoHTML = '';
             if (currentUser) {
-                if (userProgress.includes(data.w)) {
-                    btnCompletadoHTML = `<button disabled class="bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm shadow-sm opacity-80 border border-green-200"><i class="fas fa-check-circle mr-2"></i>Completada</button>`;
-                } else {
-                    btnCompletadoHTML = `<button onclick="markLessonCompleted(${data.w}); this.outerHTML='<button disabled class=\\'bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm shadow-sm opacity-80 border border-green-200\\'><i class=\\'fas fa-check-circle mr-2\\'></i>Completada</button>'" class="bg-primary text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-blue-900 transition shadow-sm"><i class="fas fa-check mr-2"></i>Marcar como Completada</button>`;
-                }
+                btnCompletadoHTML = userProgress.includes(data.w)
+                    ? `<button disabled class="bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm shadow-sm opacity-80 border border-green-200"><i class="fas fa-check-circle mr-2"></i>Completada</button>`
+                    : `<button onclick="markLessonCompleted(${data.w}); this.outerHTML='<button disabled class=\\'bg-green-100 text-green-700 px-4 py-2 rounded-md font-bold text-sm\\'><i class=\\'fas fa-check-circle mr-2\\'></i>Completada</button>'" class="bg-primary text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-blue-900 transition shadow-sm"><i class="fas fa-check mr-2"></i>Marcar como completada</button>`;
             }
-
-            if (data.type === 'class') {
-                mainView.innerHTML = `
-                    <div class="h-full flex flex-col">
-                        <div class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 shadow-sm z-10 flex justify-between items-center flex-wrap gap-4">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-secondary mb-1 block">Semana ${data.w}</span>
-                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">${data.t}</h2>
-                            </div>
-                            <div>
-                                ${btnCompletadoHTML}
-                            </div>
-                        </div>
-
-                        <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 pb-20">
-                            <div class="mb-6">
-                                <p class="text-gray-600 dark:text-gray-400">${data.d}</p>
-                            </div>
-
-                        <!-- TABS NAVIGATION (Coursera Style) -->
-                        <div class="flex border-b border-gray-200 dark:border-slate-700 mb-6 overflow-x-auto hide-scroll">
-                            <button id="btn-video" onclick="switchTab('video')" class="tab-btn active px-6 py-3 whitespace-nowrap"><i class="fas fa-video mr-2"></i>Video Lecture</button>
-                            <button id="btn-theory" onclick="switchTab('theory')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-chalkboard-teacher mr-2"></i>Teoría e Interactividad</button>
-                            <button id="btn-lab" onclick="switchTab('lab')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fab fa-python mr-2"></i>Laboratorio Jupyter</button>
-                            <button id="btn-taller" onclick="switchTab('taller')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-file-pdf mr-2"></i>Taller Práctico</button>
-                            <button id="btn-game" onclick="switchTab('game')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-gamepad mr-2"></i>Reto Gamificado</button>
-                            <button id="btn-quiz" onclick="switchTab('quiz')" class="tab-btn px-6 py-3 whitespace-nowrap"><i class="fas fa-tasks mr-2"></i>Evaluación</button>
-                        </div>
-
-                        <div class="card rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-800 border-x border-b border-gray-200 dark:border-slate-700">
-                            
-                            <!-- TAB 1: VIDEO -->
-                            <div id="content-video" class="tab-content active p-6">
-                                <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">Grabación Magistral</h3>
-                                <div class="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
-                                    <i class="fas fa-play-circle text-6xl text-white/40 hover:text-white/80 cursor-pointer transition"></i>
-                                </div>
-                            </div>
-
-                            <!-- TAB 2: TEORÍA -->
-                            <div id="content-theory" class="tab-content p-6">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">Diapositivas y Material Teórico</h3>
-                                    <a href="Semanas/Semana_${data.w}/diapositivas_semana_${data.w}.html" target="_blank" class="text-sm text-primary hover:underline font-semibold"><i class="fas fa-external-link-alt mr-1"></i> Pantalla Completa</a>
-                                </div>
-                                <div class="w-full aspect-[16/9] bg-gray-50 dark:bg-slate-900 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
-                                    <iframe src="Semanas/Semana_${data.w}/diapositivas_semana_${data.w}.html" width="100%" height="100%" frameborder="0"></iframe>
-                                </div>
-                            </div>
-
-                            <!-- TAB 3: LABORATORIO (JUPYTER NATIVO) -->
-                            <div id="content-lab" class="tab-content p-0">
-                                <div class="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-                                    <div>
-                                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200"><i class="fas fa-flask text-secondary mr-2"></i>Laboratorio Práctico</h3>
-                                        <p class="text-sm text-gray-500 mt-1">Renderizado nativo del Notebook para fácil lectura.</p>
-                                    </div>
-                                    <a href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_${data.w}/Colab_Guiado_Semana_${data.w}.ipynb" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-blue-700 transition flex items-center gap-2">
-                                        <img src="https://colab.research.google.com/img/colab_favicon_256px.png" class="w-4 h-4 bg-white rounded-full"> Abrir en Colab
-                                    </a>
-                                </div>
-                                <!-- Render de Jupyter Notebook -->
-                                <div class="w-full h-[800px] overflow-y-auto bg-white">
-                                    <iframe src="Semanas/Semana_${data.w}/Colab_Guiado_Semana_${data.w}_render.html" width="100%" height="100%" frameborder="0" style="background: white;" onerror="this.outerHTML='<div class=\\'p-10 text-center text-gray-500\\'><i class=\\'fas fa-tools text-4xl mb-4\\'></i><p>El cuaderno renderizado no está disponible para esta semana. Usa el botón de Colab.</p></div>'"></iframe>
-                                </div>
-                            </div>
-
-                            <!-- TAB: TALLER PRÁCTICO -->
-                            <div id="content-taller" class="tab-content p-0">
-                                <div class="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-                                    <div>
-                                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200"><i class="fas fa-file-pdf text-red-600 mr-2"></i>Taller Práctico (Retos Autónomos)</h3>
-                                        <p class="text-sm text-gray-500 mt-1">Guía PDF con ejercicios para resolución independiente.</p>
-                                    </div>
-                                    <a href="Semanas/Semana_${data.w}/Taller_Semana_${data.w}.pdf" target="_blank" class="bg-primary text-white px-4 py-2 rounded-md font-semibold shadow-sm hover:bg-blue-900 transition flex items-center gap-2">
-                                        <i class="fas fa-download"></i> Descargar PDF
-                                    </a>
-                                </div>
-                                <div class="w-full h-[800px] bg-slate-100">
-                                    <iframe src="Semanas/Semana_${data.w}/Taller_Semana_${data.w}.pdf" width="100%" height="100%" frameborder="0" onerror="this.outerHTML='<div class=\\'p-10 text-center text-gray-500\\'><i class=\\'fas fa-tools text-4xl mb-4\\'></i><p>El Taller en PDF aún no está disponible para esta semana.</p></div>'"></iframe>
-                                </div>
-                            </div>
-
-                            <!-- TAB 4: RETO GAMIFICADO -->
-                            <div id="content-game" class="tab-content p-0">
-                                <div class="w-full h-[700px] bg-slate-900">
-                                    <iframe src="Semanas/Semana_${data.w}/game_semana_${data.w}.html" width="100%" height="100%" frameborder="0" onerror="this.outerHTML='<div class=\\'p-20 text-center text-gray-500 bg-white\\'><i class=\\'fas fa-tools text-6xl mb-6\\'></i><h3 class=\\'text-2xl font-bold\\'>Reto en Construcción</h3><p>El juego interactivo para esta clase aún no ha sido publicado.</p></div>'"></iframe>
-                                </div>
-                            </div>
-
-                            <!-- TAB 5: QUIZ -->
-                            <div id="content-quiz" class="tab-content p-0">
-                                <div class="w-full h-[600px] bg-gray-50 dark:bg-slate-900">
-                                    <iframe src="Semanas/Semana_${data.w}/quiz_semana_${data.w}.html" width="100%" height="100%" frameborder="0"></iframe>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                `;
-            } else {
-                // EXAMEN
-                mainView.innerHTML = `
-                    <div class="max-w-4xl mx-auto px-4 py-16">
-                        <div class="card p-10 rounded-xl text-center border-t-4 border-secondary">
-                            <i class="fas fa-file-signature text-6xl text-secondary mb-6"></i>
-                            <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">${data.t}</h2>
-                            <p class="text-gray-600 dark:text-gray-400 mb-8">${data.d}</p>
-                            <button class="bg-secondary text-white px-8 py-3 rounded-md font-bold hover:bg-orange-600 transition shadow-md">Iniciar Evaluación Controlada</button>
-                        </div>
-                    </div>
-                `;
+            const tabs = [];
+            if (r.s) tabs.push(['theory', 'fa-chalkboard-teacher', 'Presentación', encabezado('Presentación de la semana', base + r.s, 'Pantalla completa') + marco(base + r.s, 'aspect-[16/9]') + '<p class="text-xs text-gray-500 mt-2">Flechas para avanzar, F pantalla completa, L tema claro u oscuro.</p>']);
+            if (r.g || r.p || r.m) {
+                let c = '';
+                if (r.g) c += encabezado(data.type === 'exam' ? 'Instrucciones y rúbrica' : 'Guía de laboratorio', base + r.g, 'Abrir en otra pestaña') + marco(base + r.g, 'h-[800px]');
+                if (r.p) c += encabezado('Taller en PDF', base + r.p, 'Descargar PDF') + (r.g ? '' : marco(base + r.p, 'h-[800px]'));
+                if (r.m) c += encabezado('Guía en Markdown', REPO + base + r.m, 'Ver en GitHub');
+                tabs.push(['lab', 'fa-flask', data.type === 'exam' ? 'Instrucciones' : 'Guía de laboratorio', c]);
             }
-            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
+            if (r.n || r.v) {
+                let c = encabezado('Cuaderno guiado', r.n ? 'https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/' + base + r.n : null, 'Abrir en Colab');
+                c += r.v ? marco(base + r.v, 'h-[800px] bg-white') : '<p class="text-gray-600 dark:text-gray-400">Ábralo en Colab: los datos se leen solos desde el repositorio y cada resultado coincide con los puntos de control de la guía.</p>';
+                tabs.push(['nb', 'fab fa-python', 'Cuaderno', c]);
+            }
+            if (r.j) {
+                let c = '';
+                r.j.forEach(j => { c += encabezado(j[1], base + j[0], 'Pantalla completa') + marco(base + j[0], 'h-[700px] mb-8'); });
+                tabs.push(['game', 'fa-gamepad', 'Reto gamificado', c]);
+            }
+            if (r.q) tabs.push(['quiz', 'fa-language', 'Actividad EMI', encabezado('English immersion', base + r.q, 'Abrir en otra pestaña') + marco(base + r.q, 'h-[640px]')]);
+            if (r.x) tabs.push(['extra', 'fa-layer-group', 'Complementos', '<ul class="space-y-3">' + r.x.map(x => `<li><a class="text-primary dark:text-blue-300 font-semibold hover:underline" target="_blank" rel="noopener" href="${x[0].endsWith('.md') || x[0].endsWith('.ipynb') ? REPO + base + x[0] : base + x[0]}"><i class="fas fa-arrow-up-right-from-square mr-2"></i>${x[1]}</a></li>`).join('') + '</ul>']);
+            const botones = tabs.map((t, i) => `<button id="btn-${t[0]}" onclick="switchTab('${t[0]}')" class="tab-btn ${i ? '' : 'active'} px-6 py-3 whitespace-nowrap"><i class="${t[1].startsWith('fab') ? t[1] : 'fas ' + t[1]} mr-2"></i>${t[2]}</button>`).join('');
+            const paneles = tabs.map((t, i) => `<div id="content-${t[0]}" class="tab-content ${i ? '' : 'active'} p-6">${t[3]}</div>`).join('');
+            mainView.innerHTML = `
+                <div class="h-full flex flex-col">
+                    <div class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 shadow-sm z-10 flex justify-between items-center flex-wrap gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-secondary mb-1 block">Semana ${data.w}${data.type === 'exam' ? ' · Evaluación' : ''}</span>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">${data.t}</h2>
+                        </div>
+                        <div>${btnCompletadoHTML}</div>
+                    </div>
+                    <div class="max-w-6xl w-full mx-auto px-4 md:px-8 py-8 pb-20">
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">${data.d}</p>
+                        <div class="flex border-b border-gray-200 dark:border-slate-700 mb-6 overflow-x-auto hide-scroll">${botones}</div>
+                        <div class="card rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-800 border-x border-b border-gray-200 dark:border-slate-700">${paneles}</div>
+                    </div>
+                </div>`;
+            if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
         };
 
         // Custom Alert Logic

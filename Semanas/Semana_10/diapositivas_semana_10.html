@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 10 · Sala de pronóstico | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: sala de pronóstico. Isobaras de fondo, el modelo es el pronóstico y el residuo es la sorpresa del día. */
+  :root { --fondo: #04181a; --fondo-2: #0b2a2d; --tinta: #edf7f5; --tinta-2: #98b9b4; --regla: rgba(152,185,180,.24); --punto: #3f7f7a; --compra: #ff7a1f; --acento-texto: #ffa263; --iso: #7be0c3; }
+  :root[data-tema="claro"] { --fondo: #f3f5ef; --fondo-2: #e2e8df; --tinta: #0b2a2d; --tinta-2: #4a6663; --regla: rgba(11,42,45,.2); --punto: #86aaa5; --compra: #e85c0b; --acento-texto: #b94504; --iso: #0d806a; }
+  .rot { font: 700 22px Consolas, monospace; letter-spacing: .12em; color: var(--iso); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-i { fill: var(--iso); font-weight: 800; }
+  .boletin { background: var(--fondo-2); padding: 34px 40px; border-left: 8px solid var(--iso); }
+  .ecuacion { font: 700 40px Consolas, monospace; color: var(--tinta); background: var(--fondo-2); padding: 22px 28px; border-left: 6px solid var(--compra); }
+  .ecuacion .c { color: var(--acento-texto); }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--iso); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--iso); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .iso { animation: ondula 9s ease-in-out infinite alternate; }
+  @keyframes ondula { to { transform: translate(-40px, 18px); } }
+  @media (prefers-reduced-motion: reduce) { .iso { animation: none; } }
+</style>
+</head>
+<body data-cine="grua">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:80px;width:1100px">
+    <p class="rot">Sala de pronóstico · Semana 10</p>
+    <h1 style="font-size:104px;margin-top:16px;line-height:1.02">Predecir es apostar <span class="acento">con método.</span></h1>
+    <p class="sec" style="font-size:30px;margin-top:22px;max-width:900px">Regresión lineal simple y múltiple para anticipar la demanda de bicicletas, y los residuos que el modelo no vio venir.</p>
+    <p class="sec" style="font-size:25px;margin-top:18px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Abajo: la demanda real de los 731 días (línea clara) y lo que predice el modelo múltiple de hoy (línea naranja). Casi siempre van juntas. Donde se separan está la historia: los residuos.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Boletín de hoy</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
+  <aside class="notas">La simulación de negocio es la actividad central de la guía: cada grupo es el equipo de operaciones y debe decidir cuántas bicicletas tener listas con un pronóstico y su margen de error.</aside>
+</section>
+
+<!-- 3 Objetivo -->
+<section class="esc">
+  <div class="boletin" style="position:absolute;left:170px;top:110px;width:1260px">
+    <p class="rot">Objetivo de la semana</p>
+    <h2 style="font-size:56px;margin:16px 0 30px">Construir un modelo de regresión, leer sus coeficientes y saber cuándo su pronóstico no es confiable.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="chart-line" style="font-size:64px;color:var(--iso)"></i><p style="font-size:33px">Ajustas una regresión simple y una múltiple con scikit-learn.</p>
+      <i class="ico" data-i="sliders-horizontal" style="font-size:64px;color:var(--iso)"></i><p style="font-size:33px">Interpretas cada coeficiente "con lo demás igual".</p>
+      <i class="ico" data-i="crosshair" style="font-size:64px;color:var(--iso)"></i><p style="font-size:33px">Analizas residuos y validas respetando el orden del tiempo.</p>
+    </div>
+  </div>
+  <aside class="notas">Contenido de la semana 10 en la guía: aprendizaje supervisado, regresión lineal simple y múltiple, análisis de residuos, scikit-learn. Entrega tipo reto (40 %).</aside>
+</section>
+
+<!-- 4 Apuesta y regresión simple -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:560px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Apuesta</p>
+    <h2 style="font-size:52px;line-height:1.06">Mañana hará 25 °C. ¿Cuántas bicicletas alistamos?</h2>
+    <div class="ecuacion paso">ŷ = <span class="c">1.215</span> + <span class="c">162</span>·°C</div>
+    <p class="paso" style="font-size:30px">A 25 °C: <b class="acento">5.264</b> bicicletas. Cada grado suma 162.</p>
+    <p class="paso" style="font-size:30px">Pero R² = <b class="acento">0,394</b> y el error medio es de <b class="acento">1.246</b> al día.</p>
+    <p class="paso sec" style="font-size:25px">La temperatura sola explica menos de la mitad de la variación.</p>
+  </div>
+  <svg id="simple" class="diagrama" viewBox="0 0 900 780" style="position:absolute;left:660px;top:50px;width:900px;height:780px" role="img" aria-label="Recta de regresión de alquileres sobre temperatura"></svg>
+  <aside class="notas">Pendiente 162,0 e intercepto 1.214,6 con mínimos cuadrados sobre los 731 días. El intercepto (0 °C) no tiene sentido práctico: casi no hay días tan fríos. MAE = error absoluto medio.</aside>
+</section>
+
+<!-- 5 Múltiple -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Modelo múltiple · 10 variables</p><h2 style="font-size:50px;margin-top:6px">Con clima, calendario y año, el error baja de 1.246 a 600 bicicletas</h2></div>
+  <svg id="coef" class="diagrama" viewBox="0 0 1424 640" style="position:absolute;left:88px;top:180px;width:1424px;height:640px" role="img" aria-label="Coeficientes del modelo múltiple en bicicletas por día"></svg>
+  <aside class="notas">R² = 0,82; MAE = 600. Cada barra: cuánto cambia la demanda diaria cuando esa variable sube en una unidad y las demás no cambian. Estación y clima se comparan contra invierno y día despejado. El coeficiente de 2012 (+2.013) es el crecimiento del sistema, no un efecto del calendario. Humedad en puntos porcentuales, viento en km/h.</aside>
+</section>
+
+<!-- 6 Curva -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Lo que la recta no ve</p>
+    <h2 style="font-size:54px;line-height:1.06">El calor ayuda hasta 27,5 °C; después estorba</h2>
+    <p class="paso" style="font-size:30px">Agregar temperatura al cuadrado sube R² de <b>0,82</b> a <b class="acento">0,849</b>.</p>
+    <p class="paso" style="font-size:30px">La curva tiene su máximo en <b class="acento">27,5 °C</b>, como vimos por rangos en la semana 7.</p>
+    <p class="paso sec" style="font-size:26px">"Lineal" se refiere a los coeficientes, no a la forma: una regresión lineal puede tener curvas.</p>
+  </div>
+  <svg id="curva" class="diagrama" viewBox="0 0 720 720" style="position:absolute;left:830px;top:90px;width:720px;height:720px" role="img" aria-label="Efecto de la temperatura en forma de U invertida con máximo en 27,5 grados"></svg>
+  <aside class="notas">Coeficientes del modelo con término cuadrático: 423,5·T − 7,7·T². Máximo en −b/(2a) = 27,5 °C. Se dibuja solo el efecto de la temperatura, centrado en su valor a 20 °C, con el resto constante.</aside>
+</section>
+
+<!-- 7 Residuos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Las sorpresas del pronóstico</p><h2 style="font-size:50px;margin-top:6px">Los peores residuos tienen nombre propio</h2></div>
+  <svg id="residuos" class="diagrama" viewBox="0 0 1500 640" style="position:absolute;left:50px;top:180px;width:1500px;height:640px" role="img" aria-label="Residuos del modelo múltiple en el tiempo, con los cinco mayores señalados"></svg>
+  <aside class="notas">Residuo = real − predicho. 30 oct 2012: −3.676 (Sandy). 22 nov 2012: −3.482 (Acción de Gracias). 29 oct 2012: −3.414 (Sandy). 17 mar 2012: +3.412, un sábado con mucha más demanda de la esperada: pida que lo investiguen antes de afirmar la causa. 25 nov 2012: −2.879. Ninguna variable del modelo sabe de huracanes ni de festivos largos.</aside>
+</section>
+
+<!-- 8 Trampa del tiempo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Validación honesta</p><h2 style="font-size:50px;margin-top:6px">Entrenar con 2011 y predecir 2012 da R² negativo: peor que adivinar la media</h2></div>
+  <svg id="tiempo" class="diagrama" viewBox="0 0 1500 460" style="position:absolute;left:50px;top:170px;width:1500px;height:460px" role="img" aria-label="Pronóstico de 2012 entrenado solo con 2011: queda muy por debajo de la demanda real"></svg>
+  <div style="position:absolute;left:88px;top:660px;width:1424px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+    <div class="boletin paso" style="padding:20px 24px"><b style="font-size:27px">Al azar</b><p style="font-size:24px;color:var(--tinta-2)">R² 0,83 · error 617. Mezcla el futuro en el entrenamiento.</p></div>
+    <div class="boletin paso" style="padding:20px 24px;border-left-color:var(--compra)"><b style="font-size:27px">2011 → 2012, sin año</b><p style="font-size:24px;color:var(--tinta-2)">R² −0,64 · se queda corto 2.047 al día.</p></div>
+    <div class="boletin paso" style="padding:20px 24px"><b style="font-size:27px">Corte en septiembre de 2012</b><p style="font-size:24px;color:var(--tinta-2)">R² 0,60 · error 932 en los últimos 122 días.</p></div>
+  </div>
+  <aside class="notas">Sin la variable año, el modelo de 2011 no sabe que el sistema creció 65 %. Con corte temporal y con año, el error real esperable es 932, no 617. El número que se le reporta a la empresa es el de la validación que respeta el tiempo.</aside>
+</section>
+
+<!-- 9 Simulación de negocio -->
+<section class="esc">
+  <div class="boletin" style="position:absolute;left:150px;top:80px;width:1300px">
+    <p class="rot">Simulación de negocio</p>
+    <h2 style="font-size:52px;margin:12px 0 26px">Ustedes son operaciones: decidan la flota del sábado</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico paso" data-i="sun" style="font-size:60px;color:var(--iso)"></i><p class="paso" style="font-size:31px">Pronóstico: 24 °C, humedad 60 %, viento 12 km/h, despejado, verano, 2012, no laboral.</p>
+      <i class="ico paso" data-i="calculator" style="font-size:60px;color:var(--iso)"></i><p class="paso" style="font-size:31px">Calculen ŷ con su modelo y un margen con el error de la validación temporal.</p>
+      <i class="ico paso" data-i="truck" style="font-size:60px;color:var(--iso)"></i><p class="paso" style="font-size:31px">Decidan cuántas bicicletas alistar. Faltar cuesta más que sobrar: ¿cómo cambia su número?</p>
+    </div>
+    <p class="paso" style="font-size:26px;margin-top:24px;color:var(--tinta-2)">Antes, en el reto gamificado, encuentren la recta a mano bajando por el error: así trabaja el descenso de gradiente.</p>
+  </div>
+  <aside class="notas">El caso del sábado está en la guía con su punto de control. El juego de descenso de gradiente es el de la pestaña "Reto gamificado" de esta semana. Los costos de faltar y sobrar son supuestos del ejercicio y se declaran.</aside>
+</section>
+
+<!-- 10 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="boletin" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · read the documentation</p>
+    <p style="font-size:44px;line-height:1.2;font-weight:700;margin:22px 0 18px">“LinearRegression fits a linear model with coefficients w = (w1, …, wp) to minimize the <span class="acento">residual sum of squares</span> between the observed targets in the dataset, and the targets predicted by the linear approximation.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">scikit-learn documentation, sklearn.linear_model.LinearRegression</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--iso)"></i><p class="paso" style="font-size:32px">What is a residual? Give the residual of 29 October 2012 in one sentence.</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--iso)"></i><p class="paso" style="font-size:32px">Why “squares”? What happens to big errors when you square them?</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--iso)"></i><p class="paso" style="font-size:32px">Explain one coefficient: “Holding everything else constant, one more degree…”</p>
+    </div>
+  </div>
+  <aside class="notas">Cita textual de la documentación oficial de scikit-learn, verificada en la página estable. Residuo del 29 oct 2012: 22 − 3.436 = −3.414.</aside>
+</section>
+
+<!-- 11 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios del taller"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana10.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
+  <aside class="notas">Andamiaje progresivo, como pide la guía: cada ejercicio agrega una pieza al modelo del anterior. Punto de control clave: R² 0,82 del múltiple y −0,64 en la validación 2011 → 2012.</aside>
+</section>
+
+<!-- 12 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Términos del boletín</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="target"></i><b>Variable objetivo</b><span>Lo que se quiere predecir: aquí, cnt.</span></div>
+      <div><i class="ico" data-i="sliders-horizontal"></i><b>Coeficiente</b><span>Cambio en ŷ por unidad, con lo demás igual.</span></div>
+      <div><i class="ico" data-i="crosshair"></i><b>Residuo</b><span>Real menos predicho.</span></div>
+      <div><i class="ico" data-i="percent"></i><b>R²</b><span>Parte de la variación que el modelo explica.</span></div>
+      <div><i class="ico" data-i="ruler"></i><b>MAE</b><span>Error absoluto medio, en bicicletas.</span></div>
+      <div><i class="ico" data-i="toggle-left"></i><b>Variable ficticia</b><span>0 o 1 por categoría; una queda de referencia.</span></div>
+      <div><i class="ico" data-i="spline"></i><b>Término cuadrático</b><span>x² para que el modelo pueda curvarse.</span></div>
+      <div><i class="ico" data-i="split"></i><b>Entrenamiento y prueba</b><span>Se ajusta con unos datos y se evalúa con otros.</span></div>
+      <div><i class="ico" data-i="history"></i><b>Validación temporal</b><span>Se entrena con el pasado y se prueba con el futuro.</span></div>
+      <div><i class="ico" data-i="trending-down"></i><b>Descenso de gradiente</b><span>Busca los coeficientes bajando por el error.</span></div>
+    </div>
+  </div>
+  <aside class="notas">"Variable ficticia" es la traducción usual de dummy variable.</aside>
+</section>
+
+<!-- 13 Cierre -->
+<section class="esc">
+  <div class="boletin" style="position:absolute;left:180px;top:90px;width:1240px;border-left-color:var(--compra)">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para un pronóstico que se pueda usar</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="sliders-horizontal" style="font-size:62px;color:var(--iso)"></i><p class="paso" style="font-size:35px"><b>Un coeficiente es una comparación,</b> no una causa: "con lo demás igual".</p>
+      <i class="ico paso" data-i="crosshair" style="font-size:62px;color:var(--iso)"></i><p class="paso" style="font-size:35px"><b>Mira los residuos:</b> ahí están los huracanes y los festivos.</p>
+      <i class="ico paso" data-i="history" style="font-size:62px;color:var(--iso)"></i><p class="paso" style="font-size:35px"><b>Valida como se va a usar:</b> con el pasado se predice el futuro, no al revés.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 11: ya no un número, sino una clase. ¿Este cliente se va o se queda?</p>
+  </div>
+  <aside class="notas">Pregunta de salida: ¿qué número de error le reportarían a la gerente, 617 o 932? ¿Por qué?</aside>
+</section>
+
+<!-- 14 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Archivo del boletín</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Fanaee-T, H. (2013). <em>Bike Sharing</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a></p>
+    <p>Fanaee-T, H. y Gama, J. (2013). Event labeling combining ensemble detectors and background knowledge. <em>Progress in Artificial Intelligence</em>. <a href="https://doi.org/10.1007/s13748-013-0040-3" target="_blank" rel="noopener">doi:10.1007/s13748-013-0040-3</a></p>
+    <p>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2.ª ed.), capítulo 3. Springer. Bibliografía base del syllabus.</p>
+    <p>scikit-learn. <em>LinearRegression</em>. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
+    <p>scikit-learn. <em>TimeSeriesSplit</em>. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s10.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  /* Portada: isobaras y serie real contra predicha */
+  var p = '<g class="iso" opacity=".35">';
+  for (var k = 0; k < 9; k++) p += '<path d="M-60 ' + (120 + k * 70) + 'C300 ' + (40 + k * 80) + ' 700 ' + (220 + k * 60) + ' 1000 ' + (130 + k * 72) + 'S1500 ' + (60 + k * 75) + ' 1700 ' + (160 + k * 66) + '" fill="none" stroke="var(--iso)" stroke-width="1.6"/>';
+  p += '</g>';
+  var l1 = DS.linea({ x: 60, y: 560, w: 1480, h: 300, xd: [0, 730], yd: [0, 9000], ys: C.cnt, color: 'var(--iso)', grosor: 2 });
+  var l2 = DS.linea({ x: 60, y: 560, w: 1480, h: 300, xd: [0, 730], yd: [0, 9000], ys: C.pred, color: 'var(--compra)', grosor: 2.4 });
+  p += l1.s.replace(/<line[^>]*\/>|<text[^>]*>[^<]*<\/text>/g, '') + l2.s.replace(/<line[^>]*\/>|<text[^>]*>[^<]*<\/text>/g, '');
+  CUR.poner('portada', p);
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apuesta', 'dice-5'], ['7:10', 'Recta', 'chart-line'], ['7:35', 'Múltiple', 'sliders-horizontal'], ['8:05', 'Pausa', 'coffee'], ['8:20', 'English', 'languages'], ['8:30', 'Taller', 'flask-conical'], ['9:30', 'Simulación', 'truck'], ['9:55', 'Cierre', 'flag']], 5, { color: 'var(--iso)' }));
+  /* Regresión simple */
+  var sm = S.simple, d = DS.dispersion({ x: 110, y: 40, w: 740, h: 600, xd: [0, 36], yd: [0, 9000], xt: [0, 10, 20, 30], yt: [0, 3000, 6000, 9000], xs: C.temp, ys: C.cnt, r: 5, op: .55, xl: 'Temperatura (°C)', yl: 'Alquileres por día' });
+  d.s += '<g class="paso-capa"><line x1="' + d.X(2) + '" y1="' + d.Y(sm.intercepto + sm.pendiente * 2) + '" x2="' + d.X(35.5) + '" y2="' + d.Y(sm.intercepto + sm.pendiente * 35.5) + '" stroke="var(--compra)" stroke-width="6"/></g>';
+  d.s += '<g class="paso"><line x1="' + d.X(25) + '" x2="' + d.X(25) + '" y1="' + d.Y(0) + '" y2="' + d.Y(sm.intercepto + sm.pendiente * 25) + '" stroke="var(--acento-texto)" stroke-width="3" stroke-dasharray="8 8"/><circle cx="' + d.X(25) + '" cy="' + d.Y(sm.intercepto + sm.pendiente * 25) + '" r="12" fill="var(--compra)"/>' + DS.txt(d.X(25) + 18, d.Y(sm.intercepto + sm.pendiente * 25) + 62, '5.264', 't-o', ' font-size="34"') + '</g>';
+  CUR.poner('simple', d.s);
+  /* Coeficientes */
+  var co = S.multiple.coef, orden = ['Año 2012', 'Otoño', 'Primavera', 'Verano', 'Día laboral', 'Temperatura (°C)', 'Humedad (%)', 'Viento (km/h)', 'Niebla o nublado', 'Lluvia o nieve ligera'];
+  var cx = 760, Xc = DS.esc(0, -2200, 2200, 160, 1360), g = '';
+  g += '<line x1="' + Xc(0) + '" x2="' + Xc(0) + '" y1="0" y2="620" stroke="var(--tinta-2)" stroke-width="2"/>';
+  orden.forEach(function (k, i) {
+    var v = co[k], y = 10 + i * 61, x0 = Xc(Math.min(0, v)), w = Math.abs(Xc(v) - Xc(0)), neg = v < 0;
+    g += '<rect class="paso-capa" x="' + x0 + '" y="' + y + '" width="' + w + '" height="42" fill="' + (neg ? 'var(--compra)' : 'var(--iso)') + '"/>';
+    g += DS.txt(neg ? Xc(0) + 16 : Xc(0) - 16, y + 31, k, 't-n', ' font-size="25"' + (neg ? '' : ' text-anchor="end"'));
+    g += DS.txt(neg ? x0 - 12 : x0 + w + 12, y + 31, (v > 0 ? '+' : '') + num(v, Math.abs(v) < 100 ? 1 : 0), neg ? 't-o' : 't-i', ' font-size="26"' + (neg ? ' text-anchor="end"' : ''));
+  });
+  CUR.poner('coef', g);
+  /* Curva cuadrática del efecto de la temperatura */
+  var q = S.cuadratica, Xq = DS.esc(0, 0, 36, 100, 680), ef = function (t) { return q.temp_c * t + q.temp_c2 * t * t; }, base = ef(20), Yq = DS.esc(0, -5000, 1500, 640, 60), cu = '', dd = '';
+  [-4000, -2000, 0, 1000].forEach(function (v) { cu += '<line x1="100" x2="680" y1="' + Yq(v) + '" y2="' + Yq(v) + '" stroke="var(--regla)"/>' + DS.txt(90, Yq(v) + 8, (v > 0 ? '+' : '') + num(v), 't-eje', ' text-anchor="end"'); });
+  for (var t = 2; t <= 35.5; t += .5) dd += (t === 2 ? 'M' : 'L') + Xq(t).toFixed(1) + ' ' + Yq(ef(t) - base).toFixed(1);
+  cu += '<path d="' + dd + '" fill="none" stroke="var(--iso)" stroke-width="6"/>';
+  cu += '<g class="paso"><line x1="' + Xq(q.temp_optima) + '" x2="' + Xq(q.temp_optima) + '" y1="60" y2="640" stroke="var(--compra)" stroke-width="3" stroke-dasharray="8 8"/>' + DS.txt(Xq(q.temp_optima), 46, '27,5 °C', 't-o', ' text-anchor="middle" font-size="32"') + '</g>';
+  [0, 10, 20, 30].forEach(function (v) { cu += DS.txt(Xq(v), 680, v + ' °C', 't-eje', ' text-anchor="middle"'); });
+  cu += DS.txt(100, 30, 'Cambio en la demanda frente a 20 °C', 't-eje');
+  CUR.poner('curva', cu);
+  /* Residuos en el tiempo */
+  var res = C.cnt.map(function (v, i) { return v - C.pred[i]; });
+  var e = DS.ejes({ x: 110, y: 20, w: 960, h: 520, xd: [0, 730], yd: [-4000, 4000], yt: [-4000, -2000, 0, 2000, 4000], xt: [0, 365, 730], fx: function (v) { return ['ene 2011', 'ene 2012', 'dic 2012'][[0, 365, 730].indexOf(v)]; } }), r = e.s;
+  res.forEach(function (v, i) { r += '<line x1="' + e.X(i).toFixed(1) + '" x2="' + e.X(i).toFixed(1) + '" y1="' + e.Y(0) + '" y2="' + e.Y(v).toFixed(1) + '" stroke="var(--punto)" stroke-width="2"/>'; });
+  var t0 = new Date(Date.UTC(2011, 0, 1)).getTime();
+  r += DS.txt(1140, 40, 'Real − predicho', 't-eje', ' font-size="24"');
+  S.residuos_peores.forEach(function (w, k) {
+    var i = Math.round((Date.parse(w.fecha) - t0) / 864e5), x = e.X(i), y = e.Y(w.residuo), ly = 110 + k * 100;
+    r += '<g class="paso"><circle cx="' + x + '" cy="' + y + '" r="16" fill="var(--compra)"/>' + DS.txt(x, y + 8, k + 1, 't-n', ' text-anchor="middle" font-size="20"');
+    r += '<circle cx="1160" cy="' + (ly - 9) + '" r="18" fill="var(--compra)"/>' + DS.txt(1160, ly, k + 1, 't-n', ' text-anchor="middle" font-size="21"') + DS.txt(1194, ly, w.fecha.split('-').reverse().join('/'), 't-n', ' font-size="27"') + DS.txt(1194, ly + 36, (w.residuo > 0 ? '+' : '') + num(w.residuo) + ' bicicletas', 't-o', ' font-size="25"') + '</g>';
+  });
+  CUR.poner('residuos', r);
+  /* Validación en el tiempo */
+  var vt = DS.linea({ x: 110, y: 20, w: 1340, h: 360, xd: [0, 730], yd: [0, 9000], yt: [0, 4500, 9000], xt: [0, 365, 730], ys: C.cnt, color: 'var(--iso)', grosor: 2, fx: function (v) { return ['ene 2011', 'ene 2012', 'dic 2012'][[0, 365, 730].indexOf(v)]; } });
+  var vt2 = DS.linea({ x: 110, y: 20, w: 1340, h: 360, xd: [0, 730], yd: [0, 9000], ys: C.pred_sin_anio, color: 'var(--compra)', grosor: 3, clase: 'paso-capa' });
+  vt.s += vt2.s.replace(/<line[^>]*\/>|<text[^>]*>[^<]*<\/text>/g, '') + '<rect x="' + vt.X(0) + '" y="20" width="' + (vt.X(365) - vt.X(0)) + '" height="360" fill="var(--iso)" opacity=".07"/>' + DS.txt(vt.X(182), 52, 'Entrena: 2011', 't-i', ' text-anchor="middle" font-size="26"') + DS.txt(vt.X(548), 52, 'Predice: 2012', 't-o', ' text-anchor="middle" font-size="26"');
+  CUR.poner('tiempo', vt.s);
+  CUR.poner('taller', DS.ruta([['chart-line', 'Recta', 'Temperatura sola'], ['sliders-horizontal', 'Múltiple', '10 variables'], ['crosshair', 'Residuos', 'Los 5 peores'], ['history', 'Valida', 'En el tiempo'], ['truck', 'Decide', 'La flota del sábado']], 'Andamiaje: cada ejercicio construye sobre el anterior', 'Parejas · Colab con scikit-learn · entrega: cuaderno en GitHub y decisión de flota', 'var(--iso)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

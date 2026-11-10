@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 9 · Audiencia del dato | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: sala de audiencias. Los datos declaran, el analista argumenta y el valor p no dicta sentencia. */
+  :root { --fondo: #170f1d; --fondo-2: #261a30; --tinta: #f6f0ea; --tinta-2: #bcaec2; --regla: rgba(188,174,194,.24); --punto: #7d6a8c; --compra: #ff7a1f; --acento-texto: #ffa263; --oro: #f2c14e; }
+  :root[data-tema="claro"] { --fondo: #f7f3ec; --fondo-2: #ebe3d6; --tinta: #23172b; --tinta-2: #5c4d63; --regla: rgba(35,23,43,.2); --punto: #a08fae; --compra: #e85c0b; --acento-texto: #b94504; --oro: #9a6b00; }
+  .rot { font: 700 23px Georgia, 'Times New Roman', serif; letter-spacing: .12em; color: var(--oro); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-g { fill: var(--oro); font-weight: 800; }
+  .expediente { background: var(--fondo-2); padding: 34px 40px; border-top: 6px solid var(--oro); box-shadow: 0 30px 70px rgba(0,0,0,.35); }
+  .testigos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .testigo { background: var(--fondo-2); padding: 26px 26px 30px; border-left: 6px solid var(--punto); display: flex; flex-direction: column; gap: 12px; }
+  .testigo.si { border-left-color: var(--compra); }
+  .testigo .ico { font-size: 58px; color: var(--oro); }
+  .testigo b { font-size: 34px; } .testigo .p { font-size: 54px; font-weight: 800; color: var(--acento-texto); }
+  .testigo span { font-size: 25px; color: var(--tinta-2); line-height: 1.2; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--oro); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--oro); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .mazo { animation: golpe 2.6s cubic-bezier(.5,0,.2,1) infinite; transform-origin: 70% 80%; transform-box: fill-box; }
+  @keyframes golpe { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-18deg); } 88% { transform: rotate(3deg); } }
+  @media (prefers-reduced-motion: reduce) { .mazo { animation: none; } }
+</style>
+</head>
+<body data-cine="dolly">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:90px;width:1000px">
+    <p class="rot">Audiencia del dato · Semana 9</p>
+    <h1 style="font-size:100px;margin-top:16px;line-height:1.03">¿Diferencia real, <span class="acento">o ruido</span>?</h1>
+    <p class="sec" style="font-size:30px;margin-top:22px;max-width:820px">Población, muestra y pruebas de hipótesis con los mismos 731 días de bicicletas.</p>
+    <p class="sec" style="font-size:25px;margin-top:22px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Los puntos de la derecha son 600 medias reales: cada una es el promedio de 30 días tomados al azar de los 731. Forman una campana aunque los días no la formen. Es el tema de hoy: lo que se puede decir de una población a partir de una muestra.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Orden del día</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00 en siete pasos"></svg>
+  <aside class="notas">El debate estructurado es la actividad central que pide la guía de aprendizaje. Los equipos se forman antes de la pausa para que preparen sus argumentos con el cuaderno.</aside>
+</section>
+
+<!-- 3 Objetivo -->
+<section class="esc">
+  <div class="expediente" style="position:absolute;left:170px;top:110px;width:1260px">
+    <p class="rot">Objetivo de la semana</p>
+    <h2 style="font-size:56px;margin:16px 0 30px">Distinguir una diferencia que vale la pena de una que solo es ruido, y decirlo sin exagerar.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="users"></i><p style="font-size:33px">Explicas la diferencia entre población, muestra y error estándar.</p>
+      <i class="ico" data-i="scale"></i><p style="font-size:33px">Planteas hipótesis y corres una prueba t con su intervalo de confianza.</p>
+      <i class="ico" data-i="gavel"></i><p style="font-size:33px">Argumentas qué significa, y qué no, un valor p.</p>
+    </div>
+  </div>
+  <aside class="notas">Contenido de la semana 9 en la guía de aprendizaje: inferencia estadística, población, muestra y pruebas de hipótesis. Cuenta como entrega tipo reto (40 %). Los iconos de esta escena se pintan con el color de acento del mundo.</aside>
+</section>
+
+<!-- 4 Muestra -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:620px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Primera prueba: la muestra</p>
+    <h2 style="font-size:54px;line-height:1.06">Treinta días al azar no dan siempre la misma media</h2>
+    <p class="paso" style="font-size:30px">2.000 muestras de 30 días: las medias se alejan de la real en <b class="acento">347</b> bicicletas, en promedio.</p>
+    <p class="paso" style="font-size:30px">La fórmula del error estándar, σ/√n, predice <b class="acento">353</b>.</p>
+    <p class="paso sec" style="font-size:26px">Los días no tienen forma de campana; las medias sí. Eso permite hacer inferencia.</p>
+  </div>
+  <svg id="muestral" class="diagrama" viewBox="0 0 800 760" style="position:absolute;left:760px;top:70px;width:800px;height:760px" role="img" aria-label="Histograma de 2.000 medias de 30 días, centrado en 4.501"></svg>
+  <aside class="notas">Población aquí: los 731 días (media 4.504). Desviación de la población: 1.936; 1.936/√30 = 353. La desviación observada de las 2.000 medias: 347. La diferencia es pequeña porque se muestrea sin reemplazo de una población finita. Simulación con semilla 42, con los datos reales.</aside>
+</section>
+
+<!-- 5 Los tres testigos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">La pregunta de la semana 7, ahora con prueba</p><h2 style="font-size:52px;margin-top:6px">¿Cambia la demanda en días laborales? Tres testigos, tres respuestas</h2></div>
+  <div class="testigos" style="position:absolute;left:88px;right:88px;top:230px">
+    <div class="testigo paso"><i class="ico" data-i="bike"></i><b>Total</b><span>+255 bicicletas al día en laborales</span><span class="p">p = 0,11</span><span>Prueba t de Welch, t = 1,60</span></div>
+    <div class="testigo si paso"><i class="ico" data-i="user-round-x"></i><b>Casuales</b><span>−765 al día en laborales</span><span class="p">p ≈ 10⁻²⁹</span><span>t = −12,73</span></div>
+    <div class="testigo si paso"><i class="ico" data-i="user-check"></i><b>Registrados</b><span>+1.019 al día en laborales</span><span class="p">p ≈ 10⁻¹⁹</span><span>t = 9,24</span></div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:720px;width:1424px;font-size:31px">Mismos días, conclusiones opuestas: <b class="acento">la pregunta decide el resultado</b>, no la prueba.</p>
+  <aside class="notas">H0: la media es igual en días laborales y no laborales. Welch no supone varianzas iguales. Valores exactos: total p = 0,110; casuales p = 1,79·10⁻²⁹; registrados p = 5,82·10⁻¹⁹. Esto es lo que la guía llama "resultados contradictorios".</aside>
+</section>
+
+<!-- 6 Intervalo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Segunda prueba: el intervalo</p><h2 style="font-size:52px;margin-top:6px">El intervalo dice más que el valor p: el efecto podría ser cero o de 573</h2></div>
+  <svg id="intervalo" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:200px;width:1424px;height:560px" role="img" aria-label="Distribución bootstrap de la diferencia de medias con intervalo de 95 por ciento de menos 63 a 573"></svg>
+  <aside class="notas">Bootstrap: 5.000 remuestreos con reemplazo de cada grupo, semilla 42. Intervalo percentil del 95 %: de −63 a 573 bicicletas por día. Incluye el cero, coherente con p = 0,11. Pero también incluye 500, que para la operación sería mucho. "No significativo" no es "no hay efecto".</aside>
+</section>
+
+<!-- 7 Grupos falsos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:640px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Testigo falso</p>
+    <h2 style="font-size:54px;line-height:1.06">Si buscas lo suficiente, el azar te da un resultado</h2>
+    <p class="paso" style="font-size:30px">Dividimos los 731 días en dos grupos <b>al azar</b>, 100 veces. No hay ninguna diferencia real.</p>
+    <p class="paso" style="font-size:30px"><b class="acento">6 de 100</b> pruebas dieron p &lt; 0,05.</p>
+    <p class="paso sec" style="font-size:26px">Con 0,05 se espera que 1 de cada 20 pruebas "encuentre" algo por azar. Probar muchas cosas y reportar la que salió es hacer trampa.</p>
+  </div>
+  <svg id="falsos" class="diagrama" viewBox="0 0 760 760" style="position:absolute;left:790px;top:70px;width:760px;height:760px" role="img" aria-label="Cien valores p de grupos al azar; seis por debajo de 0,05"></svg>
+  <aside class="notas">Simulación con los datos reales y etiquetas al azar (semilla 42). El p más bajo fue 0,004. Conecte con la reproducibilidad: por eso se declara de antemano qué se va a probar.</aside>
+</section>
+
+<!-- 8 Qué es y qué no es p -->
+<section class="esc">
+  <div class="expediente" style="position:absolute;left:140px;top:70px;width:1320px">
+    <p class="rot">Lo que el valor p no dice</p>
+    <h2 style="font-size:50px;margin:12px 0 26px">Seis principios de la Asociación Estadounidense de Estadística (2016)</h2>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px 40px;font-size:28px;line-height:1.22">
+      <p class="paso"><b class="acento">1.</b> Indica qué tan incompatibles son los datos con un modelo.</p>
+      <p class="paso"><b class="acento">2.</b> No mide la probabilidad de que la hipótesis sea cierta.</p>
+      <p class="paso"><b class="acento">3.</b> Una decisión no se toma solo porque p cruzó un umbral.</p>
+      <p class="paso"><b class="acento">4.</b> Inferir bien exige reportar todo, también lo que no salió.</p>
+      <p class="paso"><b class="acento">5.</b> No mide el tamaño del efecto ni su importancia.</p>
+      <p class="paso"><b class="acento">6.</b> Solo, no es buena medida de evidencia.</p>
+    </div>
+  </div>
+  <p class="pie">Wasserstein y Lazar (2016), The ASA Statement on p-Values, The American Statistician, 70(2). Paráfrasis en español.</p>
+  <aside class="notas">Paráfrasis de los seis principios; el principio 2 se lee textual en la inmersión en inglés. Relacione cada uno con lo visto: el 4 con los grupos falsos, el 5 con el intervalo.</aside>
+</section>
+
+<!-- 9 Debate -->
+<section class="esc">
+  <svg id="debate" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Formato del debate: moción, dos bandos, réplica y veredicto con evidencia"></svg>
+  <aside class="notas">Moción: "Con p = 0,11, la empresa puede ignorar el tipo de día al planear la flota". Bando A defiende, bando B ataca. Cada argumento debe citar un número del cuaderno. Tiempos: 3 minutos de apertura por bando, 2 de réplica, 2 de cierre. El jurado (resto del grupo) vota con la rúbrica de la guía.</aside>
+</section>
+
+<!-- 10 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="expediente" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes</p>
+    <p style="font-size:48px;line-height:1.18;font-weight:700;margin:22px 0 18px">“P-values do not measure the probability that the studied hypothesis is true, or the probability that the data were produced by <span class="acento">random chance alone</span>.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">American Statistical Association, Statement on Statistical Significance and P-Values, principle 2 (2016)</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">Our total-rentals test gave p = 0.11. Say what it means in one correct English sentence.</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">Find the mistake: “p = 0.11, so there is an 11 % chance that the null is true.”</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">Open your debate argument with: “The evidence suggests… however…”</p>
+    </div>
+  </div>
+  <aside class="notas">Cita textual del comunicado oficial de la ASA (amstat.org, p-valuestatement.pdf), verificada contra el PDF. Respuesta a la segunda pregunta: p no es la probabilidad de H0; es la probabilidad de un resultado igual o más extremo si H0 fuera cierta.</aside>
+</section>
+
+<!-- 11 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios del taller"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana9.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
+  <aside class="notas">El taller alimenta el debate: cada bando sale con sus números del cuaderno. Punto de control clave: p = 0,11 para el total y el intervalo de −63 a 573.</aside>
+</section>
+
+<!-- 12 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Términos del expediente</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="users"></i><b>Población</b><span>Todo lo que interesa describir.</span></div>
+      <div><i class="ico" data-i="dice-5"></i><b>Muestra</b><span>Parte observada; al azar, si se quiere generalizar.</span></div>
+      <div><i class="ico" data-i="ruler"></i><b>Error estándar</b><span>Cuánto varía una estadística de muestra en muestra.</span></div>
+      <div><i class="ico" data-i="scale"></i><b>H0 y H1</b><span>Hipótesis nula (sin efecto) y alternativa.</span></div>
+      <div><i class="ico" data-i="sigma"></i><b>Prueba t</b><span>Compara medias en unidades de error estándar.</span></div>
+      <div><i class="ico" data-i="percent"></i><b>Valor p</b><span>Probabilidad de algo así o más extremo si H0 fuera cierta.</span></div>
+      <div><i class="ico" data-i="arrow-left-right"></i><b>Intervalo de confianza</b><span>Rango de valores compatibles con los datos.</span></div>
+      <div><i class="ico" data-i="repeat"></i><b>Bootstrap</b><span>Remuestrear los datos para ver su variación.</span></div>
+      <div><i class="ico" data-i="copy-x"></i><b>Comparaciones múltiples</b><span>Muchas pruebas, más falsos hallazgos.</span></div>
+      <div><i class="ico" data-i="gauge"></i><b>Tamaño del efecto</b><span>Cuánto cambia, no solo si cambia.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Pida que alguien explique "valor p" con sus palabras y corrija en voz alta si confunde con la probabilidad de H0.</aside>
+</section>
+
+<!-- 13 Cierre -->
+<section class="esc">
+  <div class="expediente" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot">Veredicto</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas antes de decir "es significativo"</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="arrow-left-right" style="font-size:62px;color:var(--oro)"></i><p class="paso" style="font-size:35px"><b>Reporta el intervalo,</b> no solo el p: dice cuánto puede valer el efecto.</p>
+      <i class="ico paso" data-i="split" style="font-size:62px;color:var(--oro)"></i><p class="paso" style="font-size:35px"><b>La pregunta decide:</b> el total y sus grupos pueden contar historias opuestas.</p>
+      <i class="ico paso" data-i="clipboard-list" style="font-size:62px;color:var(--oro)"></i><p class="paso" style="font-size:35px"><b>Declara antes qué vas a probar,</b> y reporta todo lo que probaste.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 10: predecir la demanda con regresión. El mismo archivo, ahora para anticipar.</p>
+  </div>
+  <aside class="notas">Cierre: ¿qué bando ganó y con qué número?</aside>
+</section>
+
+<!-- 14 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Archivo de la audiencia</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Wasserstein, R. L. y Lazar, N. A. (2016). The ASA Statement on p-Values: Context, Process, and Purpose. <em>The American Statistician</em>, 70(2), 129-133. <a href="https://doi.org/10.1080/00031305.2016.1154108" target="_blank" rel="noopener">doi:10.1080/00031305.2016.1154108</a></p>
+    <p>American Statistical Association (2016). <em>Statement on Statistical Significance and P-Values</em>. <a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf" target="_blank" rel="noopener">amstat.org</a></p>
+    <p>Fanaee-T, H. (2013). <em>Bike Sharing</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a></p>
+    <p>Efron, B. y Hastie, T. (2016). <em>Computer Age Statistical Inference</em>. Cambridge University Press. Bibliografía base del syllabus.</p>
+    <p>SciPy. <em>scipy.stats.ttest_ind</em>. <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html" target="_blank" rel="noopener">docs.scipy.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s09.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  document.querySelectorAll('.expediente .ico').forEach(function (n) { n.style.fontSize = n.style.fontSize || '64px'; n.style.color = n.style.color || 'var(--oro)'; });
+  /* Portada: 600 medias reales apiladas como puntos */
+  var p = '', X = DS.esc(0, 3300, 5700, 1080, 1540), pilas = {};
+  C.medias30.forEach(function (m) {
+    var k = Math.round((m - 3300) / 40), h = pilas[k] = (pilas[k] || 0) + 1;
+    p += '<circle cx="' + X(3300 + k * 40).toFixed(1) + '" cy="' + (860 - h * 13) + '" r="5.5" fill="' + (Math.abs(m - S.muestral_30.media_de_medias) < 40 ? 'var(--oro)' : 'var(--punto)') + '" opacity=".9"/>';
+  });
+  p += DS.txt(1310, 885, 'medias de 30 días', 't-s', ' text-anchor="middle" font-size="20"');
+  CUR.poner('portada', p);
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apuesta', 'dice-5'], ['7:10', 'Muestra', 'users'], ['7:40', 'Pruebas', 'scale'], ['8:15', 'Pausa', 'coffee'], ['8:30', 'English', 'languages'], ['8:40', 'Taller', 'flask-conical'], ['9:20', 'Debate', 'gavel'], ['9:55', 'Veredicto', 'flag']], 6, { color: 'var(--oro)', forma: 'escalera' }));
+  /* Distribución muestral */
+  var h = DS.histo({ x: 90, y: 40, w: 660, h: 560, vals: C.medias30, bins: [3200, 5800, 100], xt: [3500, 4500, 5500], yt: [], color: function (v) { return Math.abs(v + 50 - S.muestral_30.media_de_medias) < 350 ? 'var(--oro)' : 'var(--punto)'; } });
+  h.s += '<line x1="' + h.X(4504) + '" x2="' + h.X(4504) + '" y1="20" y2="600" stroke="var(--compra)" stroke-width="4" stroke-dasharray="10 8"/>' + DS.txt(h.X(4504) + 12, 46, 'media real 4.504', 't-o', ' font-size="25"');
+  h.s += DS.txt(420, 690, 'Media de 30 días (bicicletas)', 't-eje', ' text-anchor="middle"');
+  CUR.poner('muestral', h.s);
+  /* Bootstrap */
+  var b = DS.histo({ x: 80, y: 40, w: 1260, h: 380, vals: C.boot, bins: [-400, 900, 25], xt: [-400, 0, 400, 800], yt: [], color: function (v) { return v >= S.bootstrap_dif_cnt.ic95[0] && v + 25 <= S.bootstrap_dif_cnt.ic95[1] ? 'var(--oro)' : 'var(--punto)'; } });
+  var i0 = b.X(S.bootstrap_dif_cnt.ic95[0]), i1 = b.X(S.bootstrap_dif_cnt.ic95[1]), cero = b.X(0);
+  b.s += '<g class="paso"><path d="M' + i0 + ' 470H' + i1 + '" stroke="var(--oro)" stroke-width="10"/><circle cx="' + i0 + '" cy="470" r="10" fill="var(--oro)"/><circle cx="' + i1 + '" cy="470" r="10" fill="var(--oro)"/>' + DS.txt(i0, 520, num(S.bootstrap_dif_cnt.ic95[0]), 't-g', ' text-anchor="middle" font-size="32"') + DS.txt(i1, 520, num(S.bootstrap_dif_cnt.ic95[1]), 't-g', ' text-anchor="middle" font-size="32"') + DS.txt((i0 + i1) / 2, 520, 'intervalo del 95 %', 't-s', ' text-anchor="middle" font-size="26"') + '</g>';
+  b.s += '<g class="paso"><line x1="' + cero + '" x2="' + cero + '" y1="20" y2="440" stroke="var(--compra)" stroke-width="5"/>' + DS.txt(cero - 14, 40, 'cero: sin diferencia', 't-o', ' text-anchor="end" font-size="27"') + '</g>';
+  CUR.poner('intervalo', b.s);
+  /* 100 valores p */
+  var f = '', Y = DS.esc(0, 0, 1, 680, 40);
+  f += '<rect x="80" y="' + Y(.05) + '" width="640" height="' + (Y(0) - Y(.05)) + '" fill="var(--compra)" opacity=".16"/>' + DS.txt(716, Y(.05) - 12, 'p < 0,05', 't-o', ' text-anchor="end" font-size="26"');
+  C.pvals.forEach(function (v, i) { f += '<circle class="paso-capa" cx="' + (92 + (i % 25) * 25.6) + '" cy="' + Y(v).toFixed(1) + '" r="9" fill="' + (v < .05 ? 'var(--compra)' : 'var(--punto)') + '"/>'; });
+  [0, .25, .5, .75, 1].forEach(function (v) { f += DS.txt(66, Y(v) + 8, num(v, 2), 't-eje', ' text-anchor="end"'); });
+  f += DS.txt(400, 740, '100 pruebas con grupos al azar', 't-eje', ' text-anchor="middle"');
+  CUR.poner('falsos', f);
+  /* Debate */
+  var d = '<text x="88" y="112" font-size="50" font-weight="800" style="fill:var(--tinta)">Debate estructurado: la moción se gana con números</text>';
+  d += '<rect x="250" y="170" width="1100" height="120" fill="var(--fondo-2)" stroke="var(--oro)" stroke-width="4"/>' + DS.txt(800, 222, 'Moción', 't-g', ' text-anchor="middle" font-size="26"') + DS.txt(800, 268, '"Con p = 0,11 se puede ignorar el tipo de día al planear la flota"', 't-n', ' text-anchor="middle" font-size="28"');
+  [['A favor', 280, 'shield-check'], ['En contra', 1320, 'shield-alert']].forEach(function (s, i) {
+    d += CUR.luz('M800 290C800 400 ' + s[1] + ' 340 ' + s[1] + ' 430', i * .8, 3.4) + '<circle cx="' + s[1] + '" cy="520" r="88" fill="var(--fondo-2)" stroke="var(--acento-texto)" stroke-width="5"/>' + CUR.ic(s[2], s[1] - 44, 476, 88) + DS.txt(s[1], 650, s[0], 't-n', ' text-anchor="middle" font-size="36"');
+  });
+  d += '<g class="mazo">' + CUR.ic('gavel', 740, 440, 120, 'var(--oro)') + '</g>' + DS.txt(800, 610, 'Jurado', 't-n', ' text-anchor="middle" font-size="32"');
+  [['3 min', 'apertura'], ['2 min', 'réplica'], ['2 min', 'cierre'], ['voto', 'con rúbrica']].forEach(function (t, i) { d += DS.txt(320 + i * 320, 780, t[0], 't-g', ' text-anchor="middle" font-size="34"') + DS.txt(320 + i * 320, 820, t[1], 't-s', ' text-anchor="middle" font-size="26"'); });
+  CUR.poner('debate', d);
+  CUR.poner('taller', DS.ruta([['users', 'Muestrea', 'Error estándar'], ['scale', 'Plantea', 'H0 y H1'], ['sigma', 'Prueba', 't de Welch'], ['repeat', 'Remuestrea', 'Bootstrap'], ['copy-x', 'Desconfía', 'Grupos al azar']], 'Cinco ejercicios para llegar armados al debate', 'Parejas · Colab · entrega: cuaderno en GitHub y argumento escrito', 'var(--oro)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 9, "tema": "Real difference or noise?", "cierre": "A p-value is not the probability that the null is true. Report the interval, the effect size and every test you ran.", "preguntas": [
+{"q": "The test for total rentals gives p = 0.11. Which sentence is correct?", "o": ["There is an 11 % chance that the null hypothesis is true", "If there were no difference, a result this extreme would appear about 11 % of the time", "The difference is 11 %", "The result is 89 % certain"], "a": 1, "e": "Principle 2 of the ASA statement: p-values do not measure the probability that the hypothesis is true."},
+{"q": "The 95 % bootstrap interval for the difference is -63 to 573 bikes per day. What can we say?", "o": ["There is no difference", "The data are compatible with no difference and also with a large one", "The difference is exactly 255", "The test failed"], "a": 1, "e": "Not significant is not the same as no effect. The interval shows the plausible sizes of the effect."},
+{"q": "Why does the mean of 30 random days vary less than single days?", "o": ["Because days are normal", "Because averaging reduces variation: the standard error is sigma divided by the square root of n", "Because we used a seed", "It does not vary less"], "a": 1, "e": "The 2,000 sample means had a standard deviation of 347; sigma divided by the square root of 30 gives 353."},
+{"q": "We split days into two random groups 100 times and got 6 p-values below 0.05. What does it show?", "o": ["Random groups are different", "With many tests, some look significant by chance", "The data are wrong", "The threshold should be 0.06"], "a": 1, "e": "At 0.05, about 1 in 20 tests will be a false positive. Report all the tests you ran."},
+{"q": "Casual users: p is about 10 to the power of -29. Registered users: about 10 to the -19. Total: 0.11. What explains this?", "o": ["The test is broken", "The two groups move in opposite directions and cancel in the total", "The total has fewer days", "p-values are random"], "a": 1, "e": "The question you ask decides the answer. Split by group before you conclude."},
+{"q": "Why do we use Welch's t-test instead of the classic t-test?", "o": ["It is faster", "It does not assume equal variances in both groups", "It needs fewer days", "It always gives smaller p-values"], "a": 1, "e": "The two groups have different sizes (500 and 231) and different spreads."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

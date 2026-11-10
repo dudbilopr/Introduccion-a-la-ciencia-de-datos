@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 14 · Feria de cápsulas | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: feria de ciencia. Tres estands, cada uno con una técnica especializada y una demo que se puede romper. */
+  :root { --fondo: #12091a; --fondo-2: #22142e; --tinta: #f7f1fb; --tinta-2: #b9a8c6; --regla: rgba(185,168,198,.24); --punto: #6f5a86; --compra: #ff7a1f; --acento-texto: #ffa263; --neon: #e07bff; }
+  :root[data-tema="claro"] { --fondo: #f8f4f9; --fondo-2: #ebe2ef; --tinta: #221430; --tinta-2: #5d4a6c; --regla: rgba(34,20,48,.2); --punto: #a593b6; --compra: #e85c0b; --acento-texto: #b94504; --neon: #8a2ba8; }
+  .rot { font: 700 22px Consolas, monospace; letter-spacing: .12em; color: var(--neon); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-v { fill: var(--neon); font-weight: 800; }
+  .estand { background: var(--fondo-2); padding: 30px 34px; border-top: 8px solid var(--neon); }
+  .estands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .estands > div { background: var(--fondo-2); padding: 28px 26px; border-top: 8px solid var(--neon); display: flex; flex-direction: column; gap: 12px; }
+  .estands .ico { font-size: 66px; color: var(--neon); } .estands b { font-size: 34px; } .estands span { font-size: 24px; color: var(--tinta-2); line-height: 1.22; }
+  .sonda { font: 700 34px Consolas, monospace; display: flex; justify-content: space-between; background: var(--fondo-2); padding: 18px 26px; border-left: 6px solid var(--neon); }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--neon); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--neon); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+</style>
+</head>
+<body data-cine="dolly">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:90px;width:1100px">
+    <p class="rot">Feria de cápsulas · Semana 14</p>
+    <h1 style="font-size:100px;margin-top:16px;line-height:1.03">Hoy enseñan <span class="acento">ustedes.</span></h1>
+    <p class="sec" style="font-size:30px;margin-top:22px;max-width:960px">Aplicaciones especializadas: texto, series de tiempo y redes. Cada equipo prepara una cápsula y una demo técnica para el grupo.</p>
+    <p class="sec" style="font-size:25px;margin-top:18px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Aula invertida, como pide la guía de aprendizaje: los equipos investigan antes y presentan hoy. Abajo, el perfil real de alquileres por hora en días laborales y no laborales, uno de los kits de la feria.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Programa de la feria</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
+  <aside class="notas">Seis cápsulas de 12 minutos (8 de demo y 4 de preguntas), dos por estand. Si hay más equipos, se abren dos salas en paralelo.</aside>
+</section>
+
+<!-- 3 Objetivo -->
+<section class="esc">
+  <div class="estand" style="position:absolute;left:170px;top:110px;width:1260px">
+    <p class="rot">Objetivo de la semana</p>
+    <h2 style="font-size:56px;margin:16px 0 30px">Explicar una técnica especializada a tus pares, con una demo que funcione y un límite que la rompa.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="book-open" style="font-size:64px;color:var(--neon)"></i><p style="font-size:33px">Lees un artículo técnico o una documentación y la resumes con rigor.</p>
+      <i class="ico" data-i="monitor-play" style="font-size:64px;color:var(--neon)"></i><p style="font-size:33px">Construyes una demo con datos reales del kit.</p>
+      <i class="ico" data-i="triangle-alert" style="font-size:64px;color:var(--neon)"></i><p style="font-size:33px">Muestras dónde falla la técnica, no solo dónde brilla.</p>
+    </div>
+  </div>
+  <aside class="notas">Contenido de la semana 14 en la guía: NLP, redes o series de tiempo, con cápsulas de conocimiento en aula invertida. Entrega tipo reto (40 %).</aside>
+</section>
+
+<!-- 4 Estands -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Tres estands</p><h2 style="font-size:52px;margin-top:6px">Cada kit trae datos reales, una demo base y una trampa</h2></div>
+  <div class="estands" style="position:absolute;left:88px;right:88px;top:210px">
+    <div class="paso"><i class="ico" data-i="message-square"></i><b>Texto</b><span>3.000 frases de reseñas reales de Amazon, IMDb y Yelp, etiquetadas positiva o negativa.</span><span><b style="font-size:24px;color:var(--acento-texto)">Trampa:</b> la negación.</span></div>
+    <div class="paso"><i class="ico" data-i="chart-line"></i><b>Series de tiempo</b><span>731 días y 17.379 horas de alquileres de bicicletas.</span><span><b style="font-size:24px;color:var(--acento-texto)">Trampa:</b> la autocorrelación que engaña.</span></div>
+    <div class="paso"><i class="ico" data-i="network"></i><b>Redes</b><span>El equipo elige una red pública documentada y la analiza con NetworkX.</span><span><b style="font-size:24px;color:var(--acento-texto)">Trampa:</b> centralidad no es importancia.</span></div>
+  </div>
+  <aside class="notas">El kit de redes no trae datos fijos: el equipo debe documentar fuente, autor y licencia de su red, como cualquier dataset del curso. Si no encuentra una real, el docente aprueba la alternativa.</aside>
+</section>
+
+<!-- 5 Texto: bolsa de palabras -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:680px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Estand de texto · demo base</p>
+    <h2 style="font-size:52px;line-height:1.06">Contar palabras ya acierta el 81,9 % de las frases</h2>
+    <p class="paso" style="font-size:29px">Bolsa de palabras: cada frase es un vector con el conteo de <b>4.407</b> palabras. Luego, regresión logística.</p>
+    <p class="paso" style="font-size:29px">Las palabras que más empujan a positivo: <b class="acento">great, love, awesome</b>. A negativo: <b class="acento">bad, poor, worst, not</b>.</p>
+  </div>
+  <svg id="palabras" class="diagrama" viewBox="0 0 760 760" style="position:absolute;left:800px;top:60px;width:760px;height:760px" role="img" aria-label="Coeficientes de las palabras más positivas y más negativas"></svg>
+  <aside class="notas">Partición 75/25 estratificada, semilla 42: 750 frases de prueba, matriz [[302, 73], [63, 312]]. Las clases están balanceadas por diseño (1.500 y 1.500): la línea base aquí es 50 %.</aside>
+</section>
+
+<!-- 6 Texto: la trampa -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px"><p class="rot">Estand de texto · la trampa</p><h2 style="font-size:56px;margin-top:8px">El modelo cree que "not bad" es muy negativo</h2></div>
+  <div style="position:absolute;left:88px;top:240px;width:1100px;display:flex;flex-direction:column;gap:20px">
+    <p class="sonda paso"><span>"great"</span><b class="acento">93,2 % positiva</b></p>
+    <p class="sonda paso"><span>"not good"</span><b class="acento">39,3 % positiva</b></p>
+    <p class="sonda paso"><span>"not bad"</span><b class="acento">1,2 % positiva</b></p>
+    <p class="sonda paso"><span>"the battery is not bad at all"</span><b class="acento">0,6 % positiva</b></p>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:690px;width:1424px;font-size:30px">La bolsa de palabras no ve el orden: suma "not" y "bad", dos palabras negativas. Y entrenado con Amazon y Yelp, en IMDb baja a <b class="acento">71,3 %</b>.</p>
+  <aside class="notas">Probabilidades del modelo de la escena anterior. La cápsula de texto debe proponer una mejora (bigramas, por ejemplo con ngram_range=(1, 2)) y mostrar si arregla la sonda. El cambio de dominio (de productos y restaurantes a películas) es otra lección: un modelo no se lleva a otro contexto sin probarlo.</aside>
+</section>
+
+<!-- 7 Series -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Estand de series de tiempo · demo base</p><h2 style="font-size:50px;margin-top:6px">Dos ciudades en una: la que va al trabajo y la que pasea</h2></div>
+  <svg id="horas" class="diagrama" viewBox="0 0 1500 560" style="position:absolute;left:50px;top:170px;width:1500px;height:560px" role="img" aria-label="Alquileres promedio por hora: picos a las 17 y 18 en días laborales y a las 12 y 13 en no laborales"></svg>
+  <p class="paso" style="position:absolute;left:88px;top:760px;width:1424px;font-size:29px">Autocorrelación diaria: <b class="acento">0,849</b> con el día anterior y <b class="acento">0,757</b> con hace una semana. Con las diferencias diarias, la de 7 días cae a <b>−0,01</b>.</p>
+  <aside class="notas">Perfil por hora sobre las 17.379 horas: en días laborales los picos son 17 y 18 horas (y otro a las 8); en no laborales, 13 y 12. La trampa: una autocorrelación alta puede venir solo de la tendencia; al diferenciar, la de 7 días desaparece. La cápsula debe explicar por qué.</aside>
+</section>
+
+<!-- 8 Rúbrica -->
+<section class="esc">
+  <div class="estand" style="position:absolute;left:150px;top:70px;width:1300px">
+    <p class="rot">Cómo se evalúa una cápsula</p>
+    <h2 style="font-size:50px;margin:12px 0 24px">12 minutos: 8 de demo, 4 de preguntas del público</h2>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px 40px;font-size:29px;line-height:1.22">
+      <p class="paso"><b class="acento">Idea:</b> qué problema resuelve la técnica, en una frase.</p>
+      <p class="paso"><b class="acento">Fuente:</b> un artículo o documentación leída de verdad, citada.</p>
+      <p class="paso"><b class="acento">Demo:</b> corre en vivo con los datos del kit.</p>
+      <p class="paso"><b class="acento">Número:</b> una métrica contra una línea base.</p>
+      <p class="paso"><b class="acento">Límite:</b> un caso donde falla, mostrado.</p>
+      <p class="paso"><b class="acento">Enseñanza:</b> el público puede repetirlo con el cuaderno.</p>
+    </div>
+  </div>
+  <aside class="notas">Cada criterio vale de 0 a 3. El público evalúa con la misma rúbrica (co-evaluación) y el docente pondera. La rúbrica completa está en la guía.</aside>
+</section>
+
+<!-- 9 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="estand" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · read the readme</p>
+    <p style="font-size:48px;line-height:1.18;font-weight:700;margin:22px 0 18px">“We attempted to select sentences that have a clearly positive or negative connotaton, the goal was for <span class="acento">no neutral sentences</span> to be selected.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Readme of the Sentiment Labelled Sentences dataset, Kotzias et al. (text as published, including its typo)</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--neon)"></i><p class="paso" style="font-size:32px">How would our 81.9 % change on real reviews, where many sentences are neutral?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--neon)"></i><p class="paso" style="font-size:32px">Find the typo and the comma splice. Rewrite the sentence correctly.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--neon)"></i><p class="paso" style="font-size:32px">Open your capsule in English: “Today we will show you how…”</p>
+    </div>
+  </div>
+  <aside class="notas">Texto textual del readme incluido en el dataset (Material_Privado/Datos_Originales/sentiment/readme.txt). "connotaton" debe ser "connotation"; la coma une dos oraciones independientes.</aside>
+</section>
+
+<!-- 10 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Pasos para preparar la cápsula"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana14.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía de las cápsulas</a>
+  <aside class="notas">La guía trae los tres kits con su punto de control, la rúbrica y la plantilla de la cápsula.</aside>
+</section>
+
+<!-- 11 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Catálogo de la feria</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="message-square"></i><b>NLP</b><span>Procesamiento de lenguaje natural.</span></div>
+      <div><i class="ico" data-i="boxes"></i><b>Bolsa de palabras</b><span>Cuenta palabras e ignora su orden.</span></div>
+      <div><i class="ico" data-i="link-2"></i><b>Bigrama</b><span>Par de palabras seguidas: "not bad".</span></div>
+      <div><i class="ico" data-i="map"></i><b>Cambio de dominio</b><span>Probar en un contexto distinto al de entrenamiento.</span></div>
+      <div><i class="ico" data-i="repeat"></i><b>Autocorrelación</b><span>Correlación de una serie consigo misma desplazada.</span></div>
+      <div><i class="ico" data-i="calendar-days"></i><b>Estacionalidad</b><span>Patrón que se repite: diario, semanal, anual.</span></div>
+      <div><i class="ico" data-i="trending-up"></i><b>Tendencia</b><span>Movimiento de largo plazo.</span></div>
+      <div><i class="ico" data-i="minus-square"></i><b>Diferenciar</b><span>Restar el valor anterior para quitar tendencia.</span></div>
+      <div><i class="ico" data-i="network"></i><b>Grafo</b><span>Nodos unidos por aristas.</span></div>
+      <div><i class="ico" data-i="target"></i><b>Centralidad</b><span>Qué tan conectado o intermedio está un nodo.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Cada cápsula agrega al glosario los términos que use.</aside>
+</section>
+
+<!-- 12 Cierre -->
+<section class="esc">
+  <div class="estand" style="position:absolute;left:180px;top:90px;width:1240px;border-top-color:var(--compra)">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para cualquier técnica nueva</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="equal-not" style="font-size:62px;color:var(--neon)"></i><p class="paso" style="font-size:35px"><b>Compárala con algo simple:</b> si no le gana, no sirve todavía.</p>
+      <i class="ico paso" data-i="triangle-alert" style="font-size:62px;color:var(--neon)"></i><p class="paso" style="font-size:35px"><b>Busca dónde se rompe:</b> la negación, la tendencia, el cambio de contexto.</p>
+      <i class="ico paso" data-i="book-open" style="font-size:62px;color:var(--neon)"></i><p class="paso" style="font-size:35px"><b>Lee la fuente:</b> el readme dice cómo se eligieron los datos.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 15: ética. ¿Qué pasa cuando el modelo funciona bien y aun así hace daño?</p>
+  </div>
+  <aside class="notas">Pregunta de salida: ¿qué técnica usaría su equipo en el proyecto final?</aside>
+</section>
+
+<!-- 13 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Catálogo de fuentes</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Kotzias, D. (2015). <em>Sentiment Labelled Sentences</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C57604" target="_blank" rel="noopener">doi:10.24432/C57604</a></p>
+    <p>Kotzias, D., Denil, M., de Freitas, N. y Smyth, P. (2015). From Group to Individual Labels Using Deep Features. <em>Proceedings of KDD 2015</em>, 597-606. <a href="https://doi.org/10.1145/2783258.2783380" target="_blank" rel="noopener">doi:10.1145/2783258.2783380</a></p>
+    <p>Fanaee-T, H. (2013). <em>Bike Sharing</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a></p>
+    <p>scikit-learn. <em>Working With Text Data</em>. <a href="https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
+    <p>NetworkX. <em>Tutorial</em>. <a href="https://networkx.org/documentation/stable/tutorial.html" target="_blank" rel="noopener">networkx.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s14.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  var horas = [0, 3, 6, 9, 12, 15, 18, 21, 23];
+  /* Portada: perfil horario real */
+  var l1 = DS.linea({ x: 80, y: 560, w: 1440, h: 280, xd: [0, 23], yd: [0, 550], ys: C.perfil_lab, color: 'var(--neon)', grosor: 5 });
+  var l2 = DS.linea({ x: 80, y: 560, w: 1440, h: 280, xd: [0, 23], yd: [0, 550], ys: C.perfil_nolab, color: 'var(--compra)', grosor: 5 });
+  CUR.poner('portada', (l1.s + l2.s).replace(/<line[^>]*\/>|<text[^>]*>[^<]*<\/text>/g, ''));
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apertura', 'party-popper'], ['7:10', 'Kits', 'boxes'], ['7:30', 'Cápsulas 1-3', 'monitor-play'], ['8:10', 'Pausa', 'coffee'], ['8:25', 'English', 'languages'], ['8:35', 'Cápsulas 4-6', 'monitor-play'], ['9:30', 'Co-evaluación', 'vote'], ['9:55', 'Cierre', 'flag']], 2, { color: 'var(--neon)' }));
+  /* Palabras */
+  var T = S.texto, pos = Object.keys(T.positivas_top).slice(0, 6), neg = Object.keys(T.negativas_top).slice(0, 6), X = DS.esc(0, -2.6, 3.1, 30, 730), p = '';
+  p += '<line x1="' + X(0) + '" x2="' + X(0) + '" y1="10" y2="720" stroke="var(--tinta-2)" stroke-width="2"/>';
+  pos.forEach(function (w, i) { var v = T.positivas_top[w], y = 20 + i * 56; p += '<rect class="paso-capa" x="' + X(0) + '" y="' + y + '" width="' + (X(v) - X(0)) + '" height="40" fill="var(--neon)"/>' + DS.txt(X(0) - 12, y + 30, w, 't-n', ' text-anchor="end" font-size="26"') + DS.txt(X(v) + 8, y + 30, '+' + num(v, 2), 't-v', ' font-size="22"'); });
+  neg.forEach(function (w, i) { var v = T.negativas_top[w], y = 380 + i * 56; p += '<rect class="paso-capa" x="' + X(v) + '" y="' + y + '" width="' + (X(0) - X(v)) + '" height="40" fill="var(--compra)"/>' + DS.txt(X(0) + 12, y + 30, w, 't-n', ' font-size="26"') + DS.txt(X(v) - 8, y + 30, num(v, 2), 't-o', ' text-anchor="end" font-size="22"'); });
+  CUR.poner('palabras', p);
+  /* Perfil por hora */
+  var e = DS.ejes({ x: 110, y: 30, w: 1300, h: 440, xd: [0, 23], yd: [0, 550], yt: [0, 250, 500], xt: horas, fx: function (v) { return v + ' h'; } }), s = e.s;
+  [['perfil_lab', 'var(--neon)', 'Laboral'], ['perfil_nolab', 'var(--compra)', 'Fin de semana o festivo']].forEach(function (k, j) {
+    s += '<path' + (j ? ' class="paso-capa"' : '') + ' d="' + C[k[0]].map(function (v, h) { return (h ? 'L' : 'M') + e.X(h) + ' ' + e.Y(v); }).join('') + '" fill="none" stroke="' + k[1] + '" stroke-width="6"/>';
+    var pico = C[k[0]].indexOf(Math.max.apply(null, C[k[0]]));
+    s += '<rect x="' + (160 + j * 420) + '" y="40" width="26" height="26" fill="' + k[1] + '"/>' + DS.txt(198 + j * 420, 62, k[2] + ': pico ' + pico + ' h', j ? 't-o' : 't-v', ' font-size="26"');
+  });
+  s += DS.txt(110, 14, 'Alquileres promedio por hora', 't-eje');
+  CUR.poner('horas', s);
+  CUR.poner('taller', DS.ruta([['boxes', 'Elige', 'Un kit'], ['book-open', 'Lee', 'Una fuente'], ['monitor-play', 'Demo', 'Datos reales'], ['triangle-alert', 'Rómpela', 'Un límite'], ['presentation', 'Enseña', '12 minutos']], 'Cómo preparar la cápsula', 'Equipos · Colab · entrega: cuaderno de la demo y diapositivas de la cápsula', 'var(--neon)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

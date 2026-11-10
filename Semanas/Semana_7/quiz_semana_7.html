@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 7, "tema": "Exploring 731 days of bike rentals", "cierre": "Explore before you model: split by group, plot before you compute r, and judge outliers in context.", "preguntas": [
+{"q": "On working days, the average is 4,585 rentals; on other days, 4,330. What is the best next step?", "o": ["Conclude that working days are busier", "Split the total into casual and registered users", "Delete the weekends", "Compute a pie chart"], "a": 1, "e": "The total hides two groups that move in opposite directions: casual users rent twice as much on weekends."},
+{"q": "The correlation between temperature and rentals is 0.627. What does it mean?", "o": ["Heat causes 62.7 % of the rentals", "There is a moderate positive linear association", "The relationship is perfect", "Temperature and rentals are independent"], "a": 1, "e": "r measures linear association only. It says nothing about cause."},
+{"q": "The covariance is 9,123 and the correlation is 0.627. Why are they so different?", "o": ["One of them is wrong", "Covariance keeps the units; correlation has no units", "Correlation is always smaller", "Covariance counts days"], "a": 1, "e": "Correlation is the covariance divided by both standard deviations, so it lies between -1 and 1."},
+{"q": "Rentals rise up to 25-30 °C and fall above 30 °C. What does this tell you about r?", "o": ["r captures it perfectly", "r can miss a curved relationship", "r becomes negative", "The data are wrong"], "a": 1, "e": "Always plot the data. Anscombe (1973) showed datasets with the same r and very different shapes."},
+{"q": "With the IQR rule on all 731 days, the day with 22 rentals is not an outlier. Why?", "o": ["22 is a normal value", "The lower limit is negative because the spread is large", "The rule does not work with counts", "The day was deleted"], "a": 1, "e": "Q1 - 1.5 IQR = -1,054. Within its own month, the hurricane day is clearly unusual."},
+{"q": "The Readme says season 1 is spring, but the dates say winter. What should a data scientist do?", "o": ["Trust the Readme", "Check the data and document the discrepancy", "Delete the column", "Ignore it"], "a": 1, "e": "Documentation is evidence too, and it can be wrong. Verify it against the data."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 13, "tema": "Finding customer segments", "cierre": "The distance decides the cluster. Validate inside and outside, and report profiles with their limits.", "preguntas": [
+{"q": "For customers 1 and 2, Manhattan = 2.602, Euclidean = 1.721, supremum = 1.643. Is this order a coincidence?", "o": ["Yes", "No: for any two points, Manhattan is at least Euclidean, which is at least supremum", "Only for this dataset", "Supremum is always the largest"], "a": 1, "e": "They are Minkowski distances with p = 1, 2 and infinity."},
+{"q": "Without a log transform, K-means splits 440 customers into 36 and 404. Why?", "o": ["K-means is broken", "Spending is very skewed and a few big customers dominate the Euclidean distance", "There are missing values", "k should be 36"], "a": 1, "e": "With log and scaling, the groups are 252 and 188."},
+{"q": "The silhouette is 0.29 for k = 2. How do you read it?", "o": ["Perfect clusters", "Weak structure: the groups exist but overlap", "No structure at all", "29 % of customers are misclassified"], "a": 1, "e": "Silhouettes range from -1 to 1. Rousseeuw (1987)."},
+{"q": "We never showed the channel to the algorithm, but the adjusted Rand index with the channel is 0.514. What is this?", "o": ["Internal validation", "External validation against a known label", "Data leakage", "Overfitting"], "a": 1, "e": "Adjusted Rand: 0 is chance agreement, 1 is identical partitions."},
+{"q": "With eps = 1.5, DBSCAN finds one cluster and 44 noise points. What does that suggest?", "o": ["DBSCAN failed", "The data look like one dense cloud with some unusual customers, not two separate blobs", "There are 44 segments", "K-means was wrong"], "a": 1, "e": "Each method answers a different question: partitions, hierarchy or density."},
+{"q": "Why report medians instead of means in the segment profiles?", "o": ["Medians are easier to type", "Spending is skewed; medians are not pulled by a few huge customers", "Means are illegal", "Medians are always larger"], "a": 1, "e": "Fresh: mean 12,000 but median 8,504."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

@@ -149,6 +149,9 @@
 <script>
     // 1. Inicializar banco de preguntas (obtener 5 aleatorias del pool)
     let allQuestions = window.QuizBank ? window.QuizBank["ciencia_datos"] : [];
+    // El banco mezcla dos formatos (pregunta/opciones y text/options): se unifican antes de usarlos.
+    allQuestions = allQuestions.map(q => q.opciones ? q : { id: q.id, tema: q.topic, pregunta: q.text, opciones: q.options, respuestaCorrecta: q.correct, explicacion: q.explanation })
+                               .filter(q => Array.isArray(q.opciones) && q.opciones.length);
     
     // Función para barajar array
     function shuffleArray(array) {
@@ -269,8 +272,8 @@
         progressText.style.display = "none";
         
         resultDiv.style.display = "block";
-        resultDiv.innerHTML = \`Quiz Completed!<br><span style="color:var(--data-orange); font-size:2.5rem;">\${score} / \${questions.length}</span><br>Great job!<br><br>
-        <button onclick="location.reload()" style="background:var(--data-blue); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:1rem;">Retry (New Random Questions)</button>\`;
+        resultDiv.innerHTML = `Quiz Completed!<br><span style="color:var(--data-orange); font-size:2.5rem;">${score} / ${questions.length}</span><br>Great job!<br><br>
+        <button onclick="location.reload()" style="background:var(--data-blue); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:1rem;">Retry (New Random Questions)</button>`;
 
         // Enviar resultados al Parent LMS (index.html)
         const notaEscalada = Math.round((score / questions.length) * 100);

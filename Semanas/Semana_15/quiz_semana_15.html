@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 15, "tema": "Responsible data science", "cierre": "Ask who the model gets wrong, who it exposes, and who is accountable before you deploy it.", "preguntas": [
+{"q": "We removed the 'sex' column, but the model still predicts high income for 8.8 % of women and 25.5 % of men. Why?", "o": ["The model is broken", "Other variables act as proxies for sex", "Women were deleted", "The seed changed"], "a": 1, "e": "'Husband' appears for 13,192 men and 1 woman."},
+{"q": "Precision is 73.0 % for women and 73.8 % for men. Which fairness idea is almost met?", "o": ["Demographic parity", "Calibration", "Equal false positive rates", "None"], "a": 1, "e": "An alarm means about the same in both groups."},
+{"q": "Why can't all fairness definitions be met at once here?", "o": ["Because Python cannot do it", "Because the real base rates differ between groups", "Because the dataset is small", "They can always be met"], "a": 1, "e": "Chouldechova (2017) shows this trade-off."},
+{"q": "With age, sex, race, country, occupation and education, 24.7 % of people are unique. What does it mean?", "o": ["The data are anonymous", "Many people can be re-identified without names", "The data are wrong", "Nothing important"], "a": 1, "e": "k-anonymity (Sweeney, 2002) asks that each combination is shared by at least k people."},
+{"q": "The Moral Machine gathered 40 million decisions in 233 countries and territories. What did it show?", "o": ["Everyone agrees", "Moral preferences vary across cultures", "Machines decide better", "Nothing"], "a": 1, "e": "Awad et al. (2018), Nature."},
+{"q": "Which statement follows the UNAB guidelines on AI?", "o": ["The model decides alone", "Technology must be subordinate to human judgment", "AI use does not need to be declared", "Bias is not our problem"], "a": 1, "e": "Declare the AI tools you use and verify their output."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

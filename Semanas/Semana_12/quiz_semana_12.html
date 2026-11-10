@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 12, "tema": "Beat the baseline, fairly", "cierre": "Check for duplicates, choose with cross-validation, and look at the test set only once.", "preguntas": [
+{"q": "113 of the 788 test customers have an identical twin in the training set. What is the risk?", "o": ["None", "The model can score well by memory, so the test score is inflated", "The model becomes faster", "Accuracy goes down"], "a": 1, "e": "Without duplicates, the unlimited tree drops from 94.5 % to 92.3 %."},
+{"q": "What is cross-validation used for?", "o": ["To replace the test set forever", "To compare and choose models without touching the test set", "To delete outliers", "To speed up training"], "a": 1, "e": "Choose with cross-validation; confirm once on the test set."},
+{"q": "Depth 1: training 89.3 %, validation 89.3 %. What problem is this?", "o": ["High variance", "High bias: the model is too simple", "Data leakage", "No problem at all"], "a": 1, "e": "Both scores are low and similar."},
+{"q": "Depth 15: training 99.6 %, validation 93.1 %. What problem is this?", "o": ["High bias", "High variance: the model memorizes noise", "Underfitting", "Perfect model"], "a": 1, "e": "The gap between training and validation is the sign of overfitting."},
+{"q": "Why define the metric before the competition starts?", "o": ["It is a tradition", "Changing it after seeing results is moving the goalposts", "Metrics do not matter", "To make the code shorter"], "a": 1, "e": "The business goal here is customers found with 150 calls, not accuracy."},
+{"q": "Complete: 'testing it on the same data is a methodological ...'", "o": ["success", "mistake", "standard", "shortcut"], "a": 1, "e": "From the scikit-learn User Guide, section on cross-validation."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

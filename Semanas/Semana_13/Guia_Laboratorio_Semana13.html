@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 13: segmentación de clientes | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Segmentar 440 clientes sin que nadie diga quién es quién</h1>
+  <p>Cinco ejercicios para descubrir segmentos con K-means, decidir cuántos hay con siluetas, compararlos con otros métodos y publicar sus perfiles. El canal real de cada cliente se esconde hasta el final, para validar.</p>
+  <div class="datos-clase"><span><b>Semana</b>13</span><span><b>Tiempo</b>60 minutos en clase</span><span><b>Herramienta</b>Colab con scikit-learn</span><span><b>Resultados</b>RAE 1.1, 2.2, 3.1 y 3.3</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Medir distancias</a></li>
+  <li><a href="#e2">2. Preparar la escala</a></li>
+  <li><a href="#e3">3. K-means y siluetas</a></li>
+  <li><a href="#e4">4. Otros métodos y validación</a></li>
+  <li><a href="#e5">5. Publicar los perfiles</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_13/Colab_Guiado_Semana_13.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/clientes_mayoristas.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Archivo <code>clientes_mayoristas.csv</code>: 440 filas, una por cliente de un distribuidor mayorista de Portugal.</p>
+  <div class="tablon"><table>
+    <tr><th>Columna</th><th>Qué significa</th><th>Unidad o valores</th></tr>
+    <tr><td><code>Channel</code></td><td>Canal del cliente.</td><td>1 Horeca (hotel, restaurante, café), 2 minorista. No se usa para agrupar.</td></tr>
+    <tr><td><code>Region</code></td><td>Región.</td><td>1 Lisboa, 2 Oporto, 3 otra.</td></tr>
+    <tr><td><code>Fresh</code>, <code>Milk</code>, <code>Grocery</code></td><td>Gasto anual en frescos, lácteos y abarrotes.</td><td>Unidades monetarias (u. m.); la fuente no dice cuál.</td></tr>
+    <tr><td><code>Frozen</code>, <code>Detergents_Paper</code>, <code>Delicassen</code></td><td>Gasto anual en congelados, detergentes y papel, y delicatessen.</td><td>Unidades monetarias.</td></tr>
+  </table></div>
+  <div class="aviso"><strong>Datos reales.</strong> Wholesale customers, de Margarida Cardoso (2013), en el <a href="https://archive.ics.uci.edu/dataset/292/wholesale+customers" target="_blank" rel="noopener">repositorio UCI</a>, CC BY 4.0, <a href="https://doi.org/10.24432/C5030X" target="_blank" rel="noopener">doi:10.24432/C5030X</a>. El taller en Excel con Mall Customers de clases anteriores sigue sirviendo para practicar el cálculo, pero su origen no está documentado: no se usa como caso real.</div>
+  <p>Calentamiento opcional: <a href="game_kmeans.html" target="_blank" rel="noopener">reto gamificado de centroides</a>.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Medir distancias <small>(RAE 1.1)</small></h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Tome las seis columnas de gasto, aplique <code>np.log</code> y estandarice con <code>StandardScaler</code>. Llame <code>Z</code> al resultado.</li>
+    <li>Con las filas 0 y 1 de <code>Z</code> (clientes 1 y 2) calcule a mano, con NumPy, la distancia de Manhattan (p = 1), la euclidiana (p = 2) y la suprema (p → ∞).</li>
+    <li>Calcule la similitud del coseno: <code>a @ b / (norm(a) * norm(b))</code>.</li>
+    <li>Compruebe con <code>scipy.spatial.distance.minkowski</code>. ¿Qué categoría pesa más en la distancia suprema?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Manhattan 2,602; euclidiana 1,721; suprema 1,643; coseno 0,576. La suprema la decide congelados: el cliente 1 gasta 214 u. m. y el cliente 2, 1.762.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Preparar la escala</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Compare media, mediana y máximo de <code>Fresh</code>. ¿Qué dice de la forma de la distribución?</li>
+    <li>Corra <code>KMeans(2, n_init=20, random_state=42)</code> sobre el gasto solo estandarizado, sin logaritmo. Cuente los clientes de cada grupo.</li>
+    <li>Repita con <code>Z</code>. ¿Qué cambió?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Frescos: media 12.000, mediana 8.504, máximo 112.151: muy asimétrico. Sin logaritmo, grupos de 36 y 404; con logaritmo, 252 y 188.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> K-means y siluetas <small>(RAE 3.1)</small></h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Para k de 2 a 8, guarde la inercia y la silueta media (<code>silhouette_score</code>).</li>
+    <li>Grafique las dos curvas. ¿Ve un codo? ¿Qué k elige la silueta?</li>
+    <li>Interprete el valor de la silueta: ¿grupos bien separados o que se tocan?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>k</th><th class="d">2</th><th class="d">3</th><th class="d">4</th><th class="d">5</th><th class="d">6</th><th class="d">7</th><th class="d">8</th></tr>
+      <tr><td>Inercia</td><td class="d">1.848,0</td><td class="d">1.558,0</td><td class="d">1.391,9</td><td class="d">1.271,3</td><td class="d">1.178,6</td><td class="d">1.090,5</td><td class="d">1.026,9</td></tr>
+      <tr><td>Silueta</td><td class="d">0,290</td><td class="d">0,258</td><td class="d">0,188</td><td class="d">0,191</td><td class="d">0,192</td><td class="d">0,189</td><td class="d">0,194</td></tr>
+    </table>
+    <p>No hay un codo claro; la silueta elige k = 2. Un valor de 0,29 indica estructura débil: los grupos existen, pero se superponen.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Otros métodos y validación <small>(RAE 2.2 y 3.1)</small></h2>
+  <p class="meta">13 minutos.</p>
+  <ol class="pasos">
+    <li>Ahora sí, cruce los grupos de K-means (k = 2) con <code>Channel</code> en una tabla de contingencia.</li>
+    <li>Calcule el índice de Rand ajustado con <code>adjusted_rand_score</code>.</li>
+    <li>Repita con <code>AgglomerativeClustering(2, linkage="ward")</code>: Rand ajustado y silueta.</li>
+    <li>Pruebe <code>DBSCAN(eps=e, min_samples=8)</code> con e = 1,0, 1,5 y 2,0. Cuente grupos y puntos de ruido (etiqueta −1).</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Grupo</th><th class="d">Horeca</th><th class="d">Minorista</th></tr>
+      <tr><td>A (el de más Horeca)</td><td class="d">244</td><td class="d">8</td></tr>
+      <tr><td>B</td><td class="d">54</td><td class="d">134</td></tr>
+    </table>
+    <p>K-means: Rand ajustado 0,514. Ward: 0,415, silueta 0,263. DBSCAN: con 1,0, 2 grupos y 146 de ruido; con 1,5, 1 grupo y 44; con 2,0, 1 grupo y 16. La numeración 0 y 1 de K-means puede salir invertida: lo que importa es el cruce.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Publicar los perfiles</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule la mediana de cada categoría por grupo. Use medianas, no medias: el gasto es asimétrico.</li>
+    <li>Póngale nombre a cada segmento y escriba qué haría con él el equipo de ventas.</li>
+    <li>Publique en el README del repositorio del equipo: tabla de medianas, una gráfica, el número de clientes y tres límites del análisis.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Mediana (u. m.)</th><th class="d">Frescos</th><th class="d">Lácteos</th><th class="d">Abarrotes</th><th class="d">Congelados</th><th class="d">Det. y papel</th><th class="d">Delicatessen</th></tr>
+      <tr><td>Grupo A (252)</td><td class="d">10.347,5</td><td class="d">1.871</td><td class="d">2.406</td><td class="d">2.225</td><td class="d">327,5</td><td class="d">749,5</td></tr>
+      <tr><td>Grupo B (188)</td><td class="d">5.406,5</td><td class="d">7.690,5</td><td class="d">11.527</td><td class="d">1.061,5</td><td class="d">4.495</td><td class="d">1.388,5</td></tr>
+    </table>
+    <p>Límites que deberían aparecer: la unidad monetaria no se conoce; la silueta es débil; son clientes de un solo distribuidor; el agrupamiento no explica por qué compran así.</p>
+  </div></details>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo <small>(RAE 3.3)</small></h2>
+  <p><strong>Estabilidad:</strong> repita K-means con k = 2 y diez semillas distintas, y con submuestras del 80 % de los clientes. Mida con el Rand ajustado cuánto se parecen las particiones entre sí. <strong>Tipos mixtos:</strong> agregue <code>Region</code> como variable categórica e investigue la distancia de Gower. Escriba qué cambia.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Rousseeuw, P. J. (1987). Silhouettes. <em>Journal of Computational and Applied Mathematics</em>, 20, 53-65. <a href="https://doi.org/10.1016/0377-0427(87)90125-7" target="_blank" rel="noopener">doi:10.1016/0377-0427(87)90125-7</a></li>
+    <li>Hubert, L. y Arabie, P. (1985). Comparing partitions. <em>Journal of Classification</em>, 2, 193-218. <a href="https://doi.org/10.1007/BF01908075" target="_blank" rel="noopener">doi:10.1007/BF01908075</a></li>
+    <li>scikit-learn: <a href="https://scikit-learn.org/stable/modules/clustering.html" target="_blank" rel="noopener">Clustering</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script src="cifras.js"></script>
+<script>window.GUIA_PUNTOS = window.CIFRAS.grupo.map(function (g) { return g ? 0 : 1; });</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

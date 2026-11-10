@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 16: Demo Day del proyecto integrador | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Demo Day: convencer a un panel con datos que existen</h1>
+  <p>Cada equipo presenta su proyecto integrador como si buscara inversión: un problema real, datos reales, un modelo evaluado con honestidad y una decisión que alguien podría tomar mañana. El público evalúa con esta misma rúbrica.</p>
+  <div class="datos-clase"><span><b>Semana</b>16</span><span><b>Tiempo</b>10 minutos por equipo</span><span><b>Modalidad</b>Grupal, presencial</span><span><b>Peso</b>40 % · RAE 3.1 a 3.3</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#entregable">Qué se entrega</a></li>
+  <li><a href="#formato">Formato del Demo Day</a></li>
+  <li><a href="#rubrica">Rúbrica pública</a></li>
+  <li><a href="#pares">Evaluación por pares</a></li>
+  <li><a href="#lista">Lista de verificación</a></li>
+</ol></nav>
+<main>
+<section id="entregable">
+  <h2>Qué se entrega</h2>
+  <p>Un repositorio público en GitHub con:</p>
+  <ol class="pasos">
+    <li><code>README.md</code> con la pregunta de decisión, quién la toma y la Gran Idea en una oración.</li>
+    <li>Ficha de datos: fuente, autor, licencia, fecha, número de filas, diccionario de columnas con unidades y lo que el dato <em>no</em> permite afirmar.</li>
+    <li>Cuaderno reproducible: limpieza, análisis exploratorio, modelo (regresión, clasificación o agrupamiento), comparación con una línea base y validación honesta.</li>
+    <li>Sección de ética: a quién se equivoca el modelo, a quién expone y quién responde (semana 15).</li>
+    <li>Diapositivas del pitch y declaración de uso de IA.</li>
+  </ol>
+  <div class="aviso"><strong>Los datos existen.</strong> No se aceptan datos inventados ni conjuntos de Kaggle sin autor o artículo de origen. Si un personaje o supuesto es del caso, se declara. Las semanas 7 a 15 de este curso muestran cómo documentar un dataset real.</div>
+</section>
+
+<section id="formato">
+  <h2>Formato del Demo Day</h2>
+  <ol class="pasos">
+    <li><strong>Pitch (6 minutos):</strong> problema, datos, hallazgo con un número, modelo contra la línea base, decisión recomendada, límite.</li>
+    <li><strong>Demo en vivo (2 minutos):</strong> una celda del cuaderno corriendo, o una predicción para un caso nuevo.</li>
+    <li><strong>Panel (2 minutos):</strong> el panel (docente e invitados) y el público hacen preguntas. Al menos una pregunta será: "¿qué pasaría si sus datos estuvieran equivocados?".</li>
+  </ol>
+</section>
+
+<section id="rubrica">
+  <h2>Rúbrica pública (0 a 4 por criterio)</h2>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th>Peso</th><th>4: excelente</th><th>1: insuficiente</th></tr>
+    <tr><td>Pregunta y audiencia</td><td class="d">10 %</td><td>Decisión concreta de una persona con cargo</td><td>Tema general sin decisión</td></tr>
+    <tr><td>Datos</td><td class="d">15 %</td><td>Reales, documentados, con licencia y límites</td><td>Sin fuente o inventados</td></tr>
+    <tr><td>Preparación y exploración</td><td class="d">15 %</td><td>Duplicados, faltantes y atípicos tratados con razones</td><td>Sin revisar</td></tr>
+    <tr><td>Modelo y validación (RAE 3.1)</td><td class="d">20 %</td><td>Gana a una línea base con validación honesta; métrica del negocio</td><td>Solo exactitud, sin línea base</td></tr>
+    <tr><td>Estabilidad y límites (RAE 3.2, 3.3)</td><td class="d">10 %</td><td>Muestra cuánto cambia el resultado y dónde falla</td><td>Presenta el resultado como seguro</td></tr>
+    <tr><td>Ética</td><td class="d">10 %</td><td>Errores por grupo, privacidad y responsable</td><td>No se menciona</td></tr>
+    <tr><td>Comunicación</td><td class="d">15 %</td><td>Títulos de conclusión, una sorpresa, tiempo cumplido</td><td>Lectura de diapositivas</td></tr>
+    <tr><td>Reproducibilidad</td><td class="d">5 %</td><td>El cuaderno corre de principio a fin desde GitHub</td><td>Falla o falta</td></tr>
+  </table></div>
+</section>
+
+<section id="pares">
+  <h2>Evaluación por pares</h2>
+  <p>Cada estudiante evalúa a dos equipos con la rúbrica y deja dos frases: lo más convincente y la pregunta que no se respondió. La nota de pares es formativa: el docente la usa para la retroalimentación final, no la promedia.</p>
+</section>
+
+<section id="lista">
+  <h2>Lista de verificación antes de presentar</h2>
+  <ul>
+    <li>Todo número de las diapositivas aparece en el cuaderno y coincide.</li>
+    <li>El modelo se compara con una línea base y se dice cuál.</li>
+    <li>Se revisaron filas duplicadas antes de partir los datos.</li>
+    <li>Ninguna variable del modelo es posterior al momento de decidir.</li>
+    <li>Asociación no se presenta como causa.</li>
+    <li>La declaración de uso de IA dice herramienta, para qué, prompt y qué se verificó.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

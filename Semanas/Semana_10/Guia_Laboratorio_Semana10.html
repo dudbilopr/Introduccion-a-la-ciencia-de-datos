@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 10: pronosticar la demanda | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Pronosticar la demanda, y saber cuánto confiar</h1>
+  <p>Cinco ejercicios con andamiaje progresivo: cada uno agrega una pieza al modelo anterior. Terminan como equipo de operaciones, decidiendo cuántas bicicletas alistar para un sábado.</p>
+  <div class="datos-clase"><span><b>Semana</b>10</span><span><b>Tiempo</b>60 minutos en clase</span><span><b>Herramienta</b>Colab con scikit-learn</span><span><b>Entrega</b>Reto: cuaderno y decisión</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. La recta</a></li>
+  <li><a href="#e2">2. Regresión múltiple</a></li>
+  <li><a href="#e3">3. Residuos</a></li>
+  <li><a href="#e4">4. Validar en el tiempo</a></li>
+  <li><a href="#e5">5. La flota del sábado</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_10/Colab_Guiado_Semana_10.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/bicicletas_dia.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Mismo archivo de las semanas 7 y 9: <code>bicicletas_dia.csv</code>, 731 días. Variable objetivo: <code>cnt</code>, alquileres del día. Variables predictoras, ya en unidades reales:</p>
+  <div class="tablon"><table>
+    <tr><th>Variable</th><th>Cómo se construye</th><th>Unidad</th></tr>
+    <tr><td><code>temp_c</code></td><td><code>temp * 41</code></td><td>°C</td></tr>
+    <tr><td><code>hum_pct</code></td><td><code>hum * 100</code></td><td>Puntos porcentuales</td></tr>
+    <tr><td><code>viento_kmh</code></td><td><code>windspeed * 67</code></td><td>km/h</td></tr>
+    <tr><td><code>yr</code>, <code>workingday</code></td><td>Sin cambios</td><td>0 o 1</td></tr>
+    <tr><td><code>season</code>, <code>weathersit</code></td><td>Variables ficticias con <code>pd.get_dummies(..., drop_first=True)</code></td><td>Referencia: invierno (1) y despejado (1)</td></tr>
+  </table></div>
+  <div class="aviso"><strong>Datos reales.</strong> Fanaee-T y Gama (2013), Bike Sharing Dataset, <a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noopener">UCI</a>, CC BY 4.0. Los costos de faltar o sobrar del ejercicio 5 son supuestos del caso.</div>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> La recta</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Ajuste <code>LinearRegression()</code> con <code>temp_c</code> como única variable.</li>
+    <li>Escriba la ecuación con su pendiente e intercepto. ¿Qué significa la pendiente en bicicletas?</li>
+    <li>Calcule R² y MAE sobre los 731 días. Prediga la demanda a 25 °C.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>ŷ = 1.214,6 + 162,0·°C. R² = 0,394; MAE = 1.246. A 25 °C: 5.264 bicicletas. El intercepto (0 °C) está fuera de los datos: no se interpreta.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Regresión múltiple</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Construya la matriz con las diez variables de la tabla de arriba.</li>
+    <li>Ajuste el modelo y ordene los coeficientes. Lea cada uno como "con lo demás igual".</li>
+    <li>Compare R² y MAE con el ejercicio 1. ¿Por qué el coeficiente de la temperatura bajó de 162 a 124?</li>
+  </ol>
+  <pre><code>X = pd.get_dummies(df[["temp_c", "hum_pct", "viento_kmh", "yr", "workingday", "season", "weathersit"]],
+                   columns=["season", "weathersit"], drop_first=True).astype(float)
+m = LinearRegression().fit(X, df["cnt"])</code></pre>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Variable</th><th class="d">Coeficiente</th><th>Variable</th><th class="d">Coeficiente</th></tr>
+      <tr><td>Temperatura (°C)</td><td class="d">124,0</td><td>Primavera</td><td class="d">1.152,3</td></tr>
+      <tr><td>Humedad (punto %)</td><td class="d">−13,3</td><td>Verano</td><td class="d">862,4</td></tr>
+      <tr><td>Viento (km/h)</td><td class="d">−41,8</td><td>Otoño</td><td class="d">1.550,0</td></tr>
+      <tr><td>Año 2012</td><td class="d">2.012,9</td><td>Niebla o nublado</td><td class="d">−423,9</td></tr>
+      <tr><td>Día laboral</td><td class="d">174,6</td><td>Lluvia o nieve ligera</td><td class="d">−1.900,8</td></tr>
+    </table>
+    <p>Intercepto 1.534,1. R² = 0,82; MAE = 600. La temperatura baja a 124 porque la estación ya explica parte de lo que antes se le atribuía a ella: las dos están correlacionadas.</p>
+  </div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Residuos</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule el residuo de cada día: real menos predicho. Grafíquelo contra la fecha.</li>
+    <li>Liste los cinco residuos más grandes en valor absoluto y busque qué pasó esos días.</li>
+    <li>Agregue <code>temp_c ** 2</code> al modelo. ¿Sube R²? ¿En qué temperatura está el máximo?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Fecha</th><th class="d">Real</th><th class="d">Predicho</th><th class="d">Residuo</th></tr>
+      <tr><td>30/10/2012</td><td class="d">1.096</td><td class="d">4.772</td><td class="d">−3.676</td></tr>
+      <tr><td>22/11/2012</td><td class="d">2.425</td><td class="d">5.907</td><td class="d">−3.482</td></tr>
+      <tr><td>29/10/2012</td><td class="d">22</td><td class="d">3.436</td><td class="d">−3.414</td></tr>
+      <tr><td>17/03/2012</td><td class="d">7.836</td><td class="d">4.424</td><td class="d">+3.412</td></tr>
+      <tr><td>25/11/2012</td><td class="d">2.424</td><td class="d">5.303</td><td class="d">−2.879</td></tr>
+    </table>
+    <p>Huracán Sandy y el puente de Acción de Gracias. Con temperatura al cuadrado, R² = 0,849 y el máximo está en 27,5 °C (−b / 2a con b = 423,5 y a = −7,7).</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Validar en el tiempo</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Divida al azar con <code>train_test_split(X, y, test_size=0.2, random_state=42)</code>. Calcule R² y MAE en prueba.</li>
+    <li>Ahora entrene solo con 2011, <strong>sin</strong> la variable año, y prediga 2012. Calcule R², MAE y el residuo medio.</li>
+    <li>Por último, con todas las variables, entrene con los días anteriores al 1 de septiembre de 2012 y pruebe con el resto.</li>
+    <li>¿Cuál de los tres errores le reportaría a la empresa? ¿Por qué?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Validación</th><th class="d">R²</th><th class="d">MAE</th></tr>
+      <tr><td>Al azar (147 días de prueba)</td><td class="d">0,83</td><td class="d">617</td></tr>
+      <tr><td>2011 → 2012 sin año</td><td class="d">−0,642</td><td class="d">2.103</td></tr>
+      <tr><td>Corte en septiembre de 2012 (122 días)</td><td class="d">0,604</td><td class="d">932</td></tr>
+    </table>
+    <p>Sin el año, el modelo se queda corto en 2.047 bicicletas por día en promedio: no sabe que el sistema creció. El error honesto es el del corte temporal: 932. El de 617 es optimista porque el modelo vio días del futuro.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> La flota del sábado</h2>
+  <p class="meta">13 minutos. Simulación de negocio.</p>
+  <ol class="pasos">
+    <li>Escenario: 24 °C, humedad 60 %, viento 12 km/h, despejado, verano, 2012, no laboral. Construya la fila con las mismas columnas de <code>X</code>.</li>
+    <li>Prediga con el modelo múltiple y con el que tiene temperatura al cuadrado.</li>
+    <li>Supuesto del caso: cada bicicleta que falta cuesta tres veces más que una que sobra. Con un error típico de 932, ¿alistan el pronóstico, más o menos? Justifiquen con un número.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Modelo múltiple: 6.088 bicicletas. Con temperatura al cuadrado: 6.680. Como faltar cuesta más, conviene alistar por encima del pronóstico; una opción razonable es pronóstico más un error típico. Cualquier número defendido con el costo y el error es válido.</p></div></details>
+  <p><strong>Antes de terminar:</strong> jueguen el <a href="game_descenso_gradiente.html" target="_blank" rel="noopener">reto de descenso de gradiente</a>: así encuentra el computador los coeficientes, bajando por el error.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Use <code>TimeSeriesSplit(n_splits=5)</code> de scikit-learn para validar el modelo múltiple en cinco cortes sucesivos. Reporte el MAE de cada corte y explique por qué cambia. Entréguelo en GitHub con su declaración de uso de IA.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em>, capítulo 3. Springer.</li>
+    <li>scikit-learn: <a href="https://scikit-learn.org/stable/modules/linear_model.html" target="_blank" rel="noopener">Linear Models</a> y <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html" target="_blank" rel="noopener">TimeSeriesSplit</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 731; i++) o.push([667, 668, 691, 694, 441].indexOf(i) >= 0 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

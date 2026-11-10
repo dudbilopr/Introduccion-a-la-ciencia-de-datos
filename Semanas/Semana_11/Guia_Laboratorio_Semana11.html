@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 11: salva al cliente | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Salva al cliente: 150 llamadas, 3.150 clientes</h1>
+  <p>Cinco ejercicios en equipo para pasar de una tabla de uso telefónico a una lista de a quién llamar. Al final compiten: gana quien salve más clientes con el mismo presupuesto, y sepa explicar por qué.</p>
+  <div class="datos-clase"><span><b>Semana</b>11</span><span><b>Tiempo</b>75 minutos en clase</span><span><b>Herramienta</b>Colab con scikit-learn</span><span><b>Entrega</b>Reto: cuaderno y estrategia</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Explorar las señales</a></li>
+  <li><a href="#e2">2. La línea base</a></li>
+  <li><a href="#e3">3. Regresión logística</a></li>
+  <li><a href="#e4">4. Árbol de decisión</a></li>
+  <li><a href="#e5">5. Reto: 150 llamadas</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_11/Colab_Guiado_Semana_11.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/churn_telecom.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Archivo <code>churn_telecom.csv</code>: 3.150 filas, una por cliente, 14 columnas. Algunos nombres traen dos espacios; el cuaderno los limpia con <code>' '.join(c.split())</code>.</p>
+  <div class="tablon"><table>
+    <tr><th>Columna</th><th>Qué significa</th><th>Unidad o valores</th></tr>
+    <tr><td><code>Call Failure</code></td><td>Llamadas fallidas.</td><td>Conteo en 9 meses.</td></tr>
+    <tr><td><code>Complains</code></td><td>Si el cliente puso una queja.</td><td>0 no, 1 sí.</td></tr>
+    <tr><td><code>Subscription Length</code></td><td>Antigüedad de la suscripción.</td><td>Meses.</td></tr>
+    <tr><td><code>Charge Amount</code></td><td>Nivel de cobro.</td><td>Ordinal, 0 (más bajo) a 9 (más alto).</td></tr>
+    <tr><td><code>Seconds of Use</code>, <code>Frequency of use</code></td><td>Segundos totales de llamada y número de llamadas.</td><td>Totales en 9 meses.</td></tr>
+    <tr><td><code>Frequency of SMS</code>, <code>Distinct Called Numbers</code></td><td>Mensajes de texto y números distintos llamados.</td><td>Totales en 9 meses.</td></tr>
+    <tr><td><code>Age Group</code>, <code>Age</code></td><td>Grupo de edad y edad.</td><td>Grupo de 1 (menor) a 5; edad en años.</td></tr>
+    <tr><td><code>Tariff Plan</code></td><td>Tipo de plan.</td><td>1 prepago, 2 contrato.</td></tr>
+    <tr><td><code>Status</code></td><td>Estado de la línea.</td><td>1 activa, 2 inactiva.</td></tr>
+    <tr><td><code>Customer Value</code></td><td>Valor calculado del cliente.</td><td>La fuente no da la fórmula ni la moneda.</td></tr>
+    <tr><td><code>Churn</code></td><td>Si el cliente se fue al mes 12.</td><td>0 se queda, 1 se va. Es lo que se predice.</td></tr>
+  </table></div>
+  <div class="aviso"><strong>Datos reales.</strong> Iranian Churn Dataset, recogido de la base de datos de una telefónica iraní durante 12 meses, en el <a href="https://archive.ics.uci.edu/dataset/563/iranian+churn+dataset" target="_blank" rel="noopener">repositorio UCI</a>, CC BY 4.0, <a href="https://doi.org/10.24432/C5JW3Z" target="_blank" rel="noopener">doi:10.24432/C5JW3Z</a>. Las variables son de los primeros 9 meses; la etiqueta, del mes 12. Los puntos del reto son supuestos del juego.</div>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Explorar las señales</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule la tasa de churn global y el número de clientes que se van.</li>
+    <li>Calcule la tasa por <code>Complains</code>, <code>Status</code> y <code>Tariff Plan</code>, con el número de clientes de cada grupo.</li>
+    <li>Compare la media de <code>Call Failure</code> y la mediana de <code>Seconds of Use</code> entre quienes se van y quienes se quedan.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Grupo</th><th class="d">Clientes</th><th class="d">Tasa de churn</th></tr>
+      <tr><td>Todos</td><td class="d">3.150</td><td class="d">15,7 % (495)</td></tr>
+      <tr><td>Con queja / sin queja</td><td class="d">241 / 2.909</td><td class="d">83,0 % / 10,1 %</td></tr>
+      <tr><td>Inactivo / activo</td><td class="d">782 / 2.368</td><td class="d">47,3 % / 5,3 %</td></tr>
+      <tr><td>Prepago / contrato</td><td class="d">2.905 / 245</td><td class="d">16,8 % / 2,4 %</td></tr>
+    </table>
+    <p>Fallas de llamada: 7,7 en promedio de quien se queda y 7,5 de quien se va. Segundos de uso, mediana: 3.530 contra 1.182.</p>
+  </div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> La línea base</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Parta en entrenamiento y prueba: <code>train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)</code>.</li>
+    <li>¿Cuántos clientes hay en prueba? ¿Cuántos se van?</li>
+    <li>Calcule la exactitud de predecir siempre "se queda". ¿Cuántos clientes salva esa "estrategia"?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>788 en prueba, 124 se van. Exactitud de la línea base: 664/788 = 84,3 %. Salva a cero clientes.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Regresión logística</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Ajuste <code>make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))</code> con el entrenamiento.</li>
+    <li>Calcule exactitud, precisión, sensibilidad y la matriz de confusión en prueba.</li>
+    <li>Obtenga las probabilidades con <code>predict_proba</code> y repita con umbrales 0,3 y 0,2.</li>
+    <li>Para cada umbral, ¿cuántas llamadas haría y a cuántos de los 124 encontraría?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Umbral</th><th class="d">Exactitud</th><th class="d">Precisión</th><th class="d">Sensibilidad</th><th class="d">Matriz [[VN, FP], [FN, VP]]</th></tr>
+      <tr><td>0,5</td><td class="d">88,8 %</td><td class="d">77,3 %</td><td class="d">41,1 %</td><td class="d">[[649, 15], [73, 51]]</td></tr>
+      <tr><td>0,3</td><td class="d">88,1 %</td><td class="d">59,5 %</td><td class="d">75,8 %</td><td class="d">[[600, 64], [30, 94]]</td></tr>
+      <tr><td>0,2</td><td class="d">84,9 %</td><td class="d">51,2 %</td><td class="d">84,7 %</td><td class="d">[[564, 100], [19, 105]]</td></tr>
+    </table>
+    <p>Llamadas = FP + VP: 66, 158 y 205. Bajar el umbral encuentra más clientes con más llamadas en vano, y casi no cambia la exactitud.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Árbol de decisión</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Ajuste <code>DecisionTreeClassifier(max_depth=3, random_state=42)</code>.</li>
+    <li>Imprima las reglas con <code>export_text</code> y léalas en voz alta como si se las explicara al gerente.</li>
+    <li>Compare su matriz con la de la logística con umbral 0,5. ¿Cuál encuentra más clientes?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Primera pregunta: ¿se quejó? Con queja y 5.983 segundos o menos de uso: se va. Sin queja, inactivo y 8 llamadas o menos: se va. Exactitud 89,2 %, precisión 68,6 %, sensibilidad 58,1 %, matriz [[631, 33], [52, 72]]. Encuentra 72 contra 51 de la logística con umbral 0,5.</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Reto: 150 llamadas</h2>
+  <p class="meta">25 minutos. Competencia por equipos.</p>
+  <ol class="pasos">
+    <li>Reglas del juego: cada cliente de prueba que se iba a ir y recibe llamada vale 10 puntos; cada llamada cuesta 1. Máximo 150 llamadas.</li>
+    <li>Elijan modelo y regla: un umbral, o "llamar a las 150 probabilidades más altas".</li>
+    <li>Calculen sus puntos en prueba. Armen su matriz de confusión en cartulina, un post-it por cada 5 clientes.</li>
+    <li>Expliquen en un minuto por qué su regla es la mejor y qué pasaría si una llamada costara 5.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Con la logística y las 150 probabilidades más altas (corte en 0,314) se encuentran 91 de 124: 910 − 150 = 760 puntos. Con umbral 0,5 se hacen 66 llamadas y se ganan 510 − 66 = 444. Los umbrales 0,3 y 0,2 pasan de las 150 llamadas. Si un equipo supera 760, debe mostrar cómo lo hizo sin mirar la prueba al elegir.</p></div></details>
+  <p>Calentamiento: <a href="game_regresion_logistica.html" target="_blank" rel="noopener">frontera de la regresión logística</a> y <a href="game_arbol_decision.html" target="_blank" rel="noopener">árbol de decisión</a>.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Revise los coeficientes estandarizados de la logística. ¿Cuál pesa más? ¿Coincide con lo que mostró la exploración del ejercicio 1? Antes de la semana 12, busque si el archivo tiene filas repetidas con <code>df.duplicated().sum()</code> y piense qué le pasaría a la evaluación.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em>, secciones 4.4 (regresión logística) y 9.2 (árboles). Springer.</li>
+    <li>scikit-learn: <a href="https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression" target="_blank" rel="noopener">Logistic regression</a>, <a href="https://scikit-learn.org/stable/modules/tree.html" target="_blank" rel="noopener">Decision Trees</a>, <a href="https://scikit-learn.org/stable/modules/model_evaluation.html#confusion-matrix" target="_blank" rel="noopener">Confusion matrix</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script src="cifras.js"></script>
+<script>window.GUIA_PUNTOS = window.CIFRAS.churn;</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

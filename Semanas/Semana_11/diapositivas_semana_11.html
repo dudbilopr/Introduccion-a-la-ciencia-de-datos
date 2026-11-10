@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 11 · Salva al cliente | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: central de señales de una telefónica. Cada cliente es una señal; la que se apaga es la que se va. */
+  :root { --fondo: #0a0c22; --fondo-2: #151a3a; --tinta: #eef0ff; --tinta-2: #a5acd6; --regla: rgba(165,172,214,.24); --punto: #5865a8; --compra: #ff7a1f; --acento-texto: #ffa263; --senal: #8fb8ff; }
+  :root[data-tema="claro"] { --fondo: #f4f4f8; --fondo-2: #e4e5ef; --tinta: #121633; --tinta-2: #4f557a; --regla: rgba(18,22,51,.2); --punto: #9aa2cc; --compra: #e85c0b; --acento-texto: #b94504; --senal: #2c5bd1; }
+  .rot { font: 700 22px Consolas, monospace; letter-spacing: .12em; color: var(--senal); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-b { fill: var(--senal); font-weight: 800; }
+  .panel { background: var(--fondo-2); padding: 34px 40px; border-top: 6px solid var(--senal); }
+  .senales { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .senal { background: var(--fondo-2); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px; border-bottom: 6px solid var(--punto); }
+  .senal .ico { font-size: 56px; color: var(--senal); }
+  .senal b { font-size: 30px; line-height: 1.1; } .senal .c { font-size: 50px; font-weight: 800; color: var(--acento-texto); line-height: 1; }
+  .senal span { font-size: 23px; color: var(--tinta-2); line-height: 1.2; }
+  .regla { font: 700 30px Consolas, monospace; background: var(--fondo-2); padding: 18px 24px; border-left: 6px solid var(--compra); line-height: 1.35; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--senal); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--senal); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .parpadeo { animation: parpadea 2.4s ease-in-out infinite; }
+  @keyframes parpadea { 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) { .parpadeo { animation: none; } }
+</style>
+</head>
+<body data-cine="dolly">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:90px;width:820px;padding:30px 36px;background:color-mix(in srgb, var(--fondo) 90%, transparent)">
+    <p class="rot">Salva al cliente · Semana 11</p>
+    <h1 style="font-size:96px;margin-top:16px;line-height:1.03">¿Quién se va, <span class="acento">antes de que se vaya?</span></h1>
+    <p class="sec" style="font-size:28px;margin-top:22px">Clasificación con regresión logística y árboles de decisión.</p>
+    <p class="sec" style="font-size:24px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">A la derecha, los 3.150 clientes reales de una telefónica iraní, uno por punto. Los 495 naranjas, en el orden del archivo, cancelaron el servicio al cabo de 12 meses. Hoy se construye un modelo que los señale con tres meses de anticipación.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Turno de hoy</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
+  <aside class="notas">El reto "Salva al cliente" es la actividad central de la guía: competencia por equipos para armar la mejor matriz de confusión con un presupuesto de llamadas.</aside>
+</section>
+
+<!-- 3 Objetivo -->
+<section class="esc">
+  <div class="panel" style="position:absolute;left:170px;top:110px;width:1260px">
+    <p class="rot">Objetivo de la semana</p>
+    <h2 style="font-size:56px;margin:16px 0 30px">Entrenar un clasificador, leer su matriz de confusión y elegir el umbral según lo que cuesta equivocarse.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="spline" style="font-size:64px;color:var(--senal)"></i><p style="font-size:33px">Ajustas una regresión logística y un árbol de decisión.</p>
+      <i class="ico" data-i="grid-3x3" style="font-size:64px;color:var(--senal)"></i><p style="font-size:33px">Construyes e interpretas la matriz de confusión.</p>
+      <i class="ico" data-i="sliders-horizontal" style="font-size:64px;color:var(--senal)"></i><p style="font-size:33px">Mueves el umbral y explicas qué ganas y qué pierdes.</p>
+    </div>
+  </div>
+  <aside class="notas">Contenido de la semana 11 en la guía: aprendizaje supervisado de clasificación, regresión logística y árboles de decisión, reto de churn. Entrega tipo reto (40 %).</aside>
+</section>
+
+<!-- 4 Caso -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">El caso</p>
+    <h2 style="font-size:54px;line-height:1.06">3.150 clientes, 9 meses de uso, y la pregunta del mes 12</h2>
+    <p class="paso" style="font-size:30px">Las 13 variables resumen los <b>primeros 9 meses</b>. La etiqueta dice si el cliente se fue al <b>mes 12</b>.</p>
+    <p class="paso" style="font-size:30px">Esos 3 meses son el margen para actuar: llamar, ofrecer, retener.</p>
+    <p class="paso" style="font-size:30px">Se fueron <b class="acento">495</b>: el <b class="acento">15,7 %</b>.</p>
+  </div>
+  <svg id="linea" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Línea de tiempo: meses 1 a 9 con datos, meses 10 a 12 de margen, mes 12 la etiqueta"></svg>
+  <aside class="notas">Fuente: Iranian Churn Dataset, UCI, 2020, CC BY 4.0. La descripción de UCI dice que todas las variables menos churn son agregados de los primeros 9 meses. Eso evita la fuga de información: el modelo no ve nada que ocurra después del momento de decidir. El archivo tiene una trampa más que veremos la semana 12.</aside>
+</section>
+
+<!-- 5 Señales -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Primero, explorar</p><h2 style="font-size:52px;margin-top:6px">Cuatro señales antes de cualquier modelo</h2></div>
+  <div class="senales" style="position:absolute;left:88px;right:88px;top:200px">
+    <div class="senal paso" style="border-bottom-color:var(--compra)"><i class="ico" data-i="message-square-warning"></i><b>Puso una queja</b><span class="c">83,0 %</span><span>se va (241 clientes). Sin queja: 10,1 %.</span></div>
+    <div class="senal paso"><i class="ico" data-i="phone-off"></i><b>Inactivo</b><span class="c">47,3 %</span><span>se va (782 clientes). Activos: 5,3 %.</span></div>
+    <div class="senal paso"><i class="ico" data-i="receipt"></i><b>Prepago</b><span class="c">16,8 %</span><span>se va (2.905). Con contrato: 2,4 % (245).</span></div>
+    <div class="senal paso"><i class="ico" data-i="clock"></i><b>Usa poco</b><span class="c">1.182 s</span><span>mediana de quien se va; 3.530 s de quien se queda.</span></div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:690px;width:1424px;font-size:30px">Una queja multiplica por ocho la tasa de salida. <b class="acento">Asociación, no causa:</b> quizá la queja y la salida tienen el mismo origen, un mal servicio.</p>
+  <aside class="notas">Fallas de llamada en promedio: 7,7 de quien se queda y 7,5 de quien se va; casi iguales. No todo lo que suena importante lo es. Esa variable se usa en el reto.</aside>
+</section>
+
+<!-- 6 Línea base -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:1424px;display:flex;flex-direction:column;gap:26px">
+    <p class="rot">La trampa de la exactitud</p>
+    <h2 style="font-size:60px;line-height:1.06;max-width:1300px">Un modelo que dice "nadie se va" acierta el <span class="acento">84,3 %</span> de las veces</h2>
+    <p class="paso" style="font-size:33px;max-width:1250px">Y no salva a nadie. En prueba hay 788 clientes y 124 se van: "nadie se va" acierta los 664 que se quedan.</p>
+    <p class="paso" style="font-size:33px;max-width:1250px">Cualquier modelo tiene que ganarle a esa <b>línea base</b>, y en lo que importa: encontrar a los que se van.</p>
+  </div>
+  <svg id="base" class="diagrama" viewBox="0 0 1424 300" style="position:absolute;left:88px;top:540px;width:1424px;height:300px" role="img" aria-label="788 clientes de prueba, 124 se van"></svg>
+  <aside class="notas">Partición estratificada 75/25 con semilla 42. La exactitud de la línea base es 664/788 = 0,843. Esto conecta con la semana 12, donde todo el trabajo es superar la línea base con honestidad.</aside>
+</section>
+
+<!-- 7 Logística -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:560px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Regresión logística</p>
+    <h2 style="font-size:50px;line-height:1.06">Acierta 88,8 %, pero se le escapan 73 de 124</h2>
+    <p class="paso" style="font-size:28px"><b>Precisión 77,3 %:</b> de cada 4 alarmas, 3 son ciertas.</p>
+    <p class="paso" style="font-size:28px"><b>Sensibilidad (recall) 41,1 %:</b> encuentra a 51 de los 124 que se van.</p>
+    <p class="paso sec" style="font-size:24px">Umbral por defecto: alarma si la probabilidad de irse es 0,5 o más.</p>
+  </div>
+  <svg id="matriz" class="diagrama" viewBox="0 0 900 760" style="position:absolute;left:660px;top:60px;width:900px;height:760px" role="img" aria-label="Matriz de confusión: 51 detectados, 73 se escaparon, 15 falsas alarmas, 649 bien descartados"></svg>
+  <aside class="notas">Cada cuadro es un cliente de prueba. Matriz: [[649, 15], [73, 51]]. Variables estandarizadas. La logística da una probabilidad; la clase sale de compararla con un umbral.</aside>
+</section>
+
+<!-- 8 Umbral -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">El umbral es una decisión de negocio</p><h2 style="font-size:52px;margin-top:6px">Bajar el umbral encuentra más clientes a cambio de más llamadas en vano</h2></div>
+  <svg id="umbral" class="diagrama" viewBox="0 0 1424 600" style="position:absolute;left:88px;top:200px;width:1424px;height:600px" role="img" aria-label="Sensibilidad y precisión con umbrales 0,5, 0,3 y 0,2"></svg>
+  <aside class="notas">Umbral 0,5: recall 41,1 %, precisión 77,3 %, 66 llamadas. Umbral 0,3: recall 75,8 %, precisión 59,5 %, 158 llamadas. Umbral 0,2: recall 84,7 %, precisión 51,2 %, 205 llamadas. ¿Qué es más caro, una llamada o un cliente perdido? Eso decide, no el modelo.</aside>
+</section>
+
+<!-- 9 Árbol -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Árbol de decisión · profundidad 3</p><h2 style="font-size:50px;margin-top:6px">Un árbol corto se puede leer en voz alta</h2></div>
+  <svg id="arbol" class="diagrama" viewBox="0 0 1424 470" style="position:absolute;left:88px;top:170px;width:1424px;height:470px" role="img" aria-label="Árbol: la primera pregunta es si el cliente se quejó"></svg>
+  <div style="position:absolute;left:88px;top:670px;width:1424px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
+    <p class="regla paso">Se queja y usa 5.983 s o menos → <span class="acento">se va</span></p>
+    <p class="regla paso">No se queja, inactivo, 8 llamadas o menos → <span class="acento">se va</span></p>
+  </div>
+  <aside class="notas">Exactitud 89,2 %, sensibilidad 58,1 %, precisión 68,6 %. Matriz [[631, 33], [52, 72]]. Encuentra más clientes que la logística con umbral 0,5. Algunas hojas del árbol completo dan la misma clase en las dos ramas; se simplificaron para leerlas.</aside>
+</section>
+
+<!-- 10 Reto -->
+<section class="esc">
+  <div class="panel" style="position:absolute;left:150px;top:80px;width:1300px">
+    <p class="rot">Reto · Salva al cliente</p>
+    <h2 style="font-size:52px;margin:12px 0 26px">Tienen presupuesto para 150 llamadas. ¿A quién llaman?</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico paso" data-i="phone" style="font-size:60px;color:var(--senal)"></i><p class="paso" style="font-size:31px">Cada cliente salvado vale 10 puntos; cada llamada, −1. Supuestos del juego.</p>
+      <i class="ico paso" data-i="grid-3x3" style="font-size:60px;color:var(--senal)"></i><p class="paso" style="font-size:31px">Elijan modelo y umbral. Construyan su matriz con cartulina: un post-it por cliente.</p>
+      <i class="ico paso" data-i="trophy" style="font-size:60px;color:var(--senal)"></i><p class="paso" style="font-size:31px">Gana el equipo con más puntos en el conjunto de prueba, y que sepa explicar por qué.</p>
+    </div>
+    <p class="paso" style="font-size:26px;margin-top:24px;color:var(--tinta-2)">Calentamiento: los retos gamificados de frontera logística y de árbol de decisión de esta semana.</p>
+  </div>
+  <aside class="notas">Supuesto: una llamada salva al cliente si de verdad se iba a ir. Ningún cliente real participa; los puntos son del juego. En la guía está la tabla para calcular los puntos de cada umbral.</aside>
+</section>
+
+<!-- 11 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="panel" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · read the data card</p>
+    <p style="font-size:44px;line-height:1.2;font-weight:700;margin:22px 0 18px">“All of the attributes except for attribute churn is the aggregated data of the first 9 months. The churn labels are the state of the customers at the end of 12 months. The three months is the designated <span class="acento">planning gap</span>.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Iranian Churn Dataset, UCI Machine Learning Repository (text as published)</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--senal)"></i><p class="paso" style="font-size:32px">Why is the planning gap good news for a retention team?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--senal)"></i><p class="paso" style="font-size:32px">Spot the grammar error in the quote and rewrite the sentence.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--senal)"></i><p class="paso" style="font-size:32px">Explain recall to a manager without using the word “recall”.</p>
+    </div>
+  </div>
+  <aside class="notas">Texto tal como aparece en la ficha de UCI. Error: "All of the attributes ... is" debe ser "are", y "The three months is" debe ser "are". Leer críticamente la documentación también es inglés técnico.</aside>
+</section>
+
+<!-- 12 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios del taller"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana11.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
+  <aside class="notas">Punto de control clave: matriz de la logística [[649, 15], [73, 51]] y del árbol [[631, 33], [52, 72]].</aside>
+</section>
+
+<!-- 13 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Códigos de la central</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="user-minus"></i><b>Churn</b><span>Cliente que cancela el servicio.</span></div>
+      <div><i class="ico" data-i="spline"></i><b>Regresión logística</b><span>Modela la probabilidad de una clase con la sigmoide.</span></div>
+      <div><i class="ico" data-i="git-fork"></i><b>Árbol de decisión</b><span>Preguntas sucesivas que parten los datos.</span></div>
+      <div><i class="ico" data-i="grid-3x3"></i><b>Matriz de confusión</b><span>Aciertos y errores por clase.</span></div>
+      <div><i class="ico" data-i="search-check"></i><b>Sensibilidad</b><span>De los que se van, cuántos encuentro.</span></div>
+      <div><i class="ico" data-i="target"></i><b>Precisión</b><span>De mis alarmas, cuántas son ciertas.</span></div>
+      <div><i class="ico" data-i="sliders-horizontal"></i><b>Umbral</b><span>Probabilidad desde la que doy la alarma.</span></div>
+      <div><i class="ico" data-i="equal-not"></i><b>Línea base</b><span>Lo que se logra sin modelo.</span></div>
+      <div><i class="ico" data-i="calendar-clock"></i><b>Fuga de información</b><span>Usar datos que no existen al decidir.</span></div>
+      <div><i class="ico" data-i="scale"></i><b>Estratificar</b><span>Partir conservando la proporción de clases.</span></div>
+    </div>
+  </div>
+  <aside class="notas">En inglés: recall, precision, threshold, baseline, data leakage, stratified split.</aside>
+</section>
+
+<!-- 14 Cierre -->
+<section class="esc">
+  <div class="panel" style="position:absolute;left:180px;top:90px;width:1240px;border-top-color:var(--compra)">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para clasificar con criterio</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="equal-not" style="font-size:62px;color:var(--senal)"></i><p class="paso" style="font-size:35px"><b>Primero la línea base:</b> 84,3 % sin modelo.</p>
+      <i class="ico paso" data-i="grid-3x3" style="font-size:62px;color:var(--senal)"></i><p class="paso" style="font-size:35px"><b>La exactitud esconde;</b> la matriz de confusión muestra.</p>
+      <i class="ico paso" data-i="sliders-horizontal" style="font-size:62px;color:var(--senal)"></i><p class="paso" style="font-size:35px"><b>El umbral lo decide el costo del error,</b> no el 0,5 por defecto.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 12: ¿de verdad le ganamos a la línea base? Validación cruzada, y una trampa escondida en este archivo.</p>
+  </div>
+  <aside class="notas">No revele aún la trampa (300 filas duplicadas). Que la descubran en la semana 12.</aside>
+</section>
+
+<!-- 15 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Registro de la central</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p><em>Iranian Churn</em> [conjunto de datos] (2020). UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5JW3Z" target="_blank" rel="noopener">doi:10.24432/C5JW3Z</a>. UCI no lista autores.</p>
+    <p>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2.ª ed.), secciones 4.4 y 9.2. Springer.</p>
+    <p>scikit-learn. <em>LogisticRegression</em>, <em>DecisionTreeClassifier</em> y <em>confusion_matrix</em>. <a href="https://scikit-learn.org/stable/supervised_learning.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s11.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  /* Portada: los 3.150 clientes reales en el orden del archivo; naranja = se fue */
+  var p = '', cols = 60, lado = 9, gap = 2, x0 = 925, y0 = 140;
+  C.churn.forEach(function (v, i) {
+    var x = x0 + (i % cols) * (lado + gap), y = y0 + Math.floor(i / cols) * (lado + gap);
+    p += '<rect x="' + x + '" y="' + y + '" width="' + lado + '" height="' + lado + '" fill="' + (v ? 'var(--compra)' : 'var(--senal)') + '" opacity="' + (v ? 1 : .28) + '"' + (v && i % 5 === 0 ? ' class="parpadeo"' : '') + '/>';
+  });
+  CUR.poner('portada', p);
+  CUR.poner('agenda', DS.agenda([['7:00', 'Caso', 'phone'], ['7:15', 'Señales', 'activity'], ['7:35', 'Línea base', 'equal-not'], ['7:50', 'Modelos', 'git-fork'], ['8:15', 'Pausa', 'coffee'], ['8:30', 'English', 'languages'], ['8:40', 'Reto', 'trophy'], ['9:55', 'Cierre', 'flag']], 6, { color: 'var(--senal)' }));
+  /* Línea de tiempo del caso */
+  var l = '', Y = function (m) { return 60 + (m - 1) * 52; };
+  for (var m = 1; m <= 12; m++) {
+    var dato = m <= 9;
+    l += '<rect x="120" y="' + Y(m) + '" width="' + (dato ? 360 : 200) + '" height="40" fill="' + (dato ? 'var(--senal)' : 'var(--fondo-2)') + '" opacity="' + (dato ? .55 : 1) + '"' + (dato ? '' : ' stroke="var(--compra)" stroke-dasharray="6 6" stroke-width="2"') + '/>' + DS.txt(100, Y(m) + 30, 'Mes ' + m, 't-s', ' text-anchor="end" font-size="22"');
+  }
+  l += '<path d="M500 ' + Y(1) + 'V' + (Y(9) + 40) + '" stroke="var(--senal)" stroke-width="4"/>' + DS.txt(520, Y(5) + 10, '13 variables', 't-b', ' font-size="30"') + DS.txt(520, Y(5) + 48, 'de uso y cuenta', 't-s', ' font-size="24"');
+  l += '<g class="paso"><path d="M340 ' + Y(10) + 'V' + (Y(12) + 40) + '" stroke="var(--compra)" stroke-width="4"/>' + DS.txt(360, Y(11) + 10, 'Margen para actuar', 't-o', ' font-size="28"') + '</g>';
+  l += '<g class="paso"><circle cx="300" cy="' + (Y(12) + 20) + '" r="14" fill="var(--compra)"/>' + DS.txt(360, Y(12) + 58, 'Etiqueta: ¿se fue?', 't-n', ' font-size="26"') + '</g>';
+  CUR.poner('linea', l);
+  /* Línea base: 788 clientes de prueba */
+  var b = '', tot = S.prueba_n, ch = S.prueba_churn;
+  for (var k = 0; k < tot; k++) b += '<rect x="' + (10 + (k % 99) * 14.2) + '" y="' + (20 + Math.floor(k / 99) * 15) + '" width="11" height="11" fill="' + (k < ch ? 'var(--compra)' : 'var(--senal)') + '" opacity="' + (k < ch ? 1 : .35) + '"/>';
+  b += DS.txt(10, 175, num(ch) + ' se van · ' + num(tot - ch) + ' se quedan', 't-s', ' font-size="26"');
+  CUR.poner('base', b);
+  /* Matriz de confusión */
+  CUR.poner('matriz', DS.matriz({ x: 20, y: 20, w: 820, h: 700, m: S.logistica.matriz, cols: 30, lado: 9 }));
+  /* Umbral */
+  var U = S.logistica.umbrales, us = ['0.5', '0.3', '0.2'], g = '';
+  us.forEach(function (u, i) {
+    var x = 80 + i * 470, w = U[u], llam = w.matriz[0][1] + w.matriz[1][1], det = w.matriz[1][1];
+    g += DS.txt(x, 40, 'Umbral ' + u.replace('.', ','), 't-b', ' font-size="34"');
+    [['Sensibilidad', w.recall, 'var(--compra)'], ['Precisión', w.precision, 'var(--senal)']].forEach(function (f, j) {
+      var y = 90 + j * 120;
+      g += DS.txt(x, y + 30, f[0], 't-s', ' font-size="25"') + '<rect x="' + x + '" y="' + (y + 44) + '" width="380" height="34" fill="var(--fondo-2)"/><rect class="paso-capa" x="' + x + '" y="' + (y + 44) + '" width="' + (380 * f[1]) + '" height="34" fill="' + f[2] + '"/>' + DS.txt(x + 380, y + 30, num(f[1] * 100, 1) + ' %', 't-n', ' text-anchor="end" font-size="28"');
+    });
+    g += '<g class="paso">' + DS.txt(x, 400, num(llam) + ' llamadas', 't-n', ' font-size="34"') + DS.txt(x, 446, num(det) + ' de 124 encontrados', 't-o', ' font-size="28"') + DS.txt(x, 490, num(w.matriz[0][1]) + ' llamadas en vano', 't-s', ' font-size="25"') + '</g>';
+  });
+  CUR.poner('umbral', g);
+  /* Árbol simplificado */
+  var a = '', nodo = function (x, y, t, c) { return '<rect x="' + (x - 150) + '" y="' + (y - 34) + '" width="300" height="68" rx="34" fill="var(--fondo-2)" stroke="' + (c || 'var(--senal)') + '" stroke-width="4"/>' + DS.txt(x, y + 10, t, 't-n', ' text-anchor="middle" font-size="27"'); };
+  var rama = function (x1, y1, x2, y2, t) { return '<path d="M' + x1 + ' ' + (y1 + 34) + 'C' + x1 + ' ' + (y1 + 90) + ' ' + x2 + ' ' + (y2 - 90) + ' ' + x2 + ' ' + (y2 - 34) + '" fill="none" stroke="var(--regla)" stroke-width="4"/>' + DS.txt((x1 + x2) / 2 + (x2 > x1 ? 20 : -20), (y1 + y2) / 2 + 8, t, 't-s', ' font-size="23"' + (x2 > x1 ? '' : ' text-anchor="end"')); };
+  a += rama(712, 50, 360, 210, 'no') + rama(712, 50, 1060, 210, 'sí') + rama(360, 210, 160, 390, 'activo') + rama(360, 210, 530, 390, 'inactivo') + rama(1060, 210, 900, 390, '≤ 5.983 s') + rama(1060, 210, 1260, 390, '> 5.983 s');
+  a += nodo(712, 50, '¿Se quejó?', 'var(--compra)') + nodo(360, 210, '¿Estado?') + nodo(1060, 210, '¿Segundos de uso?');
+  a += '<g class="paso">' + nodo(160, 390, 'Se queda') + nodo(530, 390, '≤ 8 llamadas: se va', 'var(--compra)') + nodo(900, 390, 'Se va', 'var(--compra)') + nodo(1260, 390, 'Se queda') + '</g>';
+  CUR.poner('arbol', a);
+  CUR.poner('taller', DS.ruta([['activity', 'Explora', 'Tasas por grupo'], ['equal-not', 'Línea base', 'Nadie se va'], ['spline', 'Logística', 'Matriz y umbral'], ['git-fork', 'Árbol', 'Profundidad 3'], ['trophy', 'Reto', '150 llamadas']], 'Del archivo a la lista de llamadas', 'Equipos · Colab con scikit-learn · entrega: cuaderno y estrategia del reto', 'var(--senal)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

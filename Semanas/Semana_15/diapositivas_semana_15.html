@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 15 · Sala de espejos | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: sala de espejos. Un modelo refleja la sociedad que produjo sus datos, con sus distorsiones. */
+  :root { --fondo: #0e1416; --fondo-2: #1b2528; --tinta: #f0f4f4; --tinta-2: #9fb0b2; --regla: rgba(159,176,178,.24); --punto: #5d7477; --compra: #ff7a1f; --acento-texto: #ffa263; --espejo: #7fd1d9; }
+  :root[data-tema="claro"] { --fondo: #f4f6f5; --fondo-2: #e2e8e7; --tinta: #10201f; --tinta-2: #4b5f60; --regla: rgba(16,32,31,.2); --punto: #93a7a8; --compra: #e85c0b; --acento-texto: #b94504; --espejo: #137a84; }
+  .rot { font: 700 23px Georgia, serif; letter-spacing: .12em; color: var(--espejo); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-e { fill: var(--espejo); font-weight: 800; }
+  .marco { background: var(--fondo-2); padding: 34px 40px; border: 2px solid var(--espejo); box-shadow: inset 0 0 60px rgba(127,209,217,.08); }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .tres > div { background: var(--fondo-2); padding: 24px 24px 28px; border-top: 6px solid var(--espejo); display: flex; flex-direction: column; gap: 10px; }
+  .tres b { font-size: 30px; } .tres .c { font: 800 46px 'Schibsted Grotesk', sans-serif; color: var(--acento-texto); } .tres span { font-size: 23px; color: var(--tinta-2); line-height: 1.22; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--espejo); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--espejo); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .brillo { animation: brilla 6s ease-in-out infinite; }
+  @keyframes brilla { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .brillo { animation: none; } }
+</style>
+</head>
+<body data-cine="dolly">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:110px;width:900px">
+    <p class="rot">Sala de espejos · Semana 15</p>
+    <h1 style="font-size:96px;margin-top:16px;line-height:1.03">Un modelo puede acertar <span class="acento">y aun así ser injusto.</span></h1>
+    <p class="sec" style="font-size:28px;margin-top:22px">Ética y ciencia de datos responsable: sesgo, privacidad y transparencia.</p>
+    <p class="sec" style="font-size:24px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">A la derecha, cada cuadro representa 100 personas del censo de Estados Unidos de 1994 (32.561 en total). Los iluminados ganan más de 50.000 dólares al año. Arriba los hombres, abajo las mujeres. Hoy un modelo aprende de este espejo.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Recorrido de la sala</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
+  <aside class="notas">El roleplay de dilemas éticos con la Moral Machine es la actividad central que pide la guía de aprendizaje, seguido de evaluación crítica.</aside>
+</section>
+
+<!-- 3 Objetivo -->
+<section class="esc">
+  <div class="marco" style="position:absolute;left:170px;top:110px;width:1260px">
+    <p class="rot">Objetivo de la semana</p>
+    <h2 style="font-size:54px;margin:16px 0 30px">Auditar un modelo más allá de su exactitud: a quién se equivoca, a quién expone y quién responde.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="scale" style="font-size:64px;color:var(--espejo)"></i><p style="font-size:32px">Mides errores por grupo y comparas definiciones de justicia.</p>
+      <i class="ico" data-i="fingerprint" style="font-size:64px;color:var(--espejo)"></i><p style="font-size:32px">Estimas cuántas personas se pueden reidentificar en un archivo "anónimo".</p>
+      <i class="ico" data-i="gavel" style="font-size:64px;color:var(--espejo)"></i><p style="font-size:32px">Argumentas un dilema ético con datos y con principios.</p>
+    </div>
+  </div>
+  <aside class="notas">Contenido de la semana 15 en la guía: ética y ciencia de datos responsable, privacidad y sesgos. Conecta con los componentes éticos y el uso de IA de la guía de aprendizaje de la UNAB.</aside>
+</section>
+
+<!-- 4 El espejo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Lo que muestran los datos</p><h2 style="font-size:52px;margin-top:6px">En 1994, el 30,6 % de los hombres ganaba más de 50.000 dólares; las mujeres, 10,9 %</h2></div>
+  <svg id="espejo" class="diagrama" viewBox="0 0 1424 600" style="position:absolute;left:88px;top:200px;width:1424px;height:600px" role="img" aria-label="Tasa de ingreso alto por sexo y por raza"></svg>
+  <aside class="notas">Censo de 1994: 21.790 hombres y 10.771 mujeres. Por raza: blanca 25,6 % (27.816 personas), asiática o de las islas del Pacífico 26,6 % (1.039), negra 12,4 % (3.124), amerindia o esquimal 11,6 % (311), otra 9,2 % (271). Son las categorías del censo, no las nuestras. Los grupos pequeños se señalan. Que el dato describa una desigualdad no la vuelve aceptable como regla.</aside>
+</section>
+
+<!-- 5 Quitar la columna -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px"><p class="rot">Primer intento: no mirar el sexo</p><h2 style="font-size:52px;margin-top:6px">Sin la columna sexo, el modelo acierta 85,4 %… y sigue separando</h2></div>
+  <div class="tres" style="position:absolute;left:88px;right:88px;top:210px">
+    <div class="paso"><b>Lo predice para</b><span class="c">8,8 % · 25,5 %</span><span>de las mujeres y de los hombres de prueba. Realidad: 11,2 % y 30,4 %.</span></div>
+    <div class="paso"><b>Encuentra</b><span class="c">57,5 % · 62,0 %</span><span>de quienes sí ganan más (sensibilidad), mujeres y hombres.</span></div>
+    <div class="paso"><b>Falsas alarmas</b><span class="c">2,7 % · 9,6 %</span><span>de quienes no ganan más (tasa de falsos positivos), mujeres y hombres.</span></div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:640px;width:1424px;font-size:31px">La precisión es casi igual: <b class="acento">73,0 %</b> y <b class="acento">73,8 %</b>. ¿Es justo? Depende de qué se entienda por justo.</p>
+  <aside class="notas">Regresión logística sin la columna sex, partición 70/30 estratificada, semilla 42; 9.769 personas de prueba (3.199 mujeres y 6.570 hombres). Línea base "nadie gana más": 75,9 %. El modelo no recibe el sexo, pero sus errores no son iguales entre grupos.</aside>
+</section>
+
+<!-- 6 Proxies -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:720px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Por qué no basta</p>
+    <h2 style="font-size:54px;line-height:1.06">Otra columna dice el sexo sin decirlo</h2>
+    <p class="paso" style="font-size:29px">"Esposo": <b class="acento">13.192</b> hombres y <b>1</b> mujer. "Esposa": <b class="acento">1.566</b> mujeres y <b>2</b> hombres.</p>
+    <p class="paso" style="font-size:29px">Quitando también relación y estado civil, la brecha sigue: lo predice para <b class="acento">8,1 %</b> de las mujeres y <b class="acento">18,4 %</b> de los hombres.</p>
+    <p class="paso sec" style="font-size:25px">Ocupación, horas trabajadas y otras variables cargan la historia del mercado laboral. Borrar columnas no borra el pasado.</p>
+  </div>
+  <svg id="proxy" class="diagrama" viewBox="0 0 700 720" style="position:absolute;left:850px;top:90px;width:700px;height:720px" role="img" aria-label="Relación en el hogar por sexo"></svg>
+  <aside class="notas">Exactitud sin relación ni estado civil: 82,2 %. A esto se le llama variable sustituta (proxy). La pregunta ética no es técnica: ¿para qué se usaría este modelo? Para un estudio de brechas salariales es útil; para decidir créditos sería discriminatorio.</aside>
+</section>
+
+<!-- 7 Definiciones -->
+<section class="esc">
+  <div class="marco" style="position:absolute;left:120px;top:70px;width:1360px">
+    <p class="rot">Tres ideas de justicia que chocan</p>
+    <h2 style="font-size:48px;margin:12px 0 26px">Cuando las tasas reales difieren, no se pueden cumplir las tres a la vez</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico paso" data-i="equal-not" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px"><b>Paridad:</b> el modelo da el resultado positivo en la misma proporción a cada grupo. Aquí: 8,8 % contra 25,5 %. No se cumple.</p>
+      <i class="ico paso" data-i="search-check" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px"><b>Igualdad de oportunidades:</b> misma sensibilidad. Aquí: 57,5 % contra 62,0 %. Casi.</p>
+      <i class="ico paso" data-i="target" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px"><b>Calibración:</b> una alarma vale lo mismo en cada grupo. Aquí: 73,0 % contra 73,8 %. Se cumple.</p>
+    </div>
+  </div>
+  <p class="pie">Chouldechova (2017), Big Data, 5(2): con tasas base distintas, un predictor calibrado no puede igualar a la vez falsos positivos y falsos negativos.</p>
+  <aside class="notas">No hay una definición correcta en abstracto: se elige según el uso y el daño. Ese es el contenido del roleplay.</aside>
+</section>
+
+<!-- 8 Privacidad -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:720px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Privacidad</p>
+    <h2 style="font-size:54px;line-height:1.06">El archivo no tiene nombres. Uno de cada cuatro es único igual</h2>
+    <p class="paso" style="font-size:29px">Con edad, sexo y raza: <b>65</b> personas únicas.</p>
+    <p class="paso" style="font-size:29px">Agregando país, ocupación y educación: <b class="acento">8.054</b>, el <b class="acento">24,7 %</b>.</p>
+    <p class="paso sec" style="font-size:25px">Quien conozca esos seis datos de una persona puede encontrar su fila y leer su ingreso. Sweeney (2002) propuso la k-anonimidad para medirlo.</p>
+  </div>
+  <svg id="privacidad" class="diagrama" viewBox="0 0 700 720" style="position:absolute;left:850px;top:90px;width:700px;height:720px" role="img" aria-label="Personas únicas según cuántos atributos se combinan"></svg>
+  <aside class="notas">Una persona es única si ninguna otra fila comparte su combinación exacta de atributos: k = 1. Con cuatro atributos: 1.330 (4,1 %); con cinco: 3.565 (10,9 %). La base de datos del censo ya está generalizada (sin dirección ni fecha de nacimiento). Pregunta: ¿qué haría usted antes de publicar un archivo así?</aside>
+</section>
+
+<!-- 9 Moral Machine -->
+<section class="esc">
+  <div class="marco" style="position:absolute;left:150px;top:70px;width:1300px">
+    <p class="rot">Roleplay · Moral Machine</p>
+    <h2 style="font-size:50px;margin:12px 0 24px">40 millones de decisiones, 233 países y territorios: no hay una sola moral</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:22px 18px;align-items:center">
+      <i class="ico paso" data-i="users-round" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px">Roles: empresa que construye el modelo, persona afectada, regulador, ingeniera de datos, medio de comunicación.</p>
+      <i class="ico paso" data-i="scroll-text" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px">Dilema: un banco quiere usar el modelo de ingreso para preaprobar créditos. ¿Se usa, se cambia o se prohíbe?</p>
+      <i class="ico paso" data-i="vote" style="font-size:58px;color:var(--espejo)"></i><p class="paso" style="font-size:30px">Cada rol argumenta con un número de hoy y un principio. Al final, el grupo vota y explica.</p>
+    </div>
+  </div>
+  <p class="pie">Awad y otros (2018), The Moral Machine experiment, Nature, 563, 59-64.</p>
+  <aside class="notas">Cifra textual del resumen del artículo: "40 million decisions in ten languages from millions of people in 233 countries and territories". Antes del roleplay, cada estudiante puede responder unos dilemas en moralmachine.net (opcional). El caso del banco es un supuesto de clase.</aside>
+</section>
+
+<!-- 10 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="marco" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · read the data card</p>
+    <p style="font-size:54px;line-height:1.16;font-weight:700;margin:22px 0 18px">“Predict whether annual income of an individual exceeds <span class="acento">$50K/yr</span> based on census data.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Adult (Census Income) dataset, UCI Machine Learning Repository, abstract</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--espejo)"></i><p class="paso" style="font-size:32px">Who could benefit from this prediction task, and who could be harmed?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--espejo)"></i><p class="paso" style="font-size:32px">The data are from 1994. Is it fair to use them to decide about people today? Why?</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--espejo)"></i><p class="paso" style="font-size:32px">Defend your role in English: “From my point of view…, because the data show…”.</p>
+    </div>
+  </div>
+  <aside class="notas">Resumen textual de la ficha de UCI, verificado por su API. Útil para discutir que la tarea misma tiene implicaciones éticas.</aside>
+</section>
+
+<!-- 11 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios de la auditoría"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana15.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía de la auditoría</a>
+  <aside class="notas">Entrega: informe de auditoría de una página en GitHub con los números por grupo, la definición de justicia elegida y la recomendación del rol.</aside>
+</section>
+
+<!-- 12 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Rótulos de la sala</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="scale"></i><b>Sesgo</b><span>Error sistemático que perjudica a un grupo.</span></div>
+      <div><i class="ico" data-i="replace"></i><b>Variable sustituta</b><span>Columna que revela otra que se quitó.</span></div>
+      <div><i class="ico" data-i="equal-not"></i><b>Paridad</b><span>Misma tasa de resultado positivo por grupo.</span></div>
+      <div><i class="ico" data-i="search-check"></i><b>Igualdad de oportunidades</b><span>Misma sensibilidad por grupo.</span></div>
+      <div><i class="ico" data-i="target"></i><b>Calibración</b><span>La probabilidad significa lo mismo en cada grupo.</span></div>
+      <div><i class="ico" data-i="fingerprint"></i><b>Reidentificación</b><span>Encontrar a una persona en datos "anónimos".</span></div>
+      <div><i class="ico" data-i="users"></i><b>k-anonimidad</b><span>Cada combinación la comparten al menos k personas.</span></div>
+      <div><i class="ico" data-i="eye"></i><b>Transparencia</b><span>Poder explicar qué hace el modelo y con qué datos.</span></div>
+      <div><i class="ico" data-i="shield-check"></i><b>Consentimiento</b><span>Saber y aceptar para qué se usan los datos.</span></div>
+      <div><i class="ico" data-i="handshake"></i><b>Rendición de cuentas</b><span>Alguien responde por las decisiones del modelo.</span></div>
+    </div>
+  </div>
+  <aside class="notas">En inglés: bias, proxy variable, demographic parity, equal opportunity, calibration, re-identification, k-anonymity, accountability.</aside>
+</section>
+
+<!-- 13 Cierre -->
+<section class="esc">
+  <div class="marco" style="position:absolute;left:180px;top:90px;width:1240px;border-color:var(--compra)">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:54px;margin:12px 0 30px">Tres preguntas antes de desplegar cualquier modelo</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="users" style="font-size:62px;color:var(--espejo)"></i><p class="paso" style="font-size:34px"><b>¿A quién se equivoca?</b> Mide los errores por grupo, no solo el total.</p>
+      <i class="ico paso" data-i="fingerprint" style="font-size:62px;color:var(--espejo)"></i><p class="paso" style="font-size:34px"><b>¿A quién expone?</b> Sin nombres no significa anónimo.</p>
+      <i class="ico paso" data-i="handshake" style="font-size:62px;color:var(--espejo)"></i><p class="paso" style="font-size:34px"><b>¿Quién responde?</b> La tecnología se subordina al juicio humano.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 16: Demo Day. Su proyecto integrador debe incluir una sección de ética con estas tres preguntas.</p>
+  </div>
+  <aside class="notas">"La tecnología debe estar subordinada al juicio humano" es un principio de los lineamientos de IA de la UNAB citados en la guía de aprendizaje.</aside>
+</section>
+
+<!-- 14 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Archivo de la sala</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Becker, B. y Kohavi, R. (1996). <em>Adult</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5XW20" target="_blank" rel="noopener">doi:10.24432/C5XW20</a></p>
+    <p>Chouldechova, A. (2017). Fair Prediction with Disparate Impact. <em>Big Data</em>, 5(2), 153-163. <a href="https://doi.org/10.1089/big.2016.0047" target="_blank" rel="noopener">doi:10.1089/big.2016.0047</a></p>
+    <p>Sweeney, L. (2002). k-Anonymity: A Model for Protecting Privacy. <em>International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems</em>, 10(5), 557-570. <a href="https://doi.org/10.1142/S0218488502001648" target="_blank" rel="noopener">doi:10.1142/S0218488502001648</a></p>
+    <p>Awad, E. y otros (2018). The Moral Machine experiment. <em>Nature</em>, 563, 59-64. <a href="https://doi.org/10.1038/s41586-018-0637-6" target="_blank" rel="noopener">doi:10.1038/s41586-018-0637-6</a></p>
+    <p>UNAB. <em>Lineamientos para el uso de la inteligencia artificial</em>. <a href="https://unabdigital.unab.edu.co/landing-ia.html" target="_blank" rel="noopener">unabdigital.unab.edu.co</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s15.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var S = window.CIFRAS.resumen, num = DS.num, pct = function (v) { return num(v * 100, 1) + ' %'; };
+  /* Portada: un cuadro por cada 100 personas */
+  var p = '', sx = S.tasa_por_sexo, filas = [['Male', 'Hombres', 140], ['Female', 'Mujeres', 560]];
+  filas.forEach(function (f) {
+    var n = Math.round(sx[f[0]].personas / 100), alto = Math.round(n * sx[f[0]].tasa), cols = 22;
+    p += DS.txt(1010, f[2] - 18, f[1], 't-s', ' font-size="22"');
+    for (var i = 0; i < n; i++) p += '<rect x="' + (1010 + (i % cols) * 24) + '" y="' + (f[2] + Math.floor(i / cols) * 24) + '" width="19" height="19" fill="' + (i < alto ? 'var(--compra)' : 'var(--espejo)') + '" opacity="' + (i < alto ? 1 : .18) + '"' + (i < alto ? ' class="brillo"' : '') + '/>';
+  });
+  CUR.poner('portada', p);
+  CUR.poner('agenda', DS.agenda([['7:00', 'El espejo', 'scan-face'], ['7:20', 'Sesgo', 'scale'], ['7:45', 'Privacidad', 'fingerprint'], ['8:05', 'Pausa', 'coffee'], ['8:20', 'English', 'languages'], ['8:30', 'Auditoría', 'search-check'], ['9:10', 'Roleplay', 'users-round'], ['9:55', 'Cierre', 'flag']], 6, { color: 'var(--espejo)', forma: 'escalera' }));
+  /* Tasas por sexo y raza */
+  var X = DS.esc(0, 0, .35, 470, 1380), e = '', fil = [['Hombres', sx.Male], ['Mujeres', sx.Female]], rz = S.tasa_por_raza, nombres = { 'White': 'Blanca', 'Asian-Pac-Islander': 'Asiática o del Pacífico', 'Black': 'Negra', 'Amer-Indian-Eskimo': 'Amerindia o esquimal', 'Other': 'Otra' };
+  ['White', 'Asian-Pac-Islander', 'Black', 'Amer-Indian-Eskimo', 'Other'].forEach(function (k) { fil.push([nombres[k], rz[k], true]); });
+  fil.forEach(function (f, i) {
+    var y = 10 + i * 80 + (i > 1 ? 30 : 0);
+    e += DS.txt(450, y + 40, f[0] + ' · ' + num(f[1].personas), f[2] ? 't-s' : 't-n', ' text-anchor="end" font-size="26"');
+    e += '<rect class="paso-capa" x="470" y="' + (y + 12) + '" width="' + (X(f[1].tasa) - 470) + '" height="38" fill="' + (f[2] ? 'var(--punto)' : 'var(--espejo)') + '"/>' + DS.txt(X(f[1].tasa) + 12, y + 41, pct(f[1].tasa), f[2] ? 't-n' : 't-e', ' font-size="27"');
+  });
+  e += '<line x1="470" x2="1380" y1="182" y2="182" stroke="var(--regla)" stroke-width="2"/>';
+  CUR.poner('espejo', e);
+  /* Relación por sexo */
+  var R = S.relacion_por_sexo, rel = [['Husband', 'Esposo'], ['Wife', 'Esposa'], ['Own-child', 'Hijo o hija'], ['Unmarried', 'Sin pareja'], ['Not-in-family', 'Fuera de familia'], ['Other-relative', 'Otro pariente']], Xr = DS.esc(0, 0, 14000, 280, 660), r = '';
+  rel.forEach(function (q, i) {
+    var y = 20 + i * 112, h = R.Male[q[0]] || 0, m = R.Female[q[0]] || 0;
+    r += DS.txt(260, y + 48, q[1], 't-n', ' text-anchor="end" font-size="25"');
+    r += '<rect x="280" y="' + (y + 10) + '" width="' + Math.max(2, Xr(h) - 280) + '" height="34" fill="var(--punto)"/>' + DS.txt(Math.max(Xr(h), 290) + 8, y + 36, num(h), 't-s', ' font-size="21"');
+    r += '<rect x="280" y="' + (y + 50) + '" width="' + Math.max(2, Xr(m) - 280) + '" height="34" fill="var(--compra)"/>' + DS.txt(Math.max(Xr(m), 290) + 8, y + 76, num(m), 't-o', ' font-size="21"');
+  });
+  r += '<rect x="280" y="690" width="22" height="22" fill="var(--punto)"/>' + DS.txt(310, 708, 'Hombres', 't-s', ' font-size="22"') + '<rect x="440" y="690" width="22" height="22" fill="var(--compra)"/>' + DS.txt(470, 708, 'Mujeres', 't-s', ' font-size="22"');
+  CUR.poner('proxy', r);
+  /* Reidentificación */
+  var U = S.reidentificacion, ks = ['3', '4', '5', '6'], Y = DS.esc(0, 0, 30, 600, 60), v = '';
+  [0, 10, 20, 30].forEach(function (t) { v += '<line x1="90" x2="680" y1="' + Y(t) + '" y2="' + Y(t) + '" stroke="var(--regla)"/>' + DS.txt(80, Y(t) + 8, t + ' %', 't-eje', ' text-anchor="end"'); });
+  ks.forEach(function (k, i) {
+    var x = 130 + i * 140, u = U[k];
+    v += '<rect class="paso-capa" x="' + x + '" y="' + Y(u.pct) + '" width="96" height="' + (Y(0) - Y(u.pct)) + '" fill="' + (k === '6' ? 'var(--compra)' : 'var(--espejo)') + '"/>' + DS.txt(x + 48, Y(u.pct) - 12, num(u.personas_unicas), 't-n', ' text-anchor="middle" font-size="25"') + DS.txt(x + 48, 640, k + ' datos', 't-s', ' text-anchor="middle" font-size="23"');
+  });
+  v += DS.txt(90, 30, 'Personas únicas en el archivo', 't-eje') + DS.txt(380, 690, 'edad, sexo, raza + país + ocupación + educación', 't-s', ' text-anchor="middle" font-size="20"');
+  CUR.poner('privacidad', v);
+  CUR.poner('taller', DS.ruta([['scan-face', 'Mira', 'Tasas por grupo'], ['spline', 'Modela', 'Sin la columna'], ['scale', 'Audita', 'Errores por grupo'], ['replace', 'Busca', 'Sustitutas'], ['fingerprint', 'Protege', 'Únicos y k']], 'Auditoría de un modelo de ingreso', 'Parejas · Colab · entrega: informe de auditoría de una página', 'var(--espejo)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

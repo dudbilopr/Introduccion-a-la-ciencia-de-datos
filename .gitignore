@@ -1,0 +1,13 @@
+# Artefactos de LaTeX: solo se publican el .tex y el .pdf
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
+# Python y sistema
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+desktop.ini

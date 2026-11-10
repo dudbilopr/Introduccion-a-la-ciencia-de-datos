@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini-hackathon EDA: 731 días de bicicletas | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>731 días de bicicletas: cuatro hipótesis en 70 minutos</h1>
+  <p>Mini-hackathon de análisis exploratorio en equipos de tres. Formulan hipótesis, las ponen a prueba con datos reales del sistema de bicicletas compartidas de Washington D.C. y defienden una gráfica en tres minutos.</p>
+  <div class="datos-clase"><span><b>Semana</b>7</span><span><b>Tiempo</b>70 minutos en clase</span><span><b>Herramienta</b>Google Colab (pandas)</span><span><b>Resultado</b>RAE 1.3</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Leer el mapa</a></li>
+  <li><a href="#e2">2. Separar por grupo</a></li>
+  <li><a href="#e3">3. Covarianza y correlación</a></li>
+  <li><a href="#e4">4. La relación se curva</a></li>
+  <li><a href="#e5">5. Lo raro depende del contexto</a></li>
+  <li><a href="#e6">6. Galería y pitch</a></li>
+  <li><a href="#entrega">Qué entregan</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_7/Colab_Guiado_Semana_7.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/bicicletas_dia.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Archivo <code>bicicletas_dia.csv</code>: 731 filas, una por día, del 1 de enero de 2011 al 31 de diciembre de 2012.</p>
+  <div class="tablon"><table>
+    <tr><th>Columna</th><th>Qué significa</th><th>Unidad o valores</th></tr>
+    <tr><td><code>dteday</code></td><td>Fecha del día.</td><td>AAAA-MM-DD.</td></tr>
+    <tr><td><code>season</code></td><td>Estación del año.</td><td>1 a 4. El Readme dice 1 = primavera, pero las fechas muestran que 1 es invierno (21 de diciembre a 20 de marzo). Compruébelo en el ejercicio 1.</td></tr>
+    <tr><td><code>yr</code>, <code>mnth</code>, <code>weekday</code></td><td>Año, mes y día de la semana.</td><td>yr: 0 = 2011, 1 = 2012. weekday: 0 = domingo.</td></tr>
+    <tr><td><code>holiday</code>, <code>workingday</code></td><td>Festivo; día laboral (ni fin de semana ni festivo).</td><td>0 o 1.</td></tr>
+    <tr><td><code>weathersit</code></td><td>Clima del día.</td><td>1 despejado, 2 niebla o nublado, 3 lluvia o nieve ligera, 4 lluvia fuerte.</td></tr>
+    <tr><td><code>temp</code>, <code>atemp</code></td><td>Temperatura y sensación térmica, normalizadas.</td><td>Divididas por 41 y por 50. Multiplique para leer en °C.</td></tr>
+    <tr><td><code>hum</code>, <code>windspeed</code></td><td>Humedad y viento, normalizados.</td><td>Divididos por 100 y por 67.</td></tr>
+    <tr><td><code>casual</code>, <code>registered</code>, <code>cnt</code></td><td>Alquileres de usuarios casuales, registrados y total.</td><td>Bicicletas por día. cnt = casual + registered.</td></tr>
+  </table></div>
+  <div class="aviso"><strong>Son datos reales.</strong> Bike Sharing Dataset, de Hadi Fanaee-T y João Gama (2013), con datos de Capital Bikeshare, en el <a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noopener">repositorio UCI</a>, licencia CC BY 4.0, <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a>. El archivo se publica sin cambios.</div>
+  <p><strong>Roles:</strong> piloto (escribe el código), navegante (lee la guía y revisa el punto de control), cronista (anota cada hipótesis antes de ver el resultado). Rotan en cada ejercicio.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Leer el mapa</h2>
+  <p class="meta">10 minutos. Antes de cualquier gráfica, saber qué hay.</p>
+  <ol class="pasos">
+    <li>Corra la celda de carga del cuaderno. Revise <code>df.shape</code>, <code>df.dtypes</code> y <code>df.isna().sum()</code>.</li>
+    <li>Convierta la fecha con <code>pd.to_datetime(df['dteday'])</code> y cree <code>temp_c = temp * 41</code>.</li>
+    <li>Compruebe qué fechas abarca cada estación: <code>df.groupby('season')['dteday'].agg(['min', 'max'])</code>. ¿Coincide con el Readme?</li>
+    <li>Verifique que <code>cnt</code> es la suma de <code>casual</code> y <code>registered</code> en todas las filas.</li>
+  </ol>
+  <pre><code>df = pd.read_csv(URL, parse_dates=['dteday'])
+df['temp_c'] = df['temp'] * 41
+print(df.shape, df.isna().sum().sum())
+print(df.groupby('season')['dteday'].agg(['min', 'max']))
+print((df['casual'] + df['registered'] == df['cnt']).all())</code></pre>
+  <details><summary>Punto de control</summary><div>
+    <p>731 filas y 16 columnas; 0 vacíos. La estación 2 empieza el 21 de marzo y la 4 el 23 de septiembre, así que la 1 es invierno: el Readme las nombra mal. La suma da <code>True</code>. Temperatura media: 20,3 °C, de 2,4 a 35,3.</p>
+  </div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Separar por grupo</h2>
+  <p class="meta">12 minutos. El cronista anota la apuesta del equipo antes de correr.</p>
+  <ol class="pasos">
+    <li>Hipótesis: "En días laborales se alquilan más bicicletas que en fines de semana y festivos".</li>
+    <li>Calcule el promedio de <code>cnt</code>, <code>casual</code> y <code>registered</code> por <code>workingday</code>.</li>
+    <li>Calcule qué parte de los alquileres hacen los casuales en cada tipo de día.</li>
+    <li>Escriban en una frase: ¿se confirma la hipótesis? ¿Para quién?</li>
+  </ol>
+  <pre><code>print(df.groupby('workingday')[['cnt', 'casual', 'registered']].mean().round(0))
+cuota = df.groupby('workingday')['casual'].sum() / df.groupby('workingday')['cnt'].sum()
+print(cuota.round(3))</code></pre>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Tipo de día</th><th class="d">Días</th><th class="d">Total</th><th class="d">Casuales</th><th class="d">Registrados</th><th class="d">Cuota casual</th></tr>
+      <tr><td>Laboral (1)</td><td class="d">500</td><td class="d">4.585</td><td class="d">607</td><td class="d">3.978</td><td class="d">13,2 %</td></tr>
+      <tr><td>No laboral (0)</td><td class="d">231</td><td class="d">4.330</td><td class="d">1.371</td><td class="d">2.959</td><td class="d">31,7 %</td></tr>
+    </table>
+    <p>En total la diferencia es pequeña. Pero los casuales alquilan más del doble los fines de semana y los registrados, un 34 % más los días laborales. En la semana 9 se prueba si estas diferencias son reales o ruido.</p>
+  </div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Covarianza y correlación</h2>
+  <p class="meta">15 minutos. Primero a mano, luego con pandas.</p>
+  <ol class="pasos">
+    <li>Hipótesis: "Más temperatura, más alquileres". Haga la dispersión <code>temp_c</code> contra <code>cnt</code>.</li>
+    <li>Calcule la covarianza con la fórmula: <code>((x - x.mean()) * (y - y.mean())).sum() / (len(x) - 1)</code>. Compárela con <code>x.cov(y)</code>.</li>
+    <li>Divida la covarianza por el producto de las desviaciones estándar. Compare con <code>x.corr(y)</code>.</li>
+    <li>Repita la correlación para humedad (<code>hum * 100</code>) y viento (<code>windspeed * 67</code>).</li>
+    <li>¿Por qué la covarianza da miles y la correlación no pasa de 1?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Par de variables</th><th class="d">Resultado</th></tr>
+      <tr><td>Covarianza temperatura (°C) y alquileres</td><td class="d">9.123,1</td></tr>
+      <tr><td>Correlación temperatura y alquileres</td><td class="d">0,627</td></tr>
+      <tr><td>Correlación humedad y alquileres</td><td class="d">−0,101</td></tr>
+      <tr><td>Correlación viento y alquileres</td><td class="d">−0,235</td></tr>
+    </table>
+    <p>La covarianza tiene unidades (bicicletas por grado) y cambia si mide en Fahrenheit; la correlación no. Ninguna de las dos dice que el calor <em>cause</em> los alquileres.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> La relación se curva</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Agrupe la temperatura en rangos de 5 °C: <code>pd.cut(df['temp_c'], [0, 5, 10, 15, 20, 25, 30, 35, 41])</code>.</li>
+    <li>Calcule cuántos días y el promedio de <code>cnt</code> en cada rango.</li>
+    <li>Coloree la dispersión por año. ¿Qué otra variable mueve la nube?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Rango (°C)</th><th class="d">0-5</th><th class="d">5-10</th><th class="d">10-15</th><th class="d">15-20</th><th class="d">20-25</th><th class="d">25-30</th><th class="d">30-35</th><th class="d">35-41</th></tr>
+      <tr><td>Días</td><td class="d">4</td><td class="d">56</td><td class="d">161</td><td class="d">138</td><td class="d">130</td><td class="d">170</td><td class="d">71</td><td class="d">1</td></tr>
+      <tr><td>Promedio</td><td class="d">1.438</td><td class="d">1.695</td><td class="d">3.264</td><td class="d">4.192</td><td class="d">5.577</td><td class="d">5.726</td><td class="d">5.418</td><td class="d">4.840</td></tr>
+    </table>
+    <p>Sube hasta 25-30 °C y baja después. Los extremos tienen 4 días y 1 día: no se concluye nada de ellos. A igual temperatura, 2012 está por encima de 2011: el sistema creció 64,9 %.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Lo raro depende del contexto</h2>
+  <p class="meta">13 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule Q1, Q3 y el rango intercuartílico de <code>cnt</code> con todos los días. ¿Cuál es el límite inferior Q1 − 1,5·RIC?</li>
+    <li>¿Cuántos días quedan por debajo? Busque el día con menos alquileres. ¿Qué pasó?</li>
+    <li>Repita la regla dentro de cada mes de cada año con <code>groupby(['yr', 'mnth'])</code> y <code>transform</code>.</li>
+    <li>Liste los días marcados de octubre y noviembre de 2012 y busque qué ocurrió.</li>
+  </ol>
+  <pre><code>g = df.groupby(['yr', 'mnth'])['cnt']
+q1, q3 = g.transform(lambda s: s.quantile(.25)), g.transform(lambda s: s.quantile(.75))
+raros = df[df['cnt'] &lt; q1 - 1.5 * (q3 - q1)]
+print(len(raros)); print(raros[['dteday', 'cnt']])</code></pre>
+  <details><summary>Punto de control</summary><div>
+    <p>Con todos los días: Q1 = 3.152, Q3 = 5.956, límite −1.054; ningún atípico. El mínimo es 22, el 29 de octubre de 2012, día en que llegó el huracán Sandy. Dentro de cada mes: 26 días atípicos, entre ellos el 29 y el 30 de octubre de 2012 y del 22 al 25 de noviembre de 2012 (puente de Acción de Gracias). Un atípico no se borra: se explica.</p>
+  </div></details>
+</section>
+
+<section id="e6">
+  <h2><span class="num">6.</span> Galería y pitch</h2>
+  <p class="meta">10 minutos de preparación y 3 minutos de exposición por equipo.</p>
+  <ol class="pasos">
+    <li>Elijan su mejor hallazgo y una sola gráfica que lo muestre: histograma, cajas por grupo, dispersión o serie de tiempo.</li>
+    <li>El título de la gráfica dice la conclusión, no el tema. Mal: "Alquileres por tipo de día". Bien: "Los fines de semana alquilan los casuales; entre semana, los registrados".</li>
+    <li>Pitch: pregunta, gráfica, hallazgo con un número, y lo que el dato <em>no</em> permite afirmar.</li>
+    <li>Co-evaluación: dejen una nota a otros dos equipos con la rúbrica.</li>
+  </ol>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th>3 puntos</th><th>1 punto</th></tr>
+    <tr><td>Hipótesis</td><td>Clara y se podía desmentir</td><td>Vaga o imposible de probar</td></tr>
+    <tr><td>Gráfica</td><td>Forma adecuada, escala honesta, título de conclusión</td><td>Forma por costumbre o título de tema</td></tr>
+    <tr><td>Número</td><td>Correcto y con su grupo de comparación</td><td>Sin contexto o incorrecto</td></tr>
+    <tr><td>Límite</td><td>Dice qué no se puede afirmar</td><td>Habla de causa sin evidencia</td></tr>
+  </table></div>
+</section>
+
+<section id="entrega">
+  <h2>Qué entregan</h2>
+  <p>El cuaderno con los seis ejercicios en el repositorio de GitHub del equipo, y la gráfica del pitch con su título de conclusión. Declaren el uso de IA: herramienta, para qué, prompt y qué verificaron ustedes.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Con <a href="../Datos/bicicletas_hora.csv" download><code>bicicletas_hora.csv</code></a> (17.379 horas): ¿a qué horas alquilan los registrados y a qué horas los casuales, en días laborales y no laborales? Formule la hipótesis antes de graficar y explique el patrón en dos frases.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Anscombe, F. J. (1973). Graphs in Statistical Analysis. <em>The American Statistician</em>, 27(1), 17-21. <a href="https://doi.org/10.1080/00031305.1973.10478966" target="_blank" rel="noopener">doi:10.1080/00031305.1973.10478966</a></li>
+    <li>Fanaee-T, H. y Gama, J. (2013). Event labeling combining ensemble detectors and background knowledge. <em>Progress in Artificial Intelligence</em>. <a href="https://doi.org/10.1007/s13748-013-0040-3" target="_blank" rel="noopener">doi:10.1007/s13748-013-0040-3</a></li>
+    <li>pandas: <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.corr.html" target="_blank" rel="noopener">DataFrame.corr</a> y <a href="https://pandas.pydata.org/docs/user_guide/groupby.html" target="_blank" rel="noopener">Group by</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { /* 731 días; el punto naranja es el día del huracán Sandy */ var o = []; for (var i = 0; i < 731; i++) o.push(i === 667 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

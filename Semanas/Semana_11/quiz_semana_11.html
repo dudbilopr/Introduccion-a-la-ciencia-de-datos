@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 11, "tema": "Save the customer", "cierre": "Start with the baseline, read the confusion matrix, and let the cost of errors choose the threshold.", "preguntas": [
+{"q": "A model that always says 'nobody leaves' is 84.3 % accurate. Why is it useless?", "o": ["It is not useless", "It never finds a single customer who leaves", "84.3 % is too low", "It uses too many variables"], "a": 1, "e": "With imbalanced classes, accuracy hides the errors that matter."},
+{"q": "Recall answers which question?", "o": ["Of my alarms, how many are right?", "Of the customers who leave, how many do I find?", "How fast is the model?", "How many variables matter?"], "a": 1, "e": "Logistic regression at 0.5 finds 51 of 124: recall 41.1 %."},
+{"q": "Precision answers which question?", "o": ["Of my alarms, how many are right?", "Of all customers, how many stay?", "Of the customers who leave, how many do I find?", "How many calls fail?"], "a": 0, "e": "At 0.5, 51 of 66 alarms are right: precision 77.3 %."},
+{"q": "What happens when you lower the threshold from 0.5 to 0.2?", "o": ["Fewer calls and higher recall", "More calls, higher recall and lower precision", "Nothing changes", "Accuracy always goes up"], "a": 1, "e": "Recall goes from 41.1 % to 84.7 %; calls go from 66 to 205."},
+{"q": "The data card says the features come from months 1 to 9 and the label from month 12. Why does it matter?", "o": ["It does not matter", "It avoids data leakage and gives a three-month planning gap", "It makes the model faster", "It removes duplicates"], "a": 1, "e": "The model only sees what exists at the moment of the decision."},
+{"q": "Customers with a complaint leave at 83 %. Which statement is correct?", "o": ["Complaints cause churn", "Complaints are strongly associated with churn; the cause may be poor service", "Complaints are irrelevant", "Every customer who complains leaves"], "a": 1, "e": "Association is not causation. A retention action needs an experiment to prove it works."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

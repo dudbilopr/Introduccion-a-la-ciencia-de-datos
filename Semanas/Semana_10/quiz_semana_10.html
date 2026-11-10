@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 10, "tema": "Forecasting bike demand", "cierre": "A coefficient is a comparison, residuals tell the story, and a model is validated the way it will be used.", "preguntas": [
+{"q": "In the multiple model, the temperature coefficient is 124. What does it mean?", "o": ["Heat causes 124 rentals", "Holding the other variables constant, one more degree is associated with about 124 more rentals", "124 % more rentals", "The model is 124 times better"], "a": 1, "e": "Coefficients compare days that differ only in that variable."},
+{"q": "What is a residual?", "o": ["The predicted value", "The observed value minus the predicted value", "The intercept", "The R squared"], "a": 1, "e": "On 29 October 2012: 22 minus 3,436 gives -3,414."},
+{"q": "R squared went from 0.394 with temperature alone to 0.82 with ten variables. What does that tell you?", "o": ["The model is 82 % correct every day", "The model explains a larger share of the day-to-day variation", "Temperature stopped mattering", "The data changed"], "a": 1, "e": "R squared is the share of variation explained, not the share of correct days."},
+{"q": "A model trained on 2011 without the year variable predicts 2012 with R squared -0.64. Why?", "o": ["Linear regression cannot predict", "It does not know the system grew 65 % and underestimates every day", "2012 has missing values", "The seed was wrong"], "a": 1, "e": "Negative R squared means it is worse than predicting the mean."},
+{"q": "Random split error: 617. Time-based split error: 932. Which one do you report to the company?", "o": ["617, it looks better", "932, because it mimics predicting the future from the past", "The average of both", "Neither"], "a": 1, "e": "Validate the model the way it will be used."},
+{"q": "Why does LinearRegression minimize the sum of squared residuals?", "o": ["Squares are faster to compute", "Squaring makes errors positive and penalizes big errors more", "It ignores outliers", "It is the only option"], "a": 1, "e": "That is why one hurricane day weighs a lot in the fit."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

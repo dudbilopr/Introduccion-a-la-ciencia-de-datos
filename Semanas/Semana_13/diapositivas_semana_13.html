@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 13 · La lonja de los segmentos | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: lonja de un distribuidor mayorista. Nadie etiquetó a los clientes; los puestos aparecen cuando se mide bien la distancia. */
+  :root { --fondo: #16110c; --fondo-2: #2a2018; --tinta: #f6efe4; --tinta-2: #c4b29a; --regla: rgba(196,178,154,.24); --punto: #8a7357; --compra: #ff7a1f; --acento-texto: #ffa263; --fresco: #9ad36a; }
+  :root[data-tema="claro"] { --fondo: #f8f4ec; --fondo-2: #ece4d5; --tinta: #2a1f14; --tinta-2: #6a5844; --regla: rgba(42,31,20,.2); --punto: #b39d80; --compra: #e85c0b; --acento-texto: #b94504; --fresco: #3f7d18; }
+  .rot { font: 700 23px Georgia, serif; letter-spacing: .1em; color: var(--fresco); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-f { fill: var(--fresco); font-weight: 800; }
+  .caja { background: var(--fondo-2); padding: 34px 40px; border: 3px solid var(--punto); border-top: 10px solid var(--fresco); }
+  .dist { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .dist div { background: var(--fondo-2); padding: 22px 22px 26px; border-bottom: 6px solid var(--fresco); }
+  .dist b { display: block; font-size: 28px; } .dist .c { display: block; font: 800 58px 'Schibsted Grotesk', sans-serif; color: var(--acento-texto); margin: 6px 0; } .dist span { display: block; font-size: 23px; color: var(--tinta-2); line-height: 1.2; }
+  .formula { font: 700 30px Consolas, monospace; background: var(--fondo-2); padding: 18px 24px; border-left: 6px solid var(--compra); }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--fresco); min-height: 270px; }
+  .glosa .ico { font-size: 48px; color: var(--fresco); } .glosa b { display: block; font-size: 28px; line-height: 1.08; margin: 10px 0 8px; } .glosa span { font-size: 23.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+</style>
+</head>
+<body data-cine="grua">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:90px;width:760px">
+    <p class="rot">La lonja de los segmentos · Semana 13</p>
+    <h1 style="font-size:96px;margin-top:16px;line-height:1.03">Nadie etiquetó a estos clientes. <span class="acento">Los grupos están ahí.</span></h1>
+    <p class="sec" style="font-size:28px;margin-top:22px">Aprendizaje no supervisado: distancias, K-means, siluetas y validación.</p>
+    <p class="sec" style="font-size:24px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Cada punto es uno de los 440 clientes reales de un distribuidor mayorista de Portugal, proyectado en dos dimensiones (componentes principales, 71 % de la variación). El color es el grupo que encuentra K-means con k = 2, sin mirar ninguna etiqueta.</aside>
+</section>
+
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Jornada de la lonja</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de 7:00 a 10:00"></svg>
+  <aside class="notas">La guía pide un taller de segmentación con siluetas y la presentación de perfiles en GitHub. El reto gamificado de centroides sirve de calentamiento.</aside>
+</section>
+
+<!-- 3 Resultados de aprendizaje -->
+<section class="esc">
+  <div class="caja" style="position:absolute;left:150px;top:80px;width:1300px">
+    <p class="rot">Resultados de aprendizaje del syllabus</p>
+    <h2 style="font-size:52px;margin:14px 0 28px">Esta es la semana del corazón del curso: el análisis de conglomerados.</h2>
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:22px 18px;align-items:center">
+      <b class="acento" style="font-size:40px">1.1</b><p style="font-size:30px">Calcula distancias de Minkowski: euclidiana, Manhattan y suprema.</p>
+      <b class="acento" style="font-size:40px">2.2</b><p style="font-size:30px">Conoce fortalezas y debilidades del agrupamiento jerárquico.</p>
+      <b class="acento" style="font-size:40px">3.1</b><p style="font-size:30px">Comprende la validación de agrupaciones y la calidad del agrupamiento.</p>
+      <b class="acento" style="font-size:40px">3.3</b><p style="font-size:30px">Sabe evaluar la estabilidad y la tendencia al agrupamiento.</p>
+    </div>
+  </div>
+  <aside class="notas">RAE textuales del syllabus (código 19001). El 3.3 se trabaja en el reto autónomo de la guía (estabilidad con distintas semillas).</aside>
+</section>
+
+<!-- 4 Caso -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">El caso</p>
+    <h2 style="font-size:54px;line-height:1.06">440 clientes, gasto anual en seis categorías</h2>
+    <p class="paso" style="font-size:29px">Frescos, lácteos, abarrotes, congelados, detergentes y papel, y delicatessen. En unidades monetarias: la fuente no dice cuál.</p>
+    <p class="paso" style="font-size:29px">Además, el canal: <b>298 Horeca</b> (hoteles, restaurantes, cafés) y <b>142 minoristas</b>.</p>
+    <p class="paso" style="font-size:29px">El canal <b class="acento">no se le muestra</b> al algoritmo. Se guarda para comprobar después si los grupos tienen sentido.</p>
+  </div>
+  <svg id="gasto" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Gasto anual de frescos: media 12.000, mediana 8.504, máximo 112.151"></svg>
+  <aside class="notas">Wholesale customers, Margarida Cardoso (2013), UCI, CC BY 4.0. Región: 77 Lisboa, 47 Oporto, 316 otra. Usar una etiqueta conocida para validar un agrupamiento se llama validación externa.</aside>
+</section>
+
+<!-- 5 Distancias -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">RAE 1.1 · Medir la similitud</p><h2 style="font-size:50px;margin-top:6px">¿Qué tan lejos están los clientes 1 y 2? Depende de cómo se mida</h2></div>
+  <p class="formula paso" style="position:absolute;left:88px;top:200px;width:1424px">d<sub>p</sub>(a, b) = ( Σ |a<sub>i</sub> − b<sub>i</sub>|<sup>p</sup> )<sup>1/p</sup> &nbsp;&nbsp; p = 1 Manhattan · p = 2 euclidiana · p → ∞ suprema</p>
+  <div class="dist" style="position:absolute;left:88px;right:88px;top:330px">
+    <div class="paso"><b>Manhattan</b><span class="c">2,602</span><span>Suma de diferencias: camina por las calles.</span></div>
+    <div class="paso"><b>Euclidiana</b><span class="c">1,721</span><span>Línea recta: la de K-means.</span></div>
+    <div class="paso"><b>Suprema</b><span class="c">1,643</span><span>Solo la mayor diferencia: aquí, congelados.</span></div>
+    <div class="paso"><b>Coseno</b><span class="c">0,576</span><span>Similitud del perfil, no de la cantidad.</span></div>
+  </div>
+  <p class="paso sec" style="position:absolute;left:88px;top:700px;width:1424px;font-size:26px">Calculadas sobre el logaritmo del gasto, estandarizado. Cliente 1: 214 en congelados; cliente 2: 1.762. Las otras categorías se parecen mucho más.</p>
+  <aside class="notas">Siempre Manhattan ≥ euclidiana ≥ suprema. Para atributos categóricos (canal, región) se usan otras medidas, como la de Gower para tipos mixtos; está en el reto autónomo.</aside>
+</section>
+
+<!-- 6 Escala -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">La trampa de la escala</p>
+    <h2 style="font-size:54px;line-height:1.06">Sin logaritmo, K-means aparta a 36 clientes enormes y mete a 404 en un solo grupo</h2>
+    <p class="paso" style="font-size:30px">El gasto es muy asimétrico: unos pocos clientes compran diez veces más. La distancia euclidiana los persigue.</p>
+    <p class="paso" style="font-size:30px">Con logaritmo y estandarización: grupos de <b class="acento">252</b> y <b class="acento">188</b>.</p>
+  </div>
+  <svg id="escala" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Tamaño de los grupos sin logaritmo, 36 y 404, y con logaritmo, 252 y 188"></svg>
+  <aside class="notas">Acuerdo con el canal (índice de Rand ajustado): 0,167 sin logaritmo y 0,514 con logaritmo. La preparación de los datos pesa más que el algoritmo. Conecta con limpieza (semana 4) y descriptiva (semana 5).</aside>
+</section>
+
+<!-- 7 Elegir k -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">¿Cuántos grupos?</p><h2 style="font-size:50px;margin-top:6px">El codo no se ve claro; la silueta sí elige: k = 2</h2></div>
+  <svg id="k" class="diagrama" viewBox="0 0 1500 640" style="position:absolute;left:50px;top:170px;width:1500px;height:640px" role="img" aria-label="Inercia y silueta para k de 2 a 8"></svg>
+  <aside class="notas">Inercia: 1.848 con k = 2, baja suave hasta 1.027 con k = 8; no hay un codo evidente. Silueta: 0,29 con k = 2, 0,258 con k = 3 y menos de 0,2 desde k = 4. Una silueta de 0,29 indica estructura débil: los grupos existen, pero se tocan. Rousseeuw (1987).</aside>
+</section>
+
+<!-- 8 Perfiles -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Perfiles descubiertos</p><h2 style="font-size:50px;margin-top:6px">Un puesto compra frescos y congelados; el otro, abarrotes y papel</h2></div>
+  <svg id="perfiles" class="diagrama" viewBox="0 0 1424 620" style="position:absolute;left:88px;top:180px;width:1424px;height:620px" role="img" aria-label="Medianas de gasto por grupo en las seis categorías"></svg>
+  <aside class="notas">Medianas exactas, grupo A (252): frescos 10.347,5, lácteos 1.871, abarrotes 2.406, congelados 2.225, detergentes y papel 327,5, delicatessen 749,5. Grupo B (188): 5.406,5, 7.690,5, 11.527, 1.061,5, 4.495, 1.388,5. En la gráfica se redondean. Se reportan medianas porque el gasto es asimétrico.</aside>
+</section>
+
+<!-- 9 Validación -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:740px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">RAE 3.1 · Validar</p>
+    <h2 style="font-size:52px;line-height:1.06">El algoritmo nunca vio el canal, y casi lo reconstruye</h2>
+    <p class="paso" style="font-size:29px">Grupo A: <b>244</b> Horeca y <b>8</b> minoristas. Grupo B: <b>54</b> Horeca y <b>134</b> minoristas.</p>
+    <p class="paso" style="font-size:29px">Índice de Rand ajustado: <b class="acento">0,514</b> (0 = azar, 1 = idéntico). Jerárquico de Ward: 0,415.</p>
+    <p class="paso" style="font-size:29px">DBSCAN no encuentra dos segmentos: con radio 1,5 ve un solo grupo y <b>44 clientes atípicos</b>.</p>
+    <p class="paso sec" style="font-size:25px">Cada método responde una pregunta distinta: particiones, jerarquías o densidad.</p>
+  </div>
+  <svg id="cruce" class="diagrama" viewBox="0 0 680 700" style="position:absolute;left:870px;top:100px;width:680px;height:700px" role="img" aria-label="Cruce de grupos con canal"></svg>
+  <aside class="notas">Validación interna: silueta. Validación externa: índice de Rand ajustado contra el canal (Hubert y Arabie, 1985). DBSCAN con min_samples = 8 sobre los datos en logaritmo estandarizados: radio 1,0 da 2 grupos y 146 de ruido; 1,5 da 1 grupo y 44; 2,0 da 1 grupo y 16.</aside>
+</section>
+
+<!-- 10 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="caja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · read the data card</p>
+    <p style="font-size:50px;line-height:1.18;font-weight:700;margin:22px 0 18px">“The data set refers to clients of a wholesale distributor. It includes the annual spending in <span class="acento">monetary units (m.u.)</span> on diverse product categories.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Wholesale customers, UCI Machine Learning Repository</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Why can't we say “euros” when we report a cluster profile?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Describe group B to a sales manager in two sentences.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--fresco)"></i><p class="paso" style="font-size:32px">Explain the difference between “cluster” and “class”.</p>
+    </div>
+  </div>
+  <aside class="notas">Resumen textual de la ficha de UCI, verificado por su API. La unidad monetaria no se especifica: los perfiles se reportan en "unidades monetarias".</aside>
+</section>
+
+<!-- 11 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco ejercicios del taller de segmentación"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana13.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
+  <aside class="notas">Entrega: perfil de cada segmento en el README del repositorio de GitHub del equipo, con su gráfica y sus límites. Punto de control: silueta 0,29 con k = 2 y tamaños 252 y 188.</aside>
+</section>
+
+<!-- 12 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Rótulos de la lonja</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="group"></i><b>Conglomerado</b><span>Grupo de objetos parecidos entre sí.</span></div>
+      <div><i class="ico" data-i="ruler"></i><b>Minkowski</b><span>Familia de distancias según p.</span></div>
+      <div><i class="ico" data-i="compass"></i><b>Coseno</b><span>Similitud de dirección, no de tamaño.</span></div>
+      <div><i class="ico" data-i="crosshair"></i><b>Centroide</b><span>Promedio de un grupo en K-means.</span></div>
+      <div><i class="ico" data-i="layers"></i><b>Inercia</b><span>Suma de distancias al cuadrado a su centroide.</span></div>
+      <div><i class="ico" data-i="contrast"></i><b>Silueta</b><span>Cohesión contra separación, de −1 a 1.</span></div>
+      <div><i class="ico" data-i="git-merge"></i><b>Jerárquico</b><span>Une grupos paso a paso: dendrograma.</span></div>
+      <div><i class="ico" data-i="scan-search"></i><b>DBSCAN</b><span>Grupos por densidad; marca el ruido.</span></div>
+      <div><i class="ico" data-i="git-compare"></i><b>Rand ajustado</b><span>Acuerdo entre dos particiones, corregido por azar.</span></div>
+      <div><i class="ico" data-i="sliders-horizontal"></i><b>Estandarizar</b><span>Restar la media y dividir por la desviación.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Estos términos son los del syllabus: medidas de proximidad, métodos de partición, jerárquicos y de densidad, y validación.</aside>
+</section>
+
+<!-- 13 Cierre -->
+<section class="esc">
+  <div class="caja" style="position:absolute;left:180px;top:90px;width:1240px;border-top-color:var(--compra)">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:56px;margin:12px 0 30px">Tres reglas para segmentar con honestidad</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="ruler" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>La distancia decide el grupo:</b> escala, transforma y elige la medida a propósito.</p>
+      <i class="ico paso" data-i="contrast" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>Valida dos veces:</b> por dentro (silueta) y, si se puede, contra algo conocido.</p>
+      <i class="ico paso" data-i="file-text" style="font-size:62px;color:var(--fresco)"></i><p class="paso" style="font-size:35px"><b>Un perfil es una hipótesis,</b> no una verdad: dilo con medianas y con sus límites.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 14: aplicaciones especializadas. Cada equipo enseña una técnica al grupo.</p>
+  </div>
+  <aside class="notas">Pregunta de salida: ¿qué haría distinto el equipo de ventas con estos dos segmentos?</aside>
+</section>
+
+<!-- 14 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px" class="bib">
+    <p class="rot">Libro de la lonja</p>
+    <h2 style="font-size:50px;margin:6px 0 18px">Bibliografía y datos</h2>
+    <p>Cardoso, M. (2013). <em>Wholesale customers</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5030X" target="_blank" rel="noopener">doi:10.24432/C5030X</a></p>
+    <p>Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation and validation of cluster analysis. <em>Journal of Computational and Applied Mathematics</em>, 20, 53-65. <a href="https://doi.org/10.1016/0377-0427(87)90125-7" target="_blank" rel="noopener">doi:10.1016/0377-0427(87)90125-7</a></p>
+    <p>Hubert, L. y Arabie, P. (1985). Comparing partitions. <em>Journal of Classification</em>, 2, 193-218. <a href="https://doi.org/10.1007/BF01908075" target="_blank" rel="noopener">doi:10.1007/BF01908075</a></p>
+    <p>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2.ª ed.), sección 14.3. Springer.</p>
+    <p>scikit-learn. <em>Clustering</em>. <a href="https://scikit-learn.org/stable/modules/clustering.html" target="_blank" rel="noopener">scikit-learn.org</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras: <span class="mono">cifras_todas.py</span>, semilla 42. Uso de IA: Claude ayudó a programar y a redactar; el docente revisó cifras y citas.</p>
+  </div>
+  <aside class="notas">Cifras en Material_Privado/Cifras/cifras_s13.json. El taller de K-Means en Excel con Mall Customers ya dictado se conserva como práctica de cálculo; su origen no está documentado.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num;
+  var colG = function (g) { return g ? 'var(--fresco)' : 'var(--compra)'; };
+  /* Portada: proyección PCA real coloreada por grupo */
+  var xs = C.pca.map(function (p) { return p[0]; }), ys = C.pca.map(function (p) { return p[1]; });
+  var d = DS.dispersion({ x: 900, y: 120, w: 620, h: 660, xd: [DS.min(xs) - .3, DS.max(xs) + .3], yd: [DS.min(ys) - .3, DS.max(ys) + .3], xt: [], yt: [], xs: xs, ys: ys, r: 7, op: .85, col: function (i) { return colG(C.grupo[i]); } });
+  CUR.poner('portada', d.s.replace(/<line[^>]*\/>/g, ''));
+  CUR.poner('agenda', DS.agenda([['7:00', 'Calentamiento', 'crosshair'], ['7:15', 'Distancias', 'ruler'], ['7:40', 'K-means', 'group'], ['8:10', 'Pausa', 'coffee'], ['8:25', 'English', 'languages'], ['8:35', 'Taller', 'flask-conical'], ['9:35', 'Perfiles', 'presentation'], ['9:55', 'Cierre', 'flag']], 5, { color: 'var(--fresco)', forma: 'escalera' }));
+  /* Asimetría de frescos */
+  var a = S.asimetria_fresh, Y = DS.esc(0, 0, 115000, 680, 40), g = '';
+  [0, 25000, 50000, 75000, 100000].forEach(function (v) { g += '<line x1="140" x2="680" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--regla)"/>' + DS.txt(128, Y(v) + 8, num(v), 't-eje', ' text-anchor="end"'); });
+  [['Mediana', a.mediana, 'var(--fresco)'], ['Media', a.media, 'var(--acento-texto)'], ['Máximo', a.max, 'var(--compra)']].forEach(function (f, i) {
+    var x = 200 + i * 160;
+    g += '<rect class="paso-capa" x="' + x + '" y="' + Y(f[1]) + '" width="110" height="' + (Y(0) - Y(f[1])) + '" fill="' + f[2] + '"/>' + DS.txt(x + 55, Y(f[1]) - 14, num(f[1]), 't-n', ' text-anchor="middle" font-size="27"') + DS.txt(x + 55, 718, f[0], 't-s', ' text-anchor="middle" font-size="25"');
+  });
+  g += DS.txt(140, 20, 'Gasto anual en frescos (u. m.)', 't-eje');
+  CUR.poner('gasto', g);
+  /* Escala: tamaños con y sin logaritmo */
+  var e = '', fila = function (y, t, a1, b1, sub) {
+    var s = DS.txt(40, y, t, 't-n', ' font-size="30"') + DS.txt(40, y + 34, sub, 't-s', ' font-size="23"'), k = 0;
+    [[a1, 'var(--compra)'], [b1, 'var(--fresco)']].forEach(function (q) { for (var i = 0; i < q[0]; i++, k++) s += '<circle cx="' + (50 + (k % 40) * 15.5) + '" cy="' + (y + 70 + Math.floor(k / 40) * 15.5) + '" r="6" fill="' + q[1] + '"/>'; });
+    return s;
+  };
+  e += fila(40, 'Sin logaritmo: ' + S.k2_sin_log.tamanos.join(' y '), S.k2_sin_log.tamanos[0], S.k2_sin_log.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2_sin_log.ari, 3));
+  e += '<g class="paso">' + fila(400, 'Con logaritmo: ' + S.k2.tamanos.join(' y '), S.k2.tamanos[0], S.k2.tamanos[1], 'Rand ajustado con el canal: ' + num(S.k2.ari, 3)) + '</g>';
+  CUR.poner('escala', e);
+  /* Inercia y silueta */
+  var K = S.curva_k, e1 = DS.ejes({ x: 110, y: 40, w: 560, h: 480, xd: [2, 8], yd: [900, 2000], xt: [2, 3, 4, 5, 6, 7, 8], yt: [1000, 1500, 2000], xl: 'k' }), s1 = e1.s + DS.txt(110, 18, 'Inercia', 't-n', ' font-size="28"');
+  s1 += '<path d="' + K.map(function (q, i) { return (i ? 'L' : 'M') + e1.X(q.k) + ' ' + e1.Y(q.inercia); }).join('') + '" fill="none" stroke="var(--punto)" stroke-width="5"/>';
+  K.forEach(function (q) { s1 += '<circle cx="' + e1.X(q.k) + '" cy="' + e1.Y(q.inercia) + '" r="8" fill="var(--punto)"/>'; });
+  var e2 = DS.ejes({ x: 850, y: 40, w: 560, h: 480, xd: [1.4, 8], yd: [0, .35], xt: [2, 3, 4, 5, 6, 7, 8], yt: [0, .1, .2, .3], fy: function (v) { return num(v, 1); }, xl: 'k' }), s2 = e2.s + DS.txt(850, 18, 'Silueta media', 't-n', ' font-size="28"');
+  K.forEach(function (q) { s2 += '<rect class="paso-capa" x="' + (e2.X(q.k) - 26) + '" y="' + e2.Y(q.silueta) + '" width="52" height="' + (e2.Y(0) - e2.Y(q.silueta)) + '" fill="' + (q.k === 2 ? 'var(--fresco)' : 'var(--punto)') + '"/>'; });
+  s2 += '<g class="paso">' + DS.txt(e2.X(2), e2.Y(K[0].silueta) - 16, num(K[0].silueta, 2), 't-f', ' text-anchor="middle" font-size="30"') + '</g>';
+  CUR.poner('k', s1 + s2);
+  /* Perfiles: medianas por categoría */
+  var M = S.k2.medianas, cats = [['Fresh', 'Frescos'], ['Milk', 'Lácteos'], ['Grocery', 'Abarrotes'], ['Frozen', 'Congelados'], ['Detergents_Paper', 'Detergentes y papel'], ['Delicassen', 'Delicatessen']], Xp = DS.esc(0, 0, 12500, 330, 1340), p = '';
+  cats.forEach(function (c, i) {
+    var y = 20 + i * 96;
+    p += DS.txt(310, y + 52, c[1], 't-n', ' text-anchor="end" font-size="27"');
+    [['grupo_A', 'var(--compra)', 0], ['grupo_B', 'var(--fresco)', 1]].forEach(function (q) {
+      var v = M[q[0]][c[0]], yy = y + 14 + q[2] * 38;
+      p += '<rect class="paso-capa" x="330" y="' + yy + '" width="' + (Xp(v) - 330) + '" height="30" fill="' + q[1] + '"/>' + DS.txt(Xp(v) + 10, yy + 25, num(v), 't-s', ' font-size="22"');
+    });
+  });
+  p += '<rect x="900" y="570" width="24" height="24" fill="var(--compra)"/>' + DS.txt(934, 590, 'Grupo A · ' + S.k2.tamanos[0], 't-s', ' font-size="24"') + '<rect x="1140" y="570" width="24" height="24" fill="var(--fresco)"/>' + DS.txt(1174, 590, 'Grupo B · ' + S.k2.tamanos[1], 't-s', ' font-size="24"');
+  CUR.poner('perfiles', p);
+  /* Cruce con canal: reja de unidades */
+  var X2 = S.k2.cruce_canal, c2 = '', k2 = 0;
+  [['grupo_A', 'Grupo A', 'var(--compra)'], ['grupo_B', 'Grupo B', 'var(--fresco)']].forEach(function (q, j) {
+    var y0 = 30 + j * 340, h = X2[q[0]].Horeca, m = X2[q[0]].Minorista, k = 0;
+    c2 += DS.txt(20, y0, q[1] + ': ' + h + ' Horeca · ' + m + ' minoristas', 't-n', ' font-size="27"');
+    for (var i = 0; i < h + m; i++, k++) c2 += '<rect x="' + (20 + (k % 26) * 24) + '" y="' + (y0 + 20 + Math.floor(k / 26) * 24) + '" width="19" height="19" fill="' + q[2] + '" opacity="' + (i < h ? .95 : .3) + '"' + (i < h ? '' : ' stroke="var(--tinta)" stroke-width="1.5"') + '/>';
+  });
+  c2 += DS.txt(20, 690, 'Lleno: Horeca · vacío: minorista', 't-s', ' font-size="23"');
+  CUR.poner('cruce', c2);
+  CUR.poner('taller', DS.ruta([['ruler', 'Mide', 'Minkowski y coseno'], ['sliders-horizontal', 'Prepara', 'Log y escala'], ['group', 'Agrupa', 'K-means y silueta'], ['git-merge', 'Compara', 'Ward y DBSCAN'], ['file-text', 'Publica', 'Perfil en GitHub']], 'Taller de segmentación', 'Equipos · Colab · entrega: perfiles de los segmentos en el README del repositorio', 'var(--fresco)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

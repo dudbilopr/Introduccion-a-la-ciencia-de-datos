@@ -7802,7 +7802,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="%F0%9F%9A%80-Pair-Programming---Semana-4">🚀 Pair Programming - Semana 4<a class="anchor-link" href="#%F0%9F%9A%80-Pair-Programming---Semana-4">¶</a></h1><h2 id="Procesamiento-Exhaustivo-de-Datos-(EDA-Workflow)">Procesamiento Exhaustivo de Datos (EDA Workflow)<a class="anchor-link" href="#Procesamiento-Exhaustivo-de-Datos-(EDA-Workflow)">¶</a></h2><p>En este Colab aplicaremos <strong>Pandas</strong> para el Análisis Exploratorio de Datos (EDA) siguiendo la estructura profesional de 8 pasos. Utilizaremos <strong>Matplotlib</strong>, <strong>Seaborn</strong> y <strong>Plotly</strong> para extraer insights visuales de un dataset real.</p>
+<h1 id="%F0%9F%9A%80-Pair-Programming---Semana-4">Pair Programming - Semana 4<a class="anchor-link" href="#%F0%9F%9A%80-Pair-Programming---Semana-4">¶</a></h1><h2 id="Procesamiento-Exhaustivo-de-Datos-(EDA-Workflow)">Procesamiento Exhaustivo de Datos (EDA Workflow)<a class="anchor-link" href="#Procesamiento-Exhaustivo-de-Datos-(EDA-Workflow)">¶</a></h2><p>En este Colab aplicaremos <strong>Pandas</strong> para el Análisis Exploratorio de Datos (EDA) siguiendo la estructura profesional de 8 pasos. Utilizaremos <strong>Matplotlib</strong>, <strong>Seaborn</strong> y <strong>Plotly</strong> para extraer insights visuales de un dataset real.</p>
 <p><strong>Dataset:</strong> Riesgo de Enfermedades Cardíacas (Heart Disease - Kaggle)
 <strong>Objetivo:</strong> Identificar patrones visuales y limpiar los datos para un futuro modelado predictivo.</p>
 </div>
@@ -7825,7 +7825,7 @@ a.anchor-link {
 
 <span class="c1"># Configuración visual de Seaborn (Estilo UNAB)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"whitegrid"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"deep"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Librerías importadas correctamente."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Librerías importadas correctamente."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7855,7 +7855,7 @@ a.anchor-link {
 <span class="c1"># Nota: Para efectos pedagógicos de despliegue rápido, usaremos el dataset 'tips' (Propinas de un restaurante)</span>
 <span class="c1"># que permite demostrar todos los pasos de EDA de forma muy visual.</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dataset cargado en memoria."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Dataset cargado en memoria."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7918,11 +7918,11 @@ a.anchor-link {
 <span class="c1"># 2. Imputar nulos (Rellenar con la mediana)</span>
 <span class="n">mediana_propina</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'tip'</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">'tip'</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">mediana_propina</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ Nulos imputados con la mediana: </span><span class="si">{</span><span class="n">mediana_propina</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Nulos imputados con la mediana: </span><span class="si">{</span><span class="n">mediana_propina</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 3. Eliminar duplicados absolutos</span>
 <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Duplicados eliminados."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Duplicados eliminados."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8088,7 +8088,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="%F0%9F%8F%86-Reto-de-Pr%C3%A1ctica-Aut%C3%B3noma">🏆 Reto de Práctica Autónoma<a class="anchor-link" href="#%F0%9F%8F%86-Reto-de-Pr%C3%A1ctica-Aut%C3%B3noma">¶</a></h3><p><strong>Contexto:</strong> Eres un Científico de Datos Junior trabajando para una aseguradora de salud.</p>
+<h3 id="%F0%9F%8F%86-Reto-de-Pr%C3%A1ctica-Aut%C3%B3noma">Reto de Práctica Autónoma<a class="anchor-link" href="#%F0%9F%8F%86-Reto-de-Pr%C3%A1ctica-Aut%C3%B3noma">¶</a></h3><p><strong>Contexto:</strong> Eres un Científico de Datos Junior trabajando para una aseguradora de salud.</p>
 <ol>
 <li>Entra a <a href="https://www.kaggle.com/">Kaggle</a> y descarga el dataset <strong>Medical Cost Personal Datasets</strong> (seguros médicos).</li>
 <li>Sube el CSV a este cuaderno y cárgalo usando Pandas (Paso 1).</li>

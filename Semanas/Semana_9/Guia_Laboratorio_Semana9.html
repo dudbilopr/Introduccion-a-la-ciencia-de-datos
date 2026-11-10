@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 9: diferencia real o ruido | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>¿Diferencia real, o ruido?</h1>
+  <p>Cinco ejercicios en parejas para pasar de "se ve distinto" a "los datos son, o no, compatibles con que no haya diferencia". Al final, cada pareja lleva sus números al debate.</p>
+  <div class="datos-clase"><span><b>Semana</b>9</span><span><b>Tiempo</b>40 minutos en clase</span><span><b>Herramienta</b>Colab (pandas y SciPy)</span><span><b>Entrega</b>Reto: cuaderno y argumento</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Población y muestra</a></li>
+  <li><a href="#e2">2. Hipótesis</a></li>
+  <li><a href="#e3">3. Prueba t de Welch</a></li>
+  <li><a href="#e4">4. Intervalo bootstrap</a></li>
+  <li><a href="#e5">5. Grupos al azar</a></li>
+  <li><a href="#debate">Debate</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_9/Colab_Guiado_Semana_9.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/bicicletas_dia.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Mismo archivo de la semana 7: <code>bicicletas_dia.csv</code>, 731 días de Capital Bikeshare (Washington D.C., 2011 y 2012). Las columnas que se usan hoy: <code>cnt</code> (total de alquileres del día), <code>casual</code>, <code>registered</code>, <code>workingday</code> (1 = laboral) y <code>yr</code> (0 = 2011, 1 = 2012).</p>
+  <div class="aviso"><strong>Datos reales.</strong> Fanaee-T y Gama (2013), Bike Sharing Dataset, <a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noopener">UCI</a>, CC BY 4.0. Las simulaciones de los ejercicios 1, 4 y 5 remuestrean esos datos con semilla 42: si usa otra semilla, sus números cambiarán un poco, y eso también es parte de la lección.</div>
+  <p><strong>Una advertencia honesta:</strong> los 731 días no son una muestra al azar de todos los días posibles; son dos años seguidos. Hoy los tratamos como población en el ejercicio 1 y como muestra en los demás. En el debate, digan qué supone cada cosa.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Población y muestra</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Tome los 731 días como población. Calcule su media y su desviación estándar poblacional (<code>ddof=0</code>).</li>
+    <li>Saque 2.000 muestras de 30 días sin reemplazo y guarde la media de cada una.</li>
+    <li>Compare la desviación de esas 2.000 medias con σ/√30. Haga el histograma de las medias.</li>
+  </ol>
+  <pre><code>rng = np.random.default_rng(42)
+medias = np.array([rng.choice(df["cnt"].values, 30, replace=False).mean() for _ in range(2000)])
+print(round(medias.mean()), round(medias.std(ddof=1)), round(df["cnt"].std(ddof=0) / np.sqrt(30)))</code></pre>
+  <details><summary>Punto de control</summary><div><p>Media de la población: 4.504; σ = 1.936. Media de las 2.000 medias: 4.507; su desviación, 347; la fórmula predice 353. Los días no forman una campana, pero las medias sí: es el teorema del límite central en acción.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Hipótesis</h2>
+  <p class="meta">5 minutos. Escríbanlas antes de calcular nada.</p>
+  <ol class="pasos">
+    <li>Para cada variable (<code>cnt</code>, <code>casual</code>, <code>registered</code>) escriba H0 y H1 sobre la media en días laborales y no laborales.</li>
+    <li>Fije el nivel de significancia (α = 0,05) y diga por qué no lo cambiarán después de ver los datos.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>H0: μ<sub>laboral</sub> = μ<sub>no laboral</sub>. H1: μ<sub>laboral</sub> ≠ μ<sub>no laboral</sub> (bilateral). Cambiar α después de ver p es una forma de hacer trampa.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Prueba t de Welch</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Separe los días en laborales (500) y no laborales (231).</li>
+    <li>Para cada variable corra <code>stats.ttest_ind(a, b, equal_var=False)</code>. Welch no supone varianzas iguales.</li>
+    <li>Llene la tabla y escriba una frase por fila que diga diferencia, dirección y p.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Variable</th><th class="d">Laboral</th><th class="d">No laboral</th><th class="d">Diferencia</th><th class="d">t</th><th class="d">p</th></tr>
+      <tr><td>Total (cnt)</td><td class="d">4.584,8</td><td class="d">4.330,2</td><td class="d">254,7</td><td class="d">1,60</td><td class="d">0,11</td></tr>
+      <tr><td>Casuales</td><td class="d">606,6</td><td class="d">1.371,1</td><td class="d">−764,6</td><td class="d">−12,73</td><td class="d">1,79·10⁻²⁹</td></tr>
+      <tr><td>Registrados</td><td class="d">3.978,2</td><td class="d">2.959,0</td><td class="d">1.019,2</td><td class="d">9,24</td><td class="d">5,82·10⁻¹⁹</td></tr>
+    </table>
+    <p>Con el total no se rechaza H0; con cada grupo, sí, y en direcciones opuestas.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Intervalo bootstrap</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Remuestree con reemplazo cada grupo y calcule la diferencia de medias del total. Repita 5.000 veces.</li>
+    <li>El intervalo del 95 % va del percentil 2,5 al 97,5 de esas diferencias.</li>
+    <li>¿El intervalo incluye el cero? ¿Incluye un efecto que a la empresa le importaría, por ejemplo 500 bicicletas?</li>
+    <li>Calcule además el intervalo t del 95 % para la media de 2012 con <code>stats.t.interval</code>.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Intervalo bootstrap de la diferencia: de −63 a 573 bicicletas por día. Incluye el cero (coherente con p = 0,11) y también 500. Conclusión correcta: "no podemos distinguir la diferencia de cero", no "no hay diferencia". Media de 2012: 5.600, intervalo del 95 % de 5.416 a 5.784 (366 días).</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Grupos al azar</h2>
+  <p class="meta">7 minutos.</p>
+  <ol class="pasos">
+    <li>Divida los 731 días en dos mitades <em>al azar</em> y haga la prueba t del total. Repita 100 veces.</li>
+    <li>Cuente cuántas veces sale p &lt; 0,05. ¿Cuántas esperaba?</li>
+    <li>Escriba qué haría para no caer en esta trampa en su proyecto final.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Con semilla 42: 6 de 100 pruebas dan p &lt; 0,05, y la más baja da 0,004, sin ninguna diferencia real. Se esperaban unas 5. Remedio: declarar antes qué se va a probar y reportar todas las pruebas hechas.</p></div></details>
+</section>
+
+<section id="debate">
+  <h2>Debate estructurado</h2>
+  <p><strong>Moción:</strong> "Con p = 0,11, la empresa puede ignorar el tipo de día al planear la flota". Bando A a favor, bando B en contra, el resto es jurado.</p>
+  <div class="tablon"><table>
+    <tr><th>Criterio del jurado</th><th>3 puntos</th><th>1 punto</th></tr>
+    <tr><td>Evidencia</td><td>Cada argumento cita un número del cuaderno</td><td>Opiniones sin datos</td></tr>
+    <tr><td>Interpretación de p</td><td>Correcta, sin confundirlo con la probabilidad de H0</td><td>"Hay 11 % de que no haya efecto"</td></tr>
+    <tr><td>Tamaño del efecto</td><td>Usa el intervalo y los grupos</td><td>Solo habla de significancia</td></tr>
+    <tr><td>Réplica</td><td>Responde al argumento del otro bando</td><td>Repite su apertura</td></tr>
+  </table></div>
+  <p><strong>Entrega:</strong> cuaderno en GitHub y un párrafo con el argumento de su bando. Declaren el uso de IA.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>¿Llueve menos en fines de semana, o solo lo parece? Con <code>weathersit</code>, compare la proporción de días con clima 2 o 3 entre días laborales y no laborales con una prueba de proporciones o de chi cuadrado (<code>stats.chi2_contingency</code>). Escriba H0, el resultado y lo que significa para la comparación del ejercicio 3.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Wasserstein, R. L. y Lazar, N. A. (2016). The ASA Statement on p-Values: Context, Process, and Purpose. <em>The American Statistician</em>, 70(2), 129-133. <a href="https://doi.org/10.1080/00031305.2016.1154108" target="_blank" rel="noopener">doi:10.1080/00031305.2016.1154108</a></li>
+    <li>Efron, B. y Hastie, T. (2016). <em>Computer Age Statistical Inference</em>, capítulos 10 y 11 (bootstrap). Cambridge University Press.</li>
+    <li>SciPy: <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html" target="_blank" rel="noopener">ttest_ind</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { /* 100 pruebas con grupos al azar: en naranja, las 6 con p < 0,05 */ var o = []; for (var i = 0; i < 100; i++) o.push(i % 17 === 3 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

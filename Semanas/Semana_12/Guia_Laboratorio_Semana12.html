@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 12: gánale a la línea base | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Beat the baseline, sin hacer trampa</h1>
+  <p>Competencia formativa por equipos: mejorar el modelo de churn de la semana 11 con validación cruzada. Antes de competir, una revisión de la pista: el archivo esconde una trampa que infla los resultados.</p>
+  <div class="datos-clase"><span><b>Semana</b>12</span><span><b>Tiempo</b>65 minutos en clase</span><span><b>Herramienta</b>Colab con scikit-learn</span><span><b>Entrega</b>Reto: cuaderno y modelo elegido</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Revisión de la pista</a></li>
+  <li><a href="#e2">2. La carrera otra vez</a></li>
+  <li><a href="#e3">3. Validación cruzada</a></li>
+  <li><a href="#e4">4. Sesgo y varianza</a></li>
+  <li><a href="#e5">5. Competencia</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_12/Colab_Guiado_Semana_12.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/churn_telecom.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Mismo archivo de la semana 11: <code>churn_telecom.csv</code>, 3.150 clientes. El diccionario de columnas está en la <a href="../Semana_11/Guia_Laboratorio_Semana11.html#inicio">guía de la semana 11</a>.</p>
+  <div class="aviso"><strong>Datos reales.</strong> Iranian Churn Dataset, <a href="https://archive.ics.uci.edu/dataset/563/iranian+churn+dataset" target="_blank" rel="noopener">UCI</a>, CC BY 4.0, <a href="https://doi.org/10.24432/C5JW3Z" target="_blank" rel="noopener">doi:10.24432/C5JW3Z</a>. La fuente no explica por qué hay filas repetidas; no lo afirmen ustedes tampoco.</div>
+  <p><strong>Reglas de la competencia:</strong> la métrica se fija antes de empezar (clientes encontrados con 150 llamadas en prueba); se elige con validación cruzada; la prueba se mira una sola vez, al final.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Revisión de la pista</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Cuente las filas repetidas con <code>df.duplicated().sum()</code>.</li>
+    <li>Repita la partición de la semana 11 (<code>test_size=0.25, random_state=42, stratify=y</code>).</li>
+    <li>Cuente cuántas filas de prueba tienen una copia exacta en entrenamiento.</li>
+    <li>Escriba en una frase qué le pasa a un árbol sin límite de profundidad con esas filas.</li>
+  </ol>
+  <pre><code>clave = lambda d: d.astype(str).agg("|".join, axis=1)
+print(clave(Xte).isin(set(clave(Xtr))).sum())</code></pre>
+  <details><summary>Punto de control</summary><div><p>300 filas repetidas. 113 de los 788 clientes de prueba tienen un gemelo idéntico en entrenamiento. Un árbol que memoriza (99,3 % en entrenamiento) acierta esos casos por memoria, no por aprendizaje.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> La carrera otra vez</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Quite los duplicados con <code>df.drop_duplicates()</code> y vuelva a partir con los mismos parámetros.</li>
+    <li>Compare en prueba la línea base, la logística y el árbol sin límite, con y sin duplicados.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Modelo</th><th class="d">Con duplicados</th><th class="d">Sin duplicados</th></tr>
+      <tr><td>Línea base "nadie se va"</td><td class="d">84,3 %</td><td class="d">84,3 %</td></tr>
+      <tr><td>Logística, exactitud / sensibilidad</td><td class="d">88,8 % / 41,1 %</td><td class="d">90,3 % / 48,2 %</td></tr>
+      <tr><td>Árbol sin límite, exactitud / sensibilidad</td><td class="d">94,5 % / 80,6 %</td><td class="d">92,3 % / 74,1 %</td></tr>
+    </table>
+    <p>Sin duplicados quedan 2.850 filas; prueba de 713 con 112 que se van, y solo 5 gemelos. El árbol sigue ganando, pero por menos.</p>
+  </div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Validación cruzada</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Con el entrenamiento sin duplicados, calcule <code>cross_val_score</code> del árbol de profundidad 10 con <code>StratifiedKFold(5, shuffle=True, random_state=42)</code>.</li>
+    <li>Reporte la media y la desviación de los 5 pliegues.</li>
+    <li>¿Por qué no se usa la prueba para elegir la profundidad?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Validación cruzada del árbol de profundidad 10: 93,5 % con desviación 0,006. Si se elige mirando la prueba, el número de prueba deja de ser una estimación honesta.</p></div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Sesgo y varianza</h2>
+  <p class="meta">13 minutos.</p>
+  <ol class="pasos">
+    <li>Para profundidades 1, 2, 3, 4, 5, 6, 8, 10, 12 y 15 calcule la exactitud en entrenamiento y la de validación cruzada.</li>
+    <li>Grafique las dos curvas contra la profundidad.</li>
+    <li>Señale dónde hay sesgo alto, dónde varianza alta y cuál profundidad elegiría.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Profundidad</th><th class="d">1</th><th class="d">3</th><th class="d">5</th><th class="d">8</th><th class="d">10</th><th class="d">15</th></tr>
+      <tr><td>Entrenamiento</td><td class="d">89,3 %</td><td class="d">90,2 %</td><td class="d">93,4 %</td><td class="d">96,6 %</td><td class="d">97,9 %</td><td class="d">99,6 %</td></tr>
+      <tr><td>Validación cruzada</td><td class="d">89,3 %</td><td class="d">89,8 %</td><td class="d">92,0 %</td><td class="d">93,0 %</td><td class="d">93,5 %</td><td class="d">93,1 %</td></tr>
+    </table>
+    <p>Con profundidad 1 las dos curvas coinciden y son bajas: sesgo. Desde 10, el entrenamiento sigue subiendo y la validación baja: varianza. La mejor validación está en 10.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Competencia</h2>
+  <p class="meta">20 minutos.</p>
+  <ol class="pasos">
+    <li>Cada equipo propone un modelo: logística con otras variables, árbol con otra profundidad, o el que elija. Sin duplicados.</li>
+    <li>Lo comparan entre equipos solo con validación cruzada.</li>
+    <li>Al final, una sola evaluación en prueba: ¿cuántos de los 112 encuentran con las 150 probabilidades más altas?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Referencia a superar: la logística sin duplicados encuentra 87 de 112 con 150 llamadas (corte en 0,265). Quien la supere debe mostrar su validación cruzada antes que el resultado de prueba.</p></div></details>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Repita el ejercicio 4 con la sensibilidad (<code>scoring="recall"</code>) en lugar de la exactitud. ¿Cambia la profundidad elegida? Escriba qué métrica le recomendaría al equipo de retención y por qué.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Hastie, T., Tibshirani, R. y Friedman, J. (2009). <em>The Elements of Statistical Learning</em>, capítulo 7. Springer.</li>
+    <li>scikit-learn: <a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener">Cross-validation</a> y <a href="https://scikit-learn.org/stable/modules/learning_curve.html" target="_blank" rel="noopener">Validation curves</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { /* 788 clientes de prueba; naranja: los 113 con gemelo en entrenamiento */ var o = []; for (var i = 0; i < 788; i++) o.push(i < 113 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@
 
 ---
 
-## ️ Guía para el Espacio EMI (20 Minutos)
+##  Guía para el Espacio EMI (20 Minutos)
 
 El objetivo de esta sección es introducir vocabulario técnico en inglés utilizando el video recomendado.
 

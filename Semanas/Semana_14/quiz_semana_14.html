@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 14, "tema": "Text, time series and networks", "cierre": "Compare every new technique with something simple, find where it breaks, and read how the data were collected.", "preguntas": [
+{"q": "A bag-of-words model gives 'not bad' a 1.2 % chance of being positive. Why?", "o": ["It is a bug in Python", "It ignores word order and adds up two negative words", "The sentence is too short", "Logistic regression cannot read"], "a": 1, "e": "Bag of words only counts words. 'not' and 'bad' both push towards negative."},
+{"q": "Bigrams barely help: 'not bad' only rises to 3.9 %. What is the main reason?", "o": ["Bigrams are useless", "Only 1 of the 3,000 sentences contains 'not bad', so there is almost nothing to learn", "The seed was wrong", "The vocabulary is too small"], "a": 1, "e": "A model cannot learn a pattern it barely sees."},
+{"q": "Trained on Amazon and Yelp, the model scores 71.3 % on IMDb instead of 81.9 %. What is this called?", "o": ["Overfitting", "Domain shift", "Data leakage", "Seasonality"], "a": 1, "e": "Products and restaurants are described with different words than movies."},
+{"q": "Rentals on working days peak at 17 and 18 h. On other days, at 13 and 12 h. What does it suggest?", "o": ["The data are wrong", "Commuting on working days and leisure on weekends", "Weather changes at noon", "Nothing"], "a": 1, "e": "Two different uses of the same system."},
+{"q": "The 7-day autocorrelation falls from 0.757 to -0.01 after differencing. Why?", "o": ["Differencing deletes data", "Much of the correlation came from the trend", "Weeks do not exist", "It is a rounding error"], "a": 1, "e": "Removing the trend shows what is really repeated every week."},
+{"q": "The readme says neutral sentences were not selected. What does that mean for real reviews?", "o": ["Nothing changes", "Accuracy will probably be lower, because real reviews include neutral sentences", "Accuracy will be higher", "The model will learn faster"], "a": 1, "e": "How the data were collected limits what you can claim."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

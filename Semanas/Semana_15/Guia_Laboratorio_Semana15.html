@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller semana 15: auditoría ética de un modelo | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Auditar un modelo que acierta 85 %</h1>
+  <p>Cinco ejercicios en parejas para revisar un modelo de ingreso entrenado con el censo de Estados Unidos de 1994: a quién se equivoca, qué columnas delatan lo que se quitó y a cuántas personas se puede reidentificar. Termina con un roleplay de dilemas.</p>
+  <div class="datos-clase"><span><b>Semana</b>15</span><span><b>Tiempo</b>40 minutos y roleplay</span><span><b>Herramienta</b>Colab con scikit-learn</span><span><b>Entrega</b>Informe de auditoría</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. El espejo</a></li>
+  <li><a href="#e2">2. Modelo sin la columna</a></li>
+  <li><a href="#e3">3. Errores por grupo</a></li>
+  <li><a href="#e4">4. Variables sustitutas</a></li>
+  <li><a href="#e5">5. Reidentificación</a></li>
+  <li><a href="#roleplay">Roleplay</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_15/Colab_Guiado_Semana_15.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/censo_adult.csv" download>Descargar el CSV</a>
+  </div>
+  <p>Archivo <code>censo_adult.csv</code>: 32.561 personas, 15 columnas. Las que usamos: <code>age</code> (años), <code>education_num</code> (años de educación codificados), <code>hours_per_week</code>, <code>capital_gain</code> y <code>capital_loss</code> (dólares), <code>workclass</code>, <code>marital_status</code>, <code>occupation</code>, <code>relationship</code>, <code>race</code>, <code>sex</code>, <code>native_country</code> e <code>income</code> (<code>&gt;50K</code> o <code>&lt;=50K</code> dólares al año). Los vacíos vienen como <code>?</code>: 1.836 en workclass, 1.843 en occupation y 583 en native_country.</p>
+  <div class="aviso"><strong>Datos reales.</strong> Adult (Census Income), extraído por Barry Becker del censo de Estados Unidos de 1994, donado por Becker y Kohavi (1996) al <a href="https://archive.ics.uci.edu/dataset/2/adult" target="_blank" rel="noopener">repositorio UCI</a>, CC BY 4.0, <a href="https://doi.org/10.24432/C5XW20" target="_blank" rel="noopener">doi:10.24432/C5XW20</a>. El archivo original no trae encabezados; el curso agregó los nombres de la documentación. Las categorías de raza y sexo son las del censo de 1994. El caso del banco del roleplay es un supuesto de clase.</div>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> El espejo</h2>
+  <p class="meta">6 minutos.</p>
+  <ol class="pasos">
+    <li>Cree <code>y = (income == "&gt;50K")</code>. Calcule la tasa por <code>sex</code> y por <code>race</code>, con el número de personas de cada grupo.</li>
+    <li>Señale los grupos con menos de 500 personas.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Hombres 30,6 % (21.790); mujeres 10,9 % (10.771). Raza: blanca 25,6 % (27.816), asiática o del Pacífico 26,6 % (1.039), negra 12,4 % (3.124), amerindia o esquimal 11,6 % (311), otra 9,2 % (271). Los dos últimos grupos son pequeños.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Modelo sin la columna sexo</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Construya la matriz con las variables numéricas y las categóricas en ficticias (<code>pd.get_dummies(..., drop_first=True)</code>), <strong>sin</strong> <code>sex</code>.</li>
+    <li>Parta 70/30 estratificado con semilla 42 y guarde aparte el sexo de cada persona de prueba.</li>
+    <li>Ajuste <code>make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000))</code>. Compare con la línea base.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>9.769 personas de prueba. Exactitud 85,4 %; línea base "nadie gana más" 75,9 %.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Errores por grupo</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Para mujeres y hombres por separado calcule: tasa real, tasa predicha, sensibilidad, tasa de falsos positivos y precisión.</li>
+    <li>Decida cuál de las tres definiciones de justicia (paridad, igualdad de oportunidades, calibración) se cumple.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Grupo</th><th class="d">Personas</th><th class="d">Tasa real</th><th class="d">Tasa predicha</th><th class="d">Sensibilidad</th><th class="d">Falsos positivos</th><th class="d">Precisión</th></tr>
+      <tr><td>Mujeres</td><td class="d">3.199</td><td class="d">11,2 %</td><td class="d">8,8 %</td><td class="d">57,5 %</td><td class="d">2,7 %</td><td class="d">73,0 %</td></tr>
+      <tr><td>Hombres</td><td class="d">6.570</td><td class="d">30,4 %</td><td class="d">25,5 %</td><td class="d">62,0 %</td><td class="d">9,6 %</td><td class="d">73,8 %</td></tr>
+    </table>
+    <p>La calibración casi se cumple; la paridad, no. Con tasas reales tan distintas no se pueden igualar las tres a la vez (Chouldechova, 2017).</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Variables sustitutas</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Haga una tabla cruzada de <code>relationship</code> contra <code>sex</code>. ¿Qué categorías delatan el sexo?</li>
+    <li>Quite además las ficticias de <code>relationship</code> y <code>marital_status</code>, reentrene y calcule de nuevo la tasa predicha por sexo.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>"Husband": 13.192 hombres y 1 mujer. "Wife": 1.566 mujeres y 2 hombres. Sin esas dos variables, exactitud 82,2 % y tasa predicha de 8,1 % para mujeres y 18,4 % para hombres: la brecha baja, pero no desaparece.</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Reidentificación</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Cuente cuántas personas tienen una combinación única de <code>age</code>, <code>sex</code> y <code>race</code> (grupos de tamaño 1 en <code>groupby(...).size()</code>).</li>
+    <li>Agregue <code>native_country</code>, luego <code>occupation</code>, luego <code>education</code>. Reporte el número y el porcentaje cada vez.</li>
+    <li>Proponga una forma de publicar el archivo con k ≥ 5: agrupar edades, quitar columnas o suprimir celdas.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Atributos combinados</th><th class="d">Personas únicas</th><th class="d">Porcentaje</th></tr>
+      <tr><td>Edad, sexo, raza</td><td class="d">65</td><td class="d">0,2 %</td></tr>
+      <tr><td>+ país</td><td class="d">1.330</td><td class="d">4,1 %</td></tr>
+      <tr><td>+ ocupación</td><td class="d">3.565</td><td class="d">10,9 %</td></tr>
+      <tr><td>+ educación</td><td class="d">8.054</td><td class="d">24,7 %</td></tr>
+    </table>
+  </div></details>
+</section>
+
+<section id="roleplay">
+  <h2>Roleplay de dilemas</h2>
+  <p><strong>Dilema (supuesto de clase):</strong> un banco quiere usar este modelo de ingreso para preaprobar créditos. ¿Se usa tal cual, se modifica o se prohíbe?</p>
+  <ol class="pasos">
+    <li>Roles: empresa que construye el modelo, persona afectada, regulador, ingeniera de datos y medio de comunicación.</li>
+    <li>Cada rol prepara en 5 minutos un argumento con un número de hoy y un principio (de la guía de aprendizaje o de la lectura).</li>
+    <li>Ronda de 2 minutos por rol, réplica libre de 10 minutos y votación.</li>
+    <li>Opcional antes de clase: responder algunos dilemas en <a href="https://www.moralmachine.net/" target="_blank" rel="noopener">moralmachine.net</a> y comparar con los resultados globales de Awad y otros (2018).</li>
+  </ol>
+  <p><strong>Entrega:</strong> informe de auditoría de una página en GitHub: números por grupo, definición de justicia que su pareja defiende y por qué, riesgo de privacidad y recomendación. Declare el uso de IA.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Chouldechova, A. (2017). Fair Prediction with Disparate Impact. <em>Big Data</em>, 5(2), 153-163. <a href="https://doi.org/10.1089/big.2016.0047" target="_blank" rel="noopener">doi:10.1089/big.2016.0047</a></li>
+    <li>Sweeney, L. (2002). k-Anonymity: A Model for Protecting Privacy. <em>IJUFKS</em>, 10(5), 557-570. <a href="https://doi.org/10.1142/S0218488502001648" target="_blank" rel="noopener">doi:10.1142/S0218488502001648</a></li>
+    <li>Awad, E. y otros (2018). The Moral Machine experiment. <em>Nature</em>, 563, 59-64. <a href="https://doi.org/10.1038/s41586-018-0637-6" target="_blank" rel="noopener">doi:10.1038/s41586-018-0637-6</a></li>
+    <li>UNAB: <a href="https://unabdigital.unab.edu.co/landing-ia.html" target="_blank" rel="noopener">lineamientos para el uso de la IA</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { /* 100 personas: 31 de cada 100 hombres y 11 de cada 100 mujeres con ingreso alto */ var o = []; for (var i = 0; i < 100; i++) o.push(i < 31 ? 1 : 0); for (var j = 0; j < 100; j++) o.push(j < 11 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

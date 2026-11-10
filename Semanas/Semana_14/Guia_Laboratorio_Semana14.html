@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 14: cápsulas de conocimiento | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Feria de cápsulas: texto, series de tiempo y redes</h1>
+  <p>Aula invertida. Cada equipo elige un kit, lo estudia antes de clase y lo enseña al grupo en 12 minutos: una demo con datos reales y un caso donde la técnica falla.</p>
+  <div class="datos-clase"><span><b>Semana</b>14</span><span><b>Tiempo</b>Preparación previa y 12 min en clase</span><span><b>Herramienta</b>Colab</span><span><b>Entrega</b>Reto: cuaderno y cápsula</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#k1">Kit 1: texto</a></li>
+  <li><a href="#k2">Kit 2: series de tiempo</a></li>
+  <li><a href="#k3">Kit 3: redes</a></li>
+  <li><a href="#plantilla">Plantilla de la cápsula</a></li>
+  <li><a href="#rubrica">Rúbrica</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_14/Colab_Guiado_Semana_14.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/frases_sentimiento.csv" download>Frases (CSV)</a>
+    <a class="boton sec" href="../Datos/bicicletas_hora.csv" download>Bicicletas por hora (CSV)</a>
+  </div>
+  <p>El cuaderno trae la demo base de los kits 1 y 2. Su equipo debe ir más allá: mejorar la demo, romperla y explicarla.</p>
+  <div class="aviso"><strong>Datos reales.</strong> Kit 1: Sentiment Labelled Sentences, Kotzias y otros (2015), <a href="https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences" target="_blank" rel="noopener">UCI</a>, CC BY 4.0. El archivo del curso une los tres archivos originales en uno y agrega la columna <code>fuente</code>; ninguna frase se cambió. Kit 2: Bike Sharing, Fanaee-T y Gama (2013), <a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noopener">UCI</a>, CC BY 4.0.</div>
+</section>
+
+<section id="k1">
+  <h2>Kit 1: texto</h2>
+  <p>Archivo <code>frases_sentimiento.csv</code>: 3.000 frases de reseñas, 1.000 de cada fuente (Amazon, IMDb y Yelp), con <code>sentimiento</code> 1 positiva o 0 negativa. Están balanceadas por diseño: 500 y 500 por fuente.</p>
+  <ol class="pasos">
+    <li>Corra la demo base: <code>CountVectorizer</code> más <code>LogisticRegression</code>, partición 75/25 estratificada con semilla 42.</li>
+    <li>Pruebe las sondas: "great", "not good", "not bad" y "the battery is not bad at all".</li>
+    <li>Mejore con bigramas (<code>ngram_range=(1, 2)</code>). ¿Arregla "not bad"? Cuente cuántas frases del archivo contienen "not bad".</li>
+    <li>Entrene con Amazon y Yelp y pruebe con IMDb. Explique la caída.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <p>Base: vocabulario de 4.407 palabras, exactitud 81,9 % en 750 frases de prueba, matriz [[302, 73], [63, 312]]. Sondas: "great" 93,2 % positiva, "not good" 39,3 %, "not bad" 1,2 %, la frase de la batería 0,6 %.</p>
+    <p>Con bigramas: 20.367 términos, exactitud 82,7 %, "not bad" sube solo a 3,9 %. Solo 1 frase de 3.000 contiene "not bad": el modelo no puede aprender lo que casi no ve. Entrenado con Amazon y Yelp, en IMDb acierta 71,3 %.</p>
+  </div></details>
+</section>
+
+<section id="k2">
+  <h2>Kit 2: series de tiempo</h2>
+  <p>Archivos <code>bicicletas_hora.csv</code> (17.379 horas; columna <code>hr</code> de 0 a 23) y <code>bicicletas_dia.csv</code> (731 días).</p>
+  <ol class="pasos">
+    <li>Calcule el promedio de <code>cnt</code> por hora, separado por <code>workingday</code>. Grafique los dos perfiles.</li>
+    <li>Con la serie diaria, calcule la autocorrelación a 1 y a 7 días con <code>serie.autocorr(k)</code>.</li>
+    <li>Diferencie la serie (<code>serie.diff()</code>) y repita la autocorrelación a 7 días. Explique qué pasó.</li>
+    <li>Agregue una media móvil de 7 días y muestre la tendencia.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Días laborales: picos a las 17 y 18 horas (y otro a las 8). No laborales: picos a las 13 y 12. Autocorrelación diaria: 0,849 a 1 día y 0,757 a 7. Con diferencias, la de 7 días cae a −0,01: buena parte de la "memoria" de la serie era tendencia.</p></div></details>
+</section>
+
+<section id="k3">
+  <h2>Kit 3: redes</h2>
+  <p>Este kit no trae datos fijos. El equipo elige una red pública con fuente, autor y licencia verificables, y la analiza con NetworkX.</p>
+  <ol class="pasos">
+    <li>Documente la red: qué es un nodo, qué es una arista, fuente y licencia. El docente la aprueba antes de la clase.</li>
+    <li>Calcule el número de nodos y aristas, el grado medio y las centralidades de grado e intermediación.</li>
+    <li>Muestre los 5 nodos más centrales con cada medida. ¿Coinciden?</li>
+    <li>Explique un caso donde "más central" no significa "más importante".</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>No hay cifras únicas: dependen de la red. El punto de control es la ficha de la red aprobada y que las dos medidas de centralidad estén calculadas y comparadas.</p></div></details>
+</section>
+
+<section id="plantilla">
+  <h2>Plantilla de la cápsula</h2>
+  <ol class="pasos">
+    <li><strong>Problema</strong> (1 min): qué pregunta responde la técnica, con un ejemplo real.</li>
+    <li><strong>Idea</strong> (2 min): cómo funciona, citando la fuente que leyeron.</li>
+    <li><strong>Demo</strong> (3 min): en vivo, con datos del kit, y un número contra una línea base.</li>
+    <li><strong>Trampa</strong> (2 min): dónde se rompe, mostrado.</li>
+    <li><strong>Preguntas</strong> (4 min): del público.</li>
+  </ol>
+</section>
+
+<section id="rubrica">
+  <h2>Rúbrica (0 a 3 por criterio)</h2>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th>3</th><th>1</th></tr>
+    <tr><td>Idea</td><td>Problema claro en una frase</td><td>Definición copiada</td></tr>
+    <tr><td>Fuente</td><td>Artículo o documentación citada y leída</td><td>Sin fuente o sin verificar</td></tr>
+    <tr><td>Demo</td><td>Corre en vivo con datos reales</td><td>Capturas o datos inventados</td></tr>
+    <tr><td>Número</td><td>Métrica contra una línea base</td><td>Número sin comparación</td></tr>
+    <tr><td>Límite</td><td>Caso de falla mostrado y explicado</td><td>Solo virtudes</td></tr>
+    <tr><td>Enseñanza</td><td>El público puede repetirlo</td><td>Nadie entendió el código</td></tr>
+  </table></div>
+  <p>Entrega en GitHub: cuaderno de la demo, diapositivas de la cápsula y declaración de uso de IA.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li>Kotzias, D., Denil, M., de Freitas, N. y Smyth, P. (2015). From Group to Individual Labels Using Deep Features. <em>KDD 2015</em>, 597-606. <a href="https://doi.org/10.1145/2783258.2783380" target="_blank" rel="noopener">doi:10.1145/2783258.2783380</a></li>
+    <li>scikit-learn: <a href="https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html" target="_blank" rel="noopener">Working With Text Data</a>.</li>
+    <li>pandas: <a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.autocorr.html" target="_blank" rel="noopener">Series.autocorr</a>. NetworkX: <a href="https://networkx.org/documentation/stable/tutorial.html" target="_blank" rel="noopener">Tutorial</a>.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 300; i++) o.push(i % 2); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>
