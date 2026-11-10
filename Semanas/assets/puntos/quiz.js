@@ -1,6 +1,15 @@
 /* Actividad EMI de cada sesión: práctica en inglés con retroalimentación inmediata. No lleva nota. */
 (function () {
   var Q = window.QUIZ, raiz = document.getElementById('quiz'), i = 0, ok = 0;
+  /* Baraja las opciones de cada pregunta para que la respuesta correcta no quede siempre en el mismo lugar */
+  function barajar() {
+    Q.preguntas.forEach(function (p) {
+      var orden = p.o.map(function (_, k) { return k; });
+      for (var j = orden.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), t = orden[j]; orden[j] = orden[r]; orden[r] = t; }
+      p.o = orden.map(function (k) { return p.o[k]; }); p.a = orden.indexOf(p.a);
+    });
+  }
+  barajar();
   document.title = 'EMI activity · Week ' + Q.sesion + ' | Introducción a la Ciencia de Datos';
   function pinta() {
     if (i >= Q.preguntas.length) { fin(); return; }
@@ -20,7 +29,7 @@
   }
   function fin() {
     raiz.innerHTML = '<p class="avance">Your result</p><p class="cifra">' + ok + ' / ' + Q.preguntas.length + '</p><p class="cierre">' + Q.cierre + '</p><p class="nota">Practice only: this activity does not count toward your grade.</p><button type="button" class="sig">Try again</button>';
-    raiz.querySelector('.sig').addEventListener('click', function () { i = 0; ok = 0; pinta(); });
+    raiz.querySelector('.sig').addEventListener('click', function () { i = 0; ok = 0; barajar(); pinta(); });
   }
   document.getElementById('tema').textContent = Q.tema;
   document.getElementById('ses').textContent = 'Week ' + Q.sesion + ' · English immersion';

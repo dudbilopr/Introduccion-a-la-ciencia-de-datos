@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detective de días raros | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="../assets/puntos/simulador.css">
+<style>
+  :root { --l-fondo: #0c1a1f; --l-panel: #15303a; --l-hondo: #08130f; --l-tinta: #f2efe6; --l-tinta2: #a9bcc0; --l-regla: rgba(169,188,192,.24); --l-acento: #e9c46a; --l-naranja: #ff7a1f; }
+  .ficha { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 15px; margin-top: 8px; }
+  .ficha span { color: var(--l-tinta2); }
+  .ficha b { color: var(--l-tinta); font-variant-numeric: tabular-nums; }
+  .veredicto { margin-top: 12px; padding: 10px 12px; background: var(--l-hondo); border-left: 5px solid var(--l-acento); font-size: 15px; line-height: 1.4; }
+  .veredicto.raro { border-left-color: var(--l-naranja); }
+    .leyenda { left: auto; right: 12px; }
+  #lista { font-size: 14px; line-height: 1.6; color: var(--l-tinta2); }
+  #lista button { background: none; border: 0; color: var(--l-acento); font: inherit; cursor: pointer; padding: 0 2px; text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Detective de días raros: 731 días de bicicletas</h1>
+  <p class="bajada">Cada barra es un día real de alquileres en Washington D.C. Toque una barra (o use las flechas) para ver su ficha. Active la regla del rango intercuartílico y elija contra qué se compara cada día: un día solo es raro respecto a su grupo. Datos: Bike Sharing, Fanaee-T y Gama (2013), UCI, CC BY 4.0.</p>
+  <div class="rejilla">
+    <div class="lienzo"><svg id="g" viewBox="0 0 1200 620" role="img" aria-label="Alquileres por día de 2011 y 2012; los días marcados como raros se pintan de naranja"></svg><div class="leyenda" id="leyenda"></div></div>
+    <div class="panel">
+      <h2>Regla</h2>
+      <label for="grupo">Comparar cada día con</label>
+      <select id="grupo"><option value="todo">Los 731 días</option><option value="mes" selected>Su mes de ese año</option><option value="semana">Su día de la semana</option></select>
+      <label for="k">Multiplicador del rango intercuartílico: <b id="kv">1,5</b></label>
+      <input id="k" type="range" min="0.5" max="3" step="0.5" value="1.5">
+      <div class="metricas">
+        <div><b id="mN">–</b><span>Días raros (por debajo)</span></div>
+        <div><b id="mPct">–</b><span>Del total</span></div>
+      </div>
+      <h2>Día elegido</h2>
+      <div class="fila"><button id="ant" type="button" aria-label="Día anterior">Anterior</button><button id="sig" type="button" aria-label="Día siguiente">Siguiente</button><button id="minimo" type="button" class="pri">Ir al mínimo</button></div>
+      <div class="ficha" id="ficha"></div>
+      <div class="veredicto" id="veredicto" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>Compare con los 731 días y multiplicador 1,5. ¿Cuántos días raros hay? ¿Por qué el día de 22 alquileres no queda marcado?</li>
+      <li>Cambie a "Su mes de ese año". Deben salir <b>26 días</b>, los mismos que calcula pandas en la semana 7. Busque en internet qué pasó dos de ellos: el 27 de agosto de 2011 y el 22 de noviembre de 2012.</li>
+      <li>Compare con "Su día de la semana". No aparece ningún día raro. ¿Por qué? Pista: un grupo de "todos los lunes" mezcla lunes de invierno y de verano; mire la mediana y el límite del grupo en la ficha.</li>
+      <li>Suba el multiplicador a 3. ¿Qué días sobreviven? Escriba una frase: "raro" ¿es una propiedad del número o de la comparación?</li>
+    </ol>
+    <p id="lista"></p>
+    <p class="nota">Cuartiles con interpolación lineal, igual que <code>pandas.Series.quantile</code>. <span class="validado" id="val"></span></p>
+  </div>
+</div>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, n = C.cnt.length, sel = C.cnt.indexOf(C.resumen.caso_sandy.cnt_min), g = document.getElementById('g');
+  var t0 = Date.UTC(2011, 0, 1), F = [], MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'], DIA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  var CLIMA = { 1: 'despejado', 2: 'niebla o nublado', 3: 'lluvia o nieve ligera', 4: 'lluvia fuerte' };
+  for (var i = 0; i < n; i++) F.push(new Date(t0 + i * 864e5));
+  function fmt(x) { return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function iso(d) { return d.toISOString().slice(0, 10); }
+  function cuantil(v, p) { var s = v.slice().sort(function (a, b) { return a - b; }), h = (s.length - 1) * p, lo = Math.floor(h); return s[lo] + (h - lo) * ((s[lo + 1] === undefined ? s[lo] : s[lo + 1]) - s[lo]); }
+  function clave(i, modo) { return modo === 'todo' ? 'x' : modo === 'mes' ? F[i].getUTCFullYear() + '-' + F[i].getUTCMonth() : F[i].getUTCDay(); }
+  function limites(modo, k) {
+    var grupos = {}, lim = [];
+    for (var i = 0; i < n; i++) { var c = clave(i, modo); (grupos[c] = grupos[c] || []).push(C.cnt[i]); }
+    var L = {};
+    Object.keys(grupos).forEach(function (c) { var q1 = cuantil(grupos[c], .25), q3 = cuantil(grupos[c], .75); L[c] = { q1: q1, q3: q3, med: cuantil(grupos[c], .5), lim: q1 - k * (q3 - q1), n: grupos[c].length }; });
+    for (i = 0; i < n; i++) lim.push(L[clave(i, modo)]);
+    return lim;
+  }
+  var lim = [];
+  function dibuja() {
+    var modo = document.getElementById('grupo').value, k = +document.getElementById('k').value;
+    document.getElementById('kv').textContent = String(k).replace('.', ',');
+    lim = limites(modo, k);
+    var raros = [], s = '', X = function (i) { return 70 + i * (1110 / n); }, Y = function (v) { return 560 - v / 9000 * 520; };
+    [0, 3000, 6000, 9000].forEach(function (v) { s += '<line x1="70" x2="1185" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--l-regla)"/><text x="60" y="' + (Y(v) + 6) + '" fill="var(--l-tinta2)" font-size="18" text-anchor="end">' + fmt(v) + '</text>'; });
+    [['ene 2011', 0], ['jul 2011', 181], ['ene 2012', 365], ['jul 2012', 547], ['dic 2012', 730]].forEach(function (e) { s += '<text x="' + X(e[1]) + '" y="596" fill="var(--l-tinta2)" font-size="18" text-anchor="' + (e[1] === 730 ? 'end' : e[1] ? 'middle' : 'start') + '">' + e[0] + '</text>'; });
+    for (var i = 0; i < n; i++) {
+      var r = C.cnt[i] < lim[i].lim; if (r) raros.push(i);
+      s += '<rect data-i="' + i + '" x="' + X(i).toFixed(1) + '" y="' + Y(C.cnt[i]).toFixed(1) + '" width="' + (r ? 3.4 : 1.6) + '" height="' + (560 - Y(C.cnt[i])).toFixed(1) + '" fill="' + (r ? 'var(--l-naranja)' : '#5d8c96') + '"/>';
+    }
+    s += '<line id="cursor" x1="' + X(sel) + '" x2="' + X(sel) + '" y1="30" y2="560" stroke="var(--l-acento)" stroke-width="2.5"/>';
+    s += '<rect id="tapa" x="70" y="20" width="1115" height="540" fill="transparent" style="cursor:crosshair"/>';
+    g.innerHTML = s;
+    document.getElementById('mN').textContent = raros.length;
+    document.getElementById('mPct').textContent = (raros.length / n * 100).toFixed(1).replace('.', ',') + ' %';
+    document.getElementById('leyenda').textContent = 'Naranja: por debajo de Q1 − ' + String(k).replace('.', ',') + ' × RIC de su grupo';
+    document.getElementById('lista').innerHTML = raros.length ? '<b>Días marcados:</b> ' + raros.map(function (i) { return '<button type="button" data-i="' + i + '">' + iso(F[i]) + '</button>'; }).join(' ') : 'Ningún día queda por debajo del límite.';
+    document.querySelectorAll('#lista button').forEach(function (b) { b.addEventListener('click', function () { sel = +b.getAttribute('data-i'); ficha(); }); });
+    document.getElementById('tapa').addEventListener('click', function (e) {
+      var p = g.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; var q = p.matrixTransform(g.getScreenCTM().inverse());
+      sel = Math.max(0, Math.min(n - 1, Math.round((q.x - 70) / (1110 / n)))); ficha();
+    });
+    var py = window.CIFRAS.resumen.caso_sandy.raros_fechas, ok = modo === 'mes' && k === 1.5;
+    document.getElementById('val').textContent = ok ? (raros.length === py.length && raros.every(function (i, j) { return iso(F[i]) === py[j]; }) ? 'Coincide con pandas: los mismos ' + py.length + ' días.' : 'No coincide con pandas: revisar.') : 'Validación con pandas: elija "Su mes de ese año" y 1,5.';
+    ficha();
+  }
+  function ficha() {
+    var d = F[sel], L = lim[sel], v = C.cnt[sel], raro = v < L.lim;
+    document.getElementById('cursor').setAttribute('x1', 70 + sel * (1110 / n)); document.getElementById('cursor').setAttribute('x2', 70 + sel * (1110 / n));
+    document.getElementById('ficha').innerHTML = '<span>Fecha</span><b>' + DIA[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MES[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + '</b><span>Alquileres</span><b>' + fmt(v) + '</b><span>Casuales</span><b>' + fmt(C.casual[sel]) + '</b><span>Clima</span><b>' + CLIMA[C.clima[sel]] + '</b><span>Temperatura</span><b>' + String(C.temp[sel]).replace('.', ',') + ' °C</b><span>Festivo / laboral</span><b>' + (C.festivo[sel] ? 'festivo' : 'no festivo') + ' / ' + (C.laboral[sel] ? 'laboral' : 'no laboral') + '</b><span>Mediana del grupo</span><b>' + fmt(L.med) + ' (' + L.n + ' días)</b><span>Límite inferior</span><b>' + fmt(L.lim) + '</b>';
+    var v2 = document.getElementById('veredicto');
+    v2.className = 'veredicto' + (raro ? ' raro' : '');
+    v2.innerHTML = raro ? '<b>Raro en su grupo.</b> Está ' + fmt(L.lim - v) + ' alquileres por debajo del límite. Formule una hipótesis y búsquela en una fuente externa.' : '<b>Dentro de lo esperado</b> para su grupo de comparación.';
+  }
+  document.getElementById('grupo').addEventListener('change', dibuja);
+  document.getElementById('k').addEventListener('input', dibuja);
+  document.getElementById('ant').addEventListener('click', function () { sel = Math.max(0, sel - 1); ficha(); });
+  document.getElementById('sig').addEventListener('click', function () { sel = Math.min(n - 1, sel + 1); ficha(); });
+  document.getElementById('minimo').addEventListener('click', function () { sel = C.cnt.indexOf(Math.min.apply(null, C.cnt)); ficha(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') { sel = Math.max(0, sel - 1); ficha(); } if (e.key === 'ArrowRight') { sel = Math.min(n - 1, sel + 1); ficha(); } });
+  dibuja();
+})();
+</script>
+</body>
+</html>

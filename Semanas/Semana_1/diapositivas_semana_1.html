@@ -1,474 +1,354 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <title>Ciencia de Datos - Semana 1</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-    <style>
-        :root {
-            --data-blue: #003865;
-            --data-orange: #E85C0B;
-            --cyber-dark: #050510;
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff007f;
-        }
-
-        body { font-family: 'Inter', sans-serif; }
-
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            color: var(--data-blue);
-            text-transform: none;
-            font-weight: 800;
-        }
-
-        .reveal h2 {
-            border-bottom: 3px solid var(--data-orange);
-            display: inline-block;
-            padding-bottom: 8px;
-            margin-bottom: 30px;
-        }
-
-        .accent { color: var(--data-orange) !important; font-weight: bold; }
-        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
-
-        .reveal .controls, .reveal .progress { color: var(--data-orange); }
-
-        .icon-container {
-            font-size: 5rem;
-            color: var(--data-orange);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .box-glass {
-            background: rgba(240, 244, 248, 0.9);
-            border-left: 6px solid var(--data-orange);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            margin-top: 15px;
-            color: #333;
-            font-size: 0.9em;
-        }
-
-        /* Dark Mode / Cyber Mode slides */
-        .reveal.cyber-mode,
-        .reveal.cyber-mode .slide-background,
-        .reveal.cyber-mode .slide-background-content {
-            background-color: var(--cyber-dark) !important;
-        }
-
-        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
-            color: #fff !important;
-        }
-
-        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
-
-        .reveal.cyber-mode .box-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border-left: 6px solid var(--neon-cyan);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
-        }
-
-        .split-layout {
-            display: flex; gap: 30px; align-items: stretch;
-            height: 100%;
-        }
-        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-
-        .quote-container {
-            position: relative;
-            padding: 30px 40px;
-            background: #f9f9f9;
-            border-left: 8px solid var(--data-blue);
-            font-style: italic;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-            text-align: left;
-        }
-        .quote-container::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            font-size: 6rem;
-            color: rgba(0, 56, 101, 0.1);
-            font-family: Georgia, serif;
-        }
-        .quote-author {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            font-style: normal;
-            color: var(--data-orange);
-            text-align: right;
-        }
-
-        .reveal .slides section {
-            max-height: 95vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 10px;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
-
-        /* VENN DIAGRAM CSS */
-        .venn-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            margin: 0 auto;
-        }
-        .venn-circle {
-            position: absolute;
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: white;
-            opacity: 0.8;
-            mix-blend-mode: multiply;
-            transition: all 0.3s;
-        }
-        .venn-circle:hover { opacity: 0.95; z-index: 10; transform: scale(1.05); }
-        .venn-cs { background-color: #ff4d4d; top: 0; left: 75px; }
-        .venn-math { background-color: #4da6ff; bottom: 30px; left: 0; }
-        .venn-domain { background-color: #ffcc00; bottom: 30px; right: 0; color: #333; }
-        .venn-center {
-            position: absolute;
-            top: 160px;
-            left: 140px;
-            width: 120px;
-            text-align: center;
-            font-weight: 900;
-            font-size: 1.2rem;
-            color: #000;
-            z-index: 5;
-        }
-
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 1 · Bitácora de expedición | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: bitácora de una expedición. Cada pregunta es un destino; el ciclo de vida del dato es el viaje. */
+  :root { --fondo: #0c1a1f; --fondo-2: #15303a; --tinta: #f2efe6; --tinta-2: #a9bcc0; --regla: rgba(169,188,192,.24); --punto: #5d8c96; --compra: #ff7a1f; --acento-texto: #ffa263; --oro: #e9c46a; }
+  :root[data-tema="claro"] { --fondo: #f4f0e4; --fondo-2: #e6dfcb; --tinta: #10262d; --tinta-2: #4d6268; --regla: rgba(16,38,45,.2); --punto: #7e9fa6; --compra: #e85c0b; --acento-texto: #b94504; --oro: #9a6f05; }
+  .rot { font: 700 23px Consolas, 'Courier New', monospace; letter-spacing: .1em; color: var(--oro); text-transform: uppercase; }
+  svg text:not([font-family]) { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; }
+  .t-n { fill: var(--tinta); font-weight: 700; }
+  .t-s { fill: var(--tinta-2); }
+  .t-o { fill: var(--acento-texto); font-weight: 800; }
+  .t-au { fill: var(--oro); font-weight: 800; }
+  .hoja { background: var(--fondo-2); border-left: 8px solid var(--oro); padding: 26px 30px; }
+  .hoja.naranja { border-left-color: var(--compra); }
+  .gds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .gds div { background: var(--fondo-2); padding: 22px 22px 24px; border-top: 6px solid var(--oro); min-height: 232px; }
+  .gds b { display: block; font-size: 31px; line-height: 1.1; margin: 8px 0 10px; }
+  .gds span { font-size: 24px; line-height: 1.25; color: var(--tinta-2); display: block; }
+  .gds em { font-style: normal; font-family: Consolas, monospace; color: var(--oro); font-size: 21px; }
+  .roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .roles div { background: var(--fondo-2); padding: 24px 22px; border-top: 6px solid var(--punto); display: flex; flex-direction: column; gap: 10px; min-height: 330px; }
+  .roles .ico { font-size: 56px; color: var(--oro); }
+  .roles b { font-size: 31px; line-height: 1.08; }
+  .roles span { font-size: 23.5px; color: var(--tinta-2); line-height: 1.24; }
+  .roles i.p { font-style: normal; font-size: 22px; color: var(--acento-texto); line-height: 1.24; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--oro); min-height: 262px; }
+  .glosa .ico { font-size: 46px; color: var(--oro); }
+  .glosa b { display: block; font-size: 27px; line-height: 1.08; margin: 10px 0 8px; }
+  .glosa span { font-size: 22.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .cita { font-size: 46px; line-height: 1.2; font-weight: 700; }
+  .grupos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grupos div { background: var(--fondo-2); padding: 26px 24px; border-top: 6px solid var(--oro); min-height: 420px; display: flex; flex-direction: column; gap: 12px; }
+  .grupos b { font-size: 32px; line-height: 1.1; }
+  .grupos span { font-size: 24px; line-height: 1.28; color: var(--tinta-2); }
+</style>
 </head>
+<body data-cine="paneo">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
 
-<body>
-    <div class="reveal">
-        <div class="slides">
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="horizonte" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:70px;width:1180px">
+    <p class="rot">Bitácora de expedición · Semana 1</p>
+    <h1 style="font-size:100px;margin-top:14px;line-height:1.02">Ciencia de datos: <span class="acento">preguntarle al mundo</span> y responder con evidencia.</h1>
+    <p class="sec" style="font-size:27px;margin-top:22px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">La línea del fondo son los 731 días reales de alquileres de bicicletas en Washington D.C. (2011 y 2012). El punto naranja es el día más bajo. No lo explique todavía: es la pregunta con la que abre la clase.</aside>
+</section>
 
-            <!-- Slide 1: Título -->
-            <section>
-                <div class="icon-container">
-                    <i class="fa-solid fa-network-wired"></i>
-                </div>
-                <h1>Ciencia de Datos</h1>
-                <h3>Semana 1: <span class="accent">El ADN del Data Scientist</span></h3>
-                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
-            </section>
+<!-- 2 Pregunta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:64px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">La primera pregunta</p>
+    <h2 style="font-size:58px;line-height:1.06">Un día, en una ciudad que alquila miles de bicicletas, solo se alquilaron <span class="acento" id="pMin"></span>. ¿Qué pasó?</h2>
+    <p class="paso" style="font-size:31px">Un día normal: <b class="acento" id="pMedia"></b> alquileres. Ese mes, <b id="pOct"></b> por día.</p>
+    <p class="paso" style="font-size:31px">Fecha: <b id="pFecha"></b>. Clima registrado: lluvia. Temperatura: <b id="pTemp"></b>.</p>
+    <p class="paso" style="font-size:31px">Ese día el huracán Sandy llegó a la costa este de Estados Unidos.</p>
+    <p class="paso sec" style="font-size:27px">Pregunta, datos, contexto, conclusión. Acaban de hacer ciencia de datos.</p>
+  </div>
+  <svg id="caida" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:70px;width:720px;height:760px" role="img" aria-label="Alquileres diarios de octubre y noviembre de 2012 con la caída del 29 de octubre"></svg>
+  <aside class="notas">Pida hipótesis antes de cada paso: ¿un festivo?, ¿un error del sensor?, ¿un paro? Cada hipótesis se puede contrastar con una columna del archivo. El clima 3 es "lluvia o nieve ligera" según la documentación; la temperatura se desnormaliza multiplicando por 41. Fuente: Fanaee-T y Gama (2013), UCI, CC BY 4.0.</aside>
+</section>
 
-            <!-- Slide 2: Introducción y RAE -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-compass"></i> Bienvenidos a la Era de los Datos</h2>
-                    <p>Más que un rol, es una forma de pensar.</p>
-                    <div class="box-glass">
-                        <p>A lo largo del tiempo, la intuición dominó las decisiones corporativas. Hoy, la intuición sin evidencia empírica es un riesgo inaceptable.</p>
-                        <hr>
-                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta:</h4>
-                        <p class="text-center" style="font-weight:bold;">¿Qué diferencia a un Científico de Datos de un Analista Tradicional?</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
-                    <div class="box-glass">
-                        <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Comprender la intersección disciplinar que conforma la Ciencia de Datos (Diagrama de Conway).</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Diferenciar los roles del ecosistema (Data Engineer vs Data Scientist vs Data Analyst).</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Entender el ciclo de vida analítico de un proyecto basado en datos.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
+<!-- 3 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Ruta de hoy · 7:00 a 10:00</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de la sesión en ocho paradas"></svg>
+  <aside class="notas">La exposición basada en artículos es el centro de la sesión (50 minutos). La configuración de GitHub y NotebookLM es práctica: todos salen con su cuenta y su primer repositorio.</aside>
+</section>
 
-            <!-- Slide 3: Agenda -->
-            <section>
-                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
-                <div class="split-layout">
-                    <div>
-                        <ul>
-                            <li class="fragment">El Paradigma del Dato (La Nueva Revolución)</li>
-                            <li class="fragment">El Diagrama de Venn de Drew Conway</li>
-                            <li class="fragment">Roles en la Industria y Perfil del Científico</li>
-                            <li class="fragment">El Ciclo de Vida de los Datos (CRISP-DM)</li>
-                            <li class="fragment">Glosario EMI</li>
-                        </ul>
-                    </div>
-                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
-                        <i class="fa-solid fa-brain text-gray-300" style="font-size:8rem;"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 4: Definición Histórica -->
-            <section>
-                <h2><i class="fa-solid fa-book-open"></i> ¿Qué es la Ciencia de Datos?</h2>
-                <div class="split-layout">
-                    <div class="quote-container" style="font-size: 0.95rem;">
-                        "La Ciencia de Datos es la disciplina de extraer conocimiento y descubrimientos a partir de información bruta, utilizando un enfoque holístico que mezcla programación, matemáticas y contexto de negocio. No se trata de qué algoritmos conoces, sino de <strong>qué problemas puedes resolver</strong>."
-                        <span class="quote-author">— What is Data Science (O'Reilly Media)</span>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h3 class="accent"><i class="fa-solid fa-lightbulb"></i> El Cambio de Paradigma</h3>
-                        <ul>
-                            <li><strong>Analítica Clásica:</strong> "¿Qué pasó en el pasado?" (Reportes, BI).</li>
-                            <li><strong>Ciencia de Datos:</strong> "¿Por qué pasó? ¿Qué pasará después? ¿Cómo lo optimizo?" (Modelado Predictivo y Prescriptivo).</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 5: Diagrama de Venn de Conway -->
-            <section>
-                <h2><i class="fa-solid fa-chart-pie"></i> El ADN: Diagrama de Conway</h2>
-                <p>Nacido en 2010, define el equilibrio del Data Scientist perfecto.</p>
-                
-                <div class="split-layout" style="align-items: center;">
-                    <div class="venn-container">
-                        <div class="venn-circle venn-cs"><div style="margin-top:-80px">Hacking Skills<br>(CS)</div></div>
-                        <div class="venn-circle venn-math"><div style="margin-bottom:-80px; margin-left:-30px;">Math &<br>Stats</div></div>
-                        <div class="venn-circle venn-domain"><div style="margin-bottom:-80px; margin-right:-30px;">Domain<br>Expertise</div></div>
-                        
-                        <div class="venn-center fade-in">Data<br>Science</div>
-                    </div>
-                    
-                    <div class="box-glass fragment" style="margin-top:0;">
-                        <ul>
-                            <li><strong style="color: #ff4d4d;">Hacking Skills:</strong> No es hackear bancos. Es saber programar, manipular archivos, raspar la web (Python/SQL).</li>
-                            <li><strong style="color: #4da6ff;">Math & Stats:</strong> Rigor matemático para no dejarse engañar por números ruidosos y crear modelos.</li>
-                            <li><strong style="color: #e6b800;">Domain Expertise:</strong> Conocer el negocio. Un buen algoritmo en el negocio equivocado es inútil.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 6: Peligro -->
-            <section>
-                <h2><i class="fa-solid fa-triangle-exclamation"></i> Las Zonas de Peligro</h2>
-                <div class="box-glass">
-                    <p>La intersección incompleta de estas tres áreas crea perfiles funcionales, pero a veces peligrosos.</p>
-                </div>
-                <div class="split-layout mt-4">
-                    <div class="box-glass fragment text-center">
-                        <h4 style="color:#d9534f;">CS + Domain</h4>
-                        <p><strong>La Zona de Peligro</strong></p>
-                        <p style="font-size: 0.8rem;">Personas que saben programar y conocen el negocio, pero aplican algoritmos sin entender la estadística subyacente. ¡Producen modelos que parecen funcionar pero mienten!</p>
-                    </div>
-                    <div class="box-glass fragment text-center">
-                        <h4 style="color:#4da6ff;">Math + CS</h4>
-                        <p><strong>Machine Learning</strong></p>
-                        <p style="font-size: 0.8rem;">Construyen sistemas asombrosos (ej. reconocimiento facial), pero si carecen de <em>Domain Expertise</em>, rara vez resuelven el problema real de la empresa.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 7: Roles -->
-            <section>
-                <h2><i class="fa-solid fa-users"></i> Ecosistema de Roles</h2>
-                <div class="box-glass">
-                    <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
-                        <tr style="border-bottom: 2px solid var(--data-blue);">
-                            <th style="padding: 10px; text-align:left;">Rol</th>
-                            <th style="padding: 10px; text-align:left;">Enfoque Principal</th>
-                            <th style="padding: 10px; text-align:left;">Herramientas Clave</th>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #ccc;">
-                            <td style="padding: 10px; font-weight:bold;">Data Engineer</td>
-                            <td style="padding: 10px;">Construye la tubería (pipelines) para que los datos fluyan limpios y escalables.</td>
-                            <td style="padding: 10px;">SQL, Spark, AWS/GCP, Airflow</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #ccc;">
-                            <td style="padding: 10px; font-weight:bold; color:var(--data-orange);">Data Scientist</td>
-                            <td style="padding: 10px;">Encuentra patrones complejos, entrena modelos predictivos y experimenta estadísticamente.</td>
-                            <td style="padding: 10px;">Python (Pandas, Scikit-Learn), R</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; font-weight:bold;">Data Analyst</td>
-                            <td style="padding: 10px;">Responde preguntas descriptivas rápidas del negocio usando visualizaciones.</td>
-                            <td style="padding: 10px;">Excel, PowerBI, Tableau, SQL</td>
-                        </tr>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Slide 8: Ciclo de Vida -->
-            <section>
-                <h2><i class="fa-solid fa-rotate"></i> El Ciclo de Vida (CRISP-DM)</h2>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <ol>
-                            <li><strong>Entendimiento del Negocio:</strong> ¿Qué resolvemos?</li>
-                            <li><strong>Entendimiento del Dato:</strong> ¿Qué tenemos?</li>
-                            <li><strong class="accent">Preparación del Dato:</strong> Limpieza (Toma el 80% del tiempo).</li>
-                            <li><strong>Modelado:</strong> Aplicar Machine Learning.</li>
-                            <li><strong>Evaluación:</strong> ¿Es confiable?</li>
-                            <li><strong>Despliegue:</strong> Poner en producción.</li>
-                        </ol>
-                    </div>
-                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
-                        <div id="cyclePlot" class="plotly-container" style="height: 300px; width:100%; border-radius: 50%;"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 9: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Data Science:</strong> Ciencia de Datos.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Domain Expertise:</strong> Experiencia en el Dominio / Negocio.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Hacking Skills:</strong> Habilidades de Programación.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Pipeline:</strong> Tubería de Procesamiento.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Deployment:</strong> Despliegue.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Raw Data:</strong> Datos Crudos.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 10: Cyber Status y Conclusiones -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
-                    <div class="box-glass" style="min-height: 200px;">
-                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
-                    <div class="box-glass" style="margin-bottom: 20px;">
-                        <ul>
-                            <li>La herramienta no hace al científico; la forma estructurada de pensar y resolver problemas sí.</li>
-                            <li>El equilibrio perfecto requiere Programación, Matemáticas y un entendimiento profundo del contexto de negocio.</li>
-                            <li>Existen roles diferenciados: no tienes que hacerlo todo tú solo. La ingeniería de datos y el análisis de datos son ramas aliadas.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
-                        <strong>Bibliografía de la Clase:</strong>
-                        <ul>
-                            <li>O'Neil, C., & Schutt, R. (2013). <em>Doing Data Science</em>. O'Reilly Media.</li>
-                            <li>Conway, D. (2010). <em>The Data Science Venn Diagram</em>.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
-
-        </div>
+<!-- 4 Competencias -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:140px;top:80px;width:1320px">
+    <p class="rot">Hacia dónde va el curso</p>
+    <h2 style="font-size:52px;margin:14px 0 28px">Tres competencias, tal como las escribe el syllabus</h2>
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:26px 18px;align-items:center">
+      <i class="ico paso" data-i="scan-search" style="font-size:64px;color:var(--oro)"></i><p class="paso" style="font-size:32px">1. Interpreta los modelos de agrupamiento como herramientas de clasificación y reconocimiento de patrones.</p>
+      <i class="ico paso" data-i="group" style="font-size:64px;color:var(--oro)"></i><p class="paso" style="font-size:32px">2. Diseña diferentes tipos de agrupamiento según los diversos enfoques.</p>
+      <i class="ico paso" data-i="badge-check" style="font-size:64px;color:var(--oro)"></i><p class="paso" style="font-size:32px">3. Valida los modelos de conglomerados aplicados a situaciones prácticas de acuerdo con criterios establecidos.</p>
     </div>
+    <p class="paso sec" style="font-size:26px;margin-top:26px">Para llegar ahí hay que saber conseguir, limpiar, describir y graficar datos: eso son las semanas 1 a 8.</p>
+  </div>
+  <aside class="notas">Texto literal del syllabus del curso. Evaluación: retos de las semanas 1 a 7 y 9 a 13 (40 %), Evaluación auténtica I en la semana 8 (20 %) y Demo Day en la semana 16 (40 %).</aside>
+</section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
-    
-    <script>
-        Reveal.initialize({
-            hash: true, transition: 'slide', controls: true, progress: true,
-            margin: 0.1, minScale: 0.2, maxScale: 2.0,
-            mathjax2: {
-                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
-                config: 'TeX-AMS_HTML-full',
-                tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    displayMath: [['$$','$$'], ['\\[','\\]']]
-                }
-            },
-            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
-        });
+<!-- 5 Línea de tiempo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">De dónde viene el nombre</p><h2 style="font-size:54px;margin-top:6px">Sesenta años pidiendo una ciencia que aprenda de los datos</h2></div>
+  <svg id="tiempo" class="diagrama" viewBox="0 0 1600 620" style="position:absolute;left:0;top:200px;width:1600px;height:620px" role="img" aria-label="Línea de tiempo: Tukey 1962, Tukey 1977, Cleveland 2001, Donoho 2017, Wing 2019"></svg>
+  <aside class="notas">Tukey (1962), "The Future of Data Analysis", Annals of Mathematical Statistics: "my central interest is in data analysis". Cleveland (2001) propuso seis áreas técnicas para un departamento de "data science". Donoho (2017) repasa esa historia y propone la "Greater Data Science". Wing (2019) presenta el ciclo de vida de los datos. Todo verificado en Crossref.</aside>
+</section>
 
-        function drawPlotlyGraphs() {
-            // Un gráfico circular (Donut) simple para el ciclo
-            var data = [{
-                values: [15, 10, 40, 20, 10, 5],
-                labels: ['1. Negocio', '2. Dato', '3. Limpieza', '4. Modelo', '5. Evaluación', '6. Despliegue'],
-                type: 'pie',
-                hole: .4,
-                marker: {
-                    colors: ['#003865', '#28a745', '#E85C0B', '#17a2b8', '#ffc107', '#6c757d']
-                }
-            }];
-            var layout = {
-                margin: {t:10, b:10, l:10, r:10},
-                showlegend: false,
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                annotations: [{ font: {size: 16}, showarrow: false, text: 'CRISP-DM', x: 0.5, y: 0.5 }]
-            };
-            Plotly.newPlot('cyclePlot', data, layout, {displayModeBar: false});
-        }
+<!-- 6 Donoho: seis divisiones -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Donoho (2017) · Greater Data Science</p><h2 style="font-size:50px;margin:6px 0 24px">Seis divisiones, y dónde las vamos a recorrer</h2>
+    <div class="gds">
+      <div class="paso"><em>GDS1</em><b>Exploración y preparación</b><span>Conocer y limpiar los datos. Semanas 3, 4 y 7.</span></div>
+      <div class="paso"><em>GDS2</em><b>Representación y transformación</b><span>Formatos, tablas, texto. Semanas 3 y 14.</span></div>
+      <div class="paso"><em>GDS3</em><b>Computar con datos</b><span>Lenguajes y herramientas. Semana 2 y todas.</span></div>
+      <div class="paso"><em>GDS4</em><b>Visualización y presentación</b><span>Gráficas que comunican. Semanas 6 y 16.</span></div>
+      <div class="paso"><em>GDS5</em><b>Modelado</b><span>Inferir y predecir. Semanas 9 a 13.</span></div>
+      <div class="paso" style="border-top-color:var(--compra)"><em>GDS6</em><b>Ciencia sobre la ciencia de datos</b><span>Evaluar cómo trabajamos. Semanas 12 y 15.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Nombres de las secciones del artículo (Donoho, 2017, sección 6): Data Exploration and Preparation; Data Representation and Transformation; Computing with Data; Data Visualization and Presentation; Data Modeling; Science about Data Science. Donoho sostiene que la ciencia de datos es más que "statistics plus machine learning plus scaling up".</aside>
+</section>
 
-        Reveal.on('ready', event => { drawPlotlyGraphs(); });
+<!-- 7 Ciclo de vida -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:600px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Wing (2019) · El ciclo de vida</p>
+    <h2 style="font-size:52px;line-height:1.08">El análisis es solo una parada del viaje</h2>
+    <p class="paso" style="font-size:29px">El artículo presenta fases "from data generation to data interpretation".</p>
+    <p class="paso" style="font-size:29px">Extraer valor "takes a lot of work, before and after data analysis".</p>
+    <p class="paso" style="font-size:29px">La privacidad y la ética se consideran <b class="acento">en cada fase</b>, no al final.</p>
+  </div>
+  <svg id="ciclo" class="diagrama" viewBox="0 0 900 820" style="position:absolute;left:690px;top:40px;width:900px;height:820px" role="img" aria-label="Ciclo de vida del dato en ocho fases, de la generación a la interpretación"></svg>
+  <aside class="notas">Las citas son del resumen de Wing (2019), Harvard Data Science Review, doi:10.1162/99608f92.e26845b4. Las ocho fases del dibujo son la versión que usa el curso (generación, recolección, procesamiento, almacenamiento, gestión, análisis, visualización, interpretación); pida a los estudiantes comparar con el diagrama del artículo.</aside>
+</section>
 
-        var typedInstance = null;
+<!-- 8 El caso por el ciclo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">El caso Sandy, fase por fase</p><h2 style="font-size:52px;margin-top:6px">La misma pregunta recorre todo el curso</h2></div>
+  <svg id="recorrido" class="diagrama" viewBox="0 0 1600 640" style="position:absolute;left:0;top:200px;width:1600px;height:640px" role="img" aria-label="Seis paradas del caso: datos, limpieza, descripción, contexto, modelo y comunicación, con la semana en la que se estudia cada una"></svg>
+  <aside class="notas">Cada parada usa un número real del archivo. Los 26 atípicos salen de aplicar la regla del rango intercuartílico dentro de cada mes (semana 7). El modelo de demanda es la semana 10. Mensaje: el curso no son temas sueltos; es un solo oficio.</aside>
+</section>
 
-        Reveal.on('slidechanged', event => {
-            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
-                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
-                setTimeout(() => {
-                    typedInstance = new Typed('#typed-output', {
-                        strings: [
-                            "> Iniciando protocolo fundacional...",
-                            "> Cargando módulos: Hacking, Math, Domain...",
-                            "> Evitando Zona de Peligro (Algoritmos sin contexto detectados)",
-                            "> Integración de ADN completada.",
-                            "> SISTEMA OPERATIVO Y LISTO PARA APRENDER."
-                        ],
-                        typeSpeed: 30,
-                        backSpeed: 10,
-                        loop: false,
-                        showCursor: true,
-                        cursorChar: '█'
-                    });
-                }, 500);
-            } else if (typedInstance) {
-                typedInstance.destroy();
-                var el = document.getElementById('typed-output');
-                if(el) el.innerHTML = '';
-            }
-        });
-    </script>
+<!-- 9 Roles -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Quién hace qué</p><h2 style="font-size:50px;margin:6px 0 24px">Cuatro roles frente al mismo día de huracán</h2>
+    <div class="roles">
+      <div class="paso"><i class="ico" data-i="database"></i><b>Ingeniería de datos</b><span>Construye la tubería: que los conteos lleguen cada día, completos y guardados.</span><i class="p">¿Llegaron los datos del 29 de octubre?</i></div>
+      <div class="paso"><i class="ico" data-i="bar-chart-3"></i><b>Análisis de datos</b><span>Describe y grafica para responder preguntas del negocio.</span><i class="p">¿Cuánto cayó la demanda y por cuántos días?</i></div>
+      <div class="paso"><i class="ico" data-i="brain"></i><b>Ciencia de datos</b><span>Modela, infiere y valida: separa la señal del ruido.</span><i class="p">¿Cuántas bicicletas se esperan con alerta de tormenta?</i></div>
+      <div class="paso" style="border-top-color:var(--compra)"><i class="ico" data-i="briefcase" style="color:var(--acento-texto)"></i><b>Experto del dominio</b><span>Conoce la ciudad y el sistema: da el contexto que el archivo no tiene.</span><i class="p">¿Se cerraron estaciones? ¿Hubo evacuación?</i></div>
+    </div>
+  </div>
+  <p class="paso sec" style="position:absolute;left:88px;top:790px;width:1424px;font-size:26px">En equipos pequeños una sola persona hace los cuatro papeles. Por eso este curso los practica todos.</p>
+  <aside class="notas">Los nombres de los cargos cambian entre empresas; lo que importa es la pregunta que responde cada rol. Actividad rápida: cada estudiante elige el rol que más le atrae y escribe una pregunta de ese rol sobre otro dato de su vida (notas, transporte, música).</aside>
+</section>
+
+<!-- 10 Los datos del curso -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Equipaje de la expedición</p><h2 style="font-size:52px;margin-top:6px">Siete conjuntos reales y abiertos: <span class="acento" id="totFilas"></span> filas</h2></div>
+  <svg id="conjuntos" class="diagrama" viewBox="0 0 1424 600" style="position:absolute;left:88px;top:200px;width:1424px;height:600px" role="img" aria-label="Filas de cada conjunto de datos del curso, con las semanas en que se usa"></svg>
+  <p class="pie">UCI Machine Learning Repository (CC BY 4.0) y Banco Mundial, Indicadores del Desarrollo Mundial (CC BY 4.0). Ninguna cifra del curso es inventada.</p>
+  <aside class="notas">Escala de las barras: logaritmo de las filas, porque el censo tiene 32.561 y el indicador del Banco Mundial una sola fila ancha. Pregunte por qué una tabla de una fila puede tener 66 años de datos: es la semana 3.</aside>
+</section>
+
+<!-- 11 Exposición -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Actividad · El futuro del científico de datos · 50 minutos</p><h2 style="font-size:48px;margin:6px 0 24px">Tres lecturas, tres equipos, una pregunta: ¿qué hará un científico de datos en 2030?</h2>
+    <div class="grupos">
+      <div class="paso"><i class="ico" data-i="scroll-text" style="font-size:52px;color:var(--oro)"></i><b>Donoho (2017)</b><span>50 Years of Data Science. ¿Qué es y qué no es la ciencia de datos?</span><span>Entregan: las seis divisiones con un ejemplo propio de cada una.</span></div>
+      <div class="paso"><i class="ico" data-i="briefcase" style="font-size:52px;color:var(--oro)"></i><b>Foro Económico Mundial</b><span>Future of Jobs Report 2025. ¿Qué empleos y habilidades crecen?</span><span>Entregan: tres cifras con su página exacta del informe.</span></div>
+      <div class="paso"><i class="ico" data-i="telescope" style="font-size:52px;color:var(--oro)"></i><b>Stanford HAI</b><span>AI Index Report 2025. ¿Qué cambió en la IA el último año?</span><span>Entregan: dos tendencias y una cifra que los sorprendió, con página.</span></div>
+    </div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:780px;width:1424px;font-size:27px">Exposición de 5 minutos por equipo. Regla: <b class="acento">toda cifra se lee en el PDF</b>, no en la respuesta del asistente.</p>
+  <aside class="notas">Enlaces verificados en la guía de investigación de la semana. Los informes del Foro Económico Mundial y de Stanford son largos: cada equipo se reparte capítulos. Rúbrica: claridad (3), cifras con página (3), conexión con el ciclo de vida (2), respeto del tiempo (2).</aside>
+</section>
+
+<!-- 12 NotebookLM -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:120px;top:70px;width:1360px">
+    <p class="rot">Asistente de lectura · NotebookLM</p>
+    <h2 style="font-size:50px;margin:12px 0 26px">La IA resume; ustedes verifican</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico paso" data-i="file-text" style="font-size:58px;color:var(--oro)"></i><p class="paso" style="font-size:31px">Suban el PDF original como fuente. Nada de resúmenes de terceros.</p>
+      <i class="ico paso" data-i="message-square" style="font-size:58px;color:var(--oro)"></i><p class="paso" style="font-size:31px">Pregunten: "¿Qué evidencia da el autor para…?" y abran la cita que el asistente señala.</p>
+      <i class="ico paso" data-i="search-check" style="font-size:58px;color:var(--oro)"></i><p class="paso" style="font-size:31px">Toda cifra se comprueba en la página del PDF. Si no está, no se usa.</p>
+      <i class="ico paso" data-i="stamp" style="font-size:58px;color:var(--acento-texto)"></i><p class="paso" style="font-size:31px">Declaren el uso: herramienta, para qué, prompt y qué verificaron ustedes.</p>
+    </div>
+  </div>
+  <aside class="notas">La guía de aprendizaje pide usar el asistente para sintetizar la exposición. La política de la UNAB pide declarar y verificar el uso de IA (unabdigital.unab.edu.co/landing-ia.html). Muestre un ejemplo en vivo con el artículo de Donoho y una pregunta cuya respuesta deba buscarse en el texto.</aside>
+</section>
+
+<!-- 13 GitHub -->
+<section class="esc">
+  <svg id="github" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco pasos para crear el repositorio del curso en GitHub"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana1.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía paso a paso</a>
+  <aside class="notas">Cuenta con el correo institucional para pedir GitHub Education. El repositorio guardará todos los retos del semestre. El README debe tener nombre, la pregunta que le interesa responder con datos y su rol favorito.</aside>
+</section>
+
+<!-- 14 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="hoja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · critical reading</p>
+    <p class="cita" style="margin:22px 0 18px">“Some say that <span class="acento">80% of the effort</span> devoted to data science is expended by diving into or becoming one with one’s messy data.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Donoho (2017), 50 Years of Data Science, section 6</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">Donoho writes “some say”. Is 80% a measured fact or a claim? How could you check it?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">In the Sandy case, which step took most of the effort?</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--oro)"></i><p class="paso" style="font-size:32px">Introduce yourself: “I want to use data to answer…”</p>
+    </div>
+    <p class="paso" style="font-size:25px;margin-top:22px;color:var(--tinta-2)"><b>Words:</b> dataset · data life cycle · stakeholder · messy data · insight · evidence · claim</p>
+  </div>
+  <aside class="notas">Cita textual del preprint de Donoho (2017), sección "The Six Divisions". Es un buen ejemplo de lectura crítica: el autor no afirma el 80 %, lo reporta como algo que "algunos dicen". Cinco minutos en parejas y cinco en plenaria, solo en inglés.</aside>
+</section>
+
+<!-- 15 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Diccionario de viaje</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="table-2"></i><b>Conjunto de datos</b><span>Tabla de observaciones (filas) y variables (columnas).</span></div>
+      <div><i class="ico" data-i="refresh-cw"></i><b>Ciclo de vida</b><span>Fases del dato, de la generación a la interpretación.</span></div>
+      <div><i class="ico" data-i="circle-help"></i><b>Pregunta</b><span>Lo que se quiere saber; decide qué datos sirven.</span></div>
+      <div><i class="ico" data-i="crosshair"></i><b>Atípico</b><span>Observación rara respecto a su grupo de comparación.</span></div>
+      <div><i class="ico" data-i="map"></i><b>Contexto</b><span>Lo que el archivo no dice y explica el dato.</span></div>
+      <div><i class="ico" data-i="folder-git-2"></i><b>Repositorio</b><span>Carpeta con historial de cambios, en GitHub.</span></div>
+      <div><i class="ico" data-i="git-commit"></i><b>Commit</b><span>Una versión guardada con un mensaje de qué cambió.</span></div>
+      <div><i class="ico" data-i="scale"></i><b>Evidencia</b><span>Dato verificable que respalda una afirmación.</span></div>
+      <div><i class="ico" data-i="shield-check"></i><b>Licencia</b><span>Permiso de uso; CC BY 4.0 exige citar.</span></div>
+      <div><i class="ico" data-i="stamp"></i><b>Declaración de IA</b><span>Qué herramienta, para qué y qué se verificó.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Estos términos se usan desde la semana 2. "Atípico" y "contexto" vuelven en las semanas 4 y 7.</aside>
+</section>
+
+<!-- 16 Cierre -->
+<section class="esc">
+  <div class="hoja naranja" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:54px;margin:12px 0 30px">Tres ideas para llevarse</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="circle-help" style="font-size:60px;color:var(--oro)"></i><p class="paso" style="font-size:34px"><b>Primero la pregunta.</b> Los datos sirven o no según lo que se quiere saber.</p>
+      <i class="ico paso" data-i="refresh-cw" style="font-size:60px;color:var(--oro)"></i><p class="paso" style="font-size:34px"><b>El análisis es una fase.</b> Antes hay que conseguir y limpiar; después, comunicar.</p>
+      <i class="ico paso" data-i="search-check" style="font-size:60px;color:var(--oro)"></i><p class="paso" style="font-size:34px"><b>Toda cifra se verifica</b>, también la que da una IA.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 2: Python, NumPy, pandas y Jupyter. Traigan el repositorio creado y una cuenta de Google para Colab.</p>
+  </div>
+  <aside class="notas">Pregunta de salida: escriba en una línea una pregunta que le gustaría responder con datos este semestre. Guárdela en el README.</aside>
+</section>
+
+<!-- 17 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px" class="bib">
+    <p class="rot">Fuentes de la bitácora</p>
+    <h2 style="font-size:48px;margin:6px 0 16px">Bibliografía y datos</h2>
+    <p>Tukey, J. W. (1962). The Future of Data Analysis. <em>The Annals of Mathematical Statistics</em>, 33(1), 1-67. <a href="https://doi.org/10.1214/aoms/1177704711" target="_blank" rel="noopener">doi:10.1214/aoms/1177704711</a></p>
+    <p>Cleveland, W. S. (2001). Data Science: an Action Plan for Expanding the Technical Areas of the Field of Statistics. <em>International Statistical Review</em>, 69(1), 21-26. <a href="https://doi.org/10.1111/j.1751-5823.2001.tb00477.x" target="_blank" rel="noopener">doi:10.1111/j.1751-5823.2001.tb00477.x</a></p>
+    <p>Donoho, D. (2017). 50 Years of Data Science. <em>Journal of Computational and Graphical Statistics</em>, 26(4), 745-766. <a href="https://doi.org/10.1080/10618600.2017.1384734" target="_blank" rel="noopener">doi:10.1080/10618600.2017.1384734</a></p>
+    <p>Wing, J. M. (2019). The Data Life Cycle. <em>Harvard Data Science Review</em>, 1(1). <a href="https://doi.org/10.1162/99608f92.e26845b4" target="_blank" rel="noopener">doi:10.1162/99608f92.e26845b4</a></p>
+    <p>Fanaee-T, H. (2013). <em>Bike Sharing</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5W894" target="_blank" rel="noopener">doi:10.24432/C5W894</a></p>
+    <p>Iconos: Lucide, licencia ISC. Cifras recalculadas con <span class="mono">cifras_1a6.py</span>. Uso de IA: Claude ayudó a programar las gráficas y a redactar; el docente revisó cada cifra y cada cita.</p>
+  </div>
+  <aside class="notas">Cifras: Material_Privado/Cifras/cifras_s01.json. Más lecturas, videos y cursos en la guía de investigación de la semana.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, K = S.caso_sandy, ic = CUR.ic, num = DS.num, txt = DS.txt;
+  var iMin = C.cnt.indexOf(K.cnt_min);
+  /* Portada: horizonte de 731 días */
+  var h = DS.linea({ x: 60, y: 560, w: 1480, h: 260, xd: [0, 730], yd: [0, 9000], ys: C.cnt, color: 'var(--punto)', grosor: 2 });
+  var hs = h.s.replace(/<text[^>]*>[^<]*<\/text>/g, '').replace(/<line[^>]*>/g, '');
+  hs += '<circle cx="' + h.X(iMin) + '" cy="' + h.Y(K.cnt_min) + '" r="12" fill="var(--compra)"/>';
+  CUR.poner('horizonte', hs);
+
+  document.getElementById('pMin').textContent = num(K.cnt_min);
+  document.getElementById('pMedia').textContent = num(K.media);
+  document.getElementById('pOct').textContent = num(K.media_octubre_2012);
+  document.getElementById('pFecha').textContent = '29 de octubre de 2012';
+  document.getElementById('pTemp').textContent = num(K.temp_c_ese_dia, 1) + ' °C';
+  document.getElementById('totFilas').textContent = num(S.total_filas);
+
+  /* Caída: octubre y noviembre de 2012 */
+  var i0 = 639, i1 = 699, tramo = C.cnt.slice(i0, i1 + 1);
+  var c = DS.ejes({ x: 110, y: 50, w: 570, h: 560, xd: [0, tramo.length - 1], yd: [0, 9000], yt: [0, 3000, 6000, 9000], xt: [0, 30, 60], fx: function (v) { return ['1 oct', '31 oct', '30 nov'][[0, 30, 60].indexOf(v)]; } });
+  var s = c.s, ancho = 570 / tramo.length;
+  tramo.forEach(function (v, k) { var foco = i0 + k === iMin; s += '<rect x="' + (c.X(k) - ancho * .4).toFixed(1) + '" y="' + c.Y(v).toFixed(1) + '" width="' + (ancho * .8).toFixed(1) + '" height="' + (c.Y(0) - c.Y(v)).toFixed(1) + '" fill="' + (foco ? 'var(--compra)' : 'var(--punto)') + '"' + (foco ? ' class="paso-capa"' : '') + '/>'; });
+  var xm = c.X(iMin - i0);
+  s += '<g class="paso">' + '<line x1="' + xm + '" x2="' + xm + '" y1="' + (c.Y(K.cnt_min) - 12) + '" y2="52" stroke="var(--compra)" stroke-width="3" stroke-dasharray="8 6"/>' + txt(xm, 36, num(K.cnt_min) + ' alquileres', 't-o', ' text-anchor="middle" font-size="32"') + '</g>';
+  s += txt(110, 740, 'Alquileres por día, octubre y noviembre de 2012', 't-s', ' font-size="24"');
+  CUR.poner('caida', s);
+
+  /* Agenda */
+  CUR.poner('agenda', DS.agenda([['7:00', 'La pregunta', 'circle-help'], ['7:15', 'Qué es', 'scroll-text'], ['7:45', 'Ciclo y roles', 'refresh-cw'], ['8:15', 'Pausa', 'coffee'], ['8:30', 'English', 'languages'], ['8:40', 'Exposición', 'presentation'], ['9:30', 'GitHub', 'folder-git-2'], ['9:50', 'Cierre', 'flag']], 5, { color: 'var(--oro)' }));
+
+  /* Línea de tiempo */
+  var T = [[1962, 'Tukey', 'The Future of Data Analysis', 'scroll-text'], [1977, 'Tukey', 'Exploratory Data Analysis', 'search'], [2001, 'Cleveland', 'Data Science: an Action Plan', 'clipboard-list'], [2017, 'Donoho', '50 Years of Data Science', 'book-open'], [2019, 'Wing', 'The Data Life Cycle', 'refresh-cw']];
+  var X = DS.esc(0, 1955, 2025, 120, 1480), t = '<line x1="100" x2="1500" y1="300" y2="300" stroke="var(--oro)" stroke-width="6"/>';
+  [1960, 1980, 2000].forEach(function (a) { t += '<line x1="' + X(a) + '" x2="' + X(a) + '" y1="290" y2="310" stroke="var(--tinta-2)" stroke-width="3"/>' + txt(X(a), 345, a, 't-eje', ' text-anchor="middle"'); });
+  T.forEach(function (e, i) {
+    var x = X(e[0]), arriba = i % 2 === 0, y = arriba ? 60 : 400;
+    t += '<g class="paso"><circle cx="' + x + '" cy="300" r="18" fill="var(--fondo)" stroke="var(--oro)" stroke-width="6"/>' + '<line x1="' + x + '" x2="' + x + '" y1="' + (arriba ? 282 : 318) + '" y2="' + (arriba ? 210 : 400) + '" stroke="var(--regla)" stroke-width="3"/>';
+    t += ic(e[3], x - 30, arriba ? y : y + 10, 60, 'var(--oro)') + txt(x, (arriba ? y : y + 10) + 98, e[1] + ' · ' + e[0], 't-n', ' text-anchor="middle" font-size="30"') + txt(x, (arriba ? y : y + 10) + 134, e[2], 't-s', ' text-anchor="middle" font-size="23"') + '</g>';
+  });
+  CUR.poner('tiempo', t);
+
+  /* Ciclo de vida */
+  var F = [['Generación', 'zap'], ['Recolección', 'download'], ['Procesamiento', 'wrench'], ['Almacenamiento', 'database'], ['Gestión', 'folder-tree'], ['Análisis', 'sigma'], ['Visualización', 'bar-chart-3'], ['Interpretación', 'lightbulb']];
+  var cx = 430, cy = 410, R = 225, o = '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="var(--regla)" stroke-width="5"/>';
+  o += '<circle cx="' + cx + '" cy="' + cy + '" r="130" fill="var(--fondo-2)" stroke="var(--compra)" stroke-width="4"/>' + ic('shield-check', cx - 30, cy - 66, 60, 'var(--acento-texto)') + txt(cx, cy + 24, 'Privacidad', 't-o', ' text-anchor="middle" font-size="28"') + txt(cx, cy + 58, 'y ética', 't-o', ' text-anchor="middle" font-size="28"');
+  F.forEach(function (f, i) {
+    var a = -Math.PI / 2 + i * 2 * Math.PI / F.length, x = cx + R * Math.cos(a), y = cy + R * Math.sin(a), foco = i === 5;
+    o += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="50" fill="var(--fondo)" stroke="' + (foco ? 'var(--compra)' : 'var(--oro)') + '" stroke-width="' + (foco ? 7 : 5) + '"/>' + ic(f[1], x - 26, y - 26, 52, foco ? 'var(--acento-texto)' : 'var(--oro)');
+    var co = Math.cos(a), lx = cx + (R + 72) * co, ly = cy + (R + 72) * Math.sin(a) + 10, an = Math.abs(co) < .3 ? 'middle' : (co > 0 ? 'start' : 'end');
+    if (Math.abs(co) >= .3) lx = cx + (R + 62) * co;
+    o += txt(lx.toFixed(1), ly.toFixed(1), f[0], foco ? 't-o' : 't-n', ' text-anchor="' + an + '" font-size="25"');
+  });
+  CUR.poner('ciclo', o);
+
+  /* Recorrido del caso */
+  var P = [['database', 'Datos', [num(K.dias) + ' días', K.columnas + ' columnas'], 'semana 3'], ['eraser', 'Limpieza', [K.faltantes + ' vacíos', 'temperatura ×41'], 'semana 4'], ['sigma', 'Descripción', ['media de ' + num(K.media), 'por día'], 'semana 5'],
+    ['crosshair', 'Contexto', [K.atipicos_por_mes + ' días raros', 'dentro de su mes'], 'semana 7'], ['trending-up', 'Modelo', ['¿cuántas', 'se esperaban?'], 'semana 10'], ['presentation', 'Comunicación', ['una gráfica,', 'un mensaje'], 'semana 16']];
+  var dx = 1240 / (P.length - 1), r = '<path d="M180 300H1420" stroke="var(--oro)" stroke-width="6" opacity=".6"/>';
+  P.forEach(function (p, i) {
+    var x = 180 + i * dx;
+    r += '<g class="paso"><circle cx="' + x + '" cy="300" r="68" fill="var(--fondo-2)" stroke="var(--oro)" stroke-width="6"/>' + ic(p[0], x - 34, 266, 68, 'var(--oro)');
+    r += txt(x, 420, p[1], 't-n', ' text-anchor="middle" font-size="32"') + txt(x, 464, p[2][0], 't-s', ' text-anchor="middle" font-size="24"') + txt(x, 496, p[2][1], 't-s', ' text-anchor="middle" font-size="24"') + txt(x, 170, p[3], 't-au', ' text-anchor="middle" font-size="24"') + '</g>';
+  });
+  CUR.poner('recorrido', r);
+
+  /* Conjuntos del curso: barras en escala logarítmica */
+  var L = S.conjuntos, b = '', mx = Math.log10(40000);
+  L.forEach(function (d, i) {
+    var y = 20 + i * 80, w = Math.max(8, Math.log10(Math.max(d.filas, 1)) / mx * 560);
+    b += txt(400, y + 44, d.nombre, 't-n', ' text-anchor="end" font-size="27"') + '<rect x="420" y="' + (y + 12) + '" width="' + w.toFixed(1) + '" height="44" fill="' + (d.filas === 1 ? 'var(--compra)' : 'var(--punto)') + '"/>';
+    b += txt(434 + w, y + 44, num(d.filas) + (d.filas === 1 ? ' fila, ' + d.columnas + ' columnas' : ''), d.filas === 1 ? 't-o' : 't-n', ' font-size="26"') + txt(1420, y + 44, 'sem. ' + d.semanas, 't-au', ' text-anchor="end" font-size="23"');
+  });
+  CUR.poner('conjuntos', b);
+
+  /* GitHub */
+  CUR.poner('github', DS.ruta([['user-check', 'Cuenta', 'correo institucional'], ['folder-git-2', 'Repositorio', 'ciencia-datos-nombre'], ['file-text', 'README', 'quién soy y mi pregunta'], ['git-commit', 'Commit', 'mensaje claro'], ['sparkles', 'NotebookLM', 'Donoho como fuente']],
+    'Taller: el repositorio del semestre en 20 minutos', 'Cada estudiante sale con su repositorio público y su primer commit', 'var(--oro)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
 </body>
 </html>

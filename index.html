@@ -314,10 +314,10 @@
            Tipos: s diapositivas, g guía de laboratorio (html), p taller en PDF, m documento Markdown, n cuaderno .ipynb, v cuaderno renderizado, j juegos [[archivo, nombre]], q actividad EMI, x complementos [[archivo, nombre]]. */
         const S = 'Semanas/Semana_';
         const syllabus = [
-            { b: "Bloque 1: Fundamentos", w: 1, t: "Introducción a la Ciencia de Datos", d: "Definición, ciclo de vida de los datos y roles. Exposición basada en reportes y primeros pasos en GitHub.", type: "class",
-              r: { s: 'diapositivas_semana_1.html', p: 'Taller_Semana_1.pdf', m: 'Guia_Clase1.md', j: [['game_semana_1.html', 'Reto de la semana']], q: 'quiz_semana_1.html' } },
-            { b: "Bloque 1: Fundamentos", w: 2, t: "Ecosistema Python y Colab", d: "Python, pandas, NumPy y Jupyter. Programación en parejas y primer push a GitHub.", type: "class",
-              r: { s: 'diapositivas_semana_2.html', p: 'Taller_Semana_2.pdf', m: 'Guia_Clase2.md', n: 'Colab_Guiado_Semana2.ipynb', j: [['game_semana_2.html', 'Reto de la semana']], q: 'quiz_semana_2.html', x: [['Fundamentos_Python_Semana2.ipynb', 'Cuaderno: fundamentos de Python']] } },
+            { b: "Bloque 1: Fundamentos", w: 1, t: "Introducción a la Ciencia de Datos", d: "Qué es la ciencia de datos según Tukey, Cleveland, Donoho y Wing; ciclo de vida y roles con el caso real del huracán Sandy. Exposición con artículos, NotebookLM con criterio y primer repositorio en GitHub.", type: "class",
+              r: { s: 'diapositivas_semana_1.html', i: 'Investigacion_Semana1.html', sim: 'simulador_dias_raros.html', g: 'Guia_Laboratorio_Semana1.html', n: 'Colab_Guiado_Semana_1.ipynb', j: [['game_semana_1.html', 'Reto de la semana']], q: 'quiz_semana_1.html' } },
+            { b: "Bloque 1: Fundamentos", w: 2, t: "Ecosistema Python: NumPy, pandas y Jupyter", d: "Tipos y listas, arreglos de NumPy, el DataFrame de pandas y las cinco preguntas a una tabla, con los 731 días reales de bicicletas. Primera distancia de Minkowski (RAE 1.1), programación en parejas y push a GitHub.", type: "class",
+              r: { s: 'diapositivas_semana_2.html', i: 'Investigacion_Semana2.html', sim: 'consola_pandas.html', g: 'Guia_Laboratorio_Semana2.html', n: 'Colab_Guiado_Semana_2.ipynb', j: [['game_semana_2.html', 'Reto de la semana']], q: 'quiz_semana_2.html' } },
             { b: "Bloque 1: Fundamentos", w: 3, t: "Estructuras, control y pandas", d: "Listas, diccionarios, ciclos y DataFrames. Analista de supermercado en parejas.", type: "class",
               r: { s: 'diapositivas_semana_3.html', p: 'Taller_Semana_3.pdf', n: 'Colab_Guiado_Semana_3.ipynb', v: 'Colab_Guiado_Semana_3_render.html', j: [['game_semana_3.html', 'Reto de la semana']], q: 'quiz_semana_3.html' } },
             { b: "Bloque 1: Fundamentos", w: 4, t: "Limpieza y visualización con pandas", d: "Valores faltantes, atípicos, Matplotlib, Seaborn y Plotly. El explorador de datos.", type: "class",

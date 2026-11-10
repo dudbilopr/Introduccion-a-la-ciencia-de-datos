@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consola de pandas en el navegador | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="../assets/puntos/simulador.css">
+<style>
+  :root { --l-fondo: #101418; --l-panel: #1b232a; --l-hondo: #0a0e11; --l-tinta: #eef2f0; --l-tinta2: #9fb0ab; --l-regla: rgba(159,176,171,.22); --l-acento: #6fe0bf; --l-naranja: #ff7a1f; }
+  textarea#codigo { width: 100%; min-height: 230px; font: 16px/1.5 Consolas, 'Cascadia Mono', monospace; background: var(--l-hondo); color: var(--l-tinta); border: 1px solid var(--l-regla); padding: 12px; resize: vertical; tab-size: 4; }
+  pre#salida { min-height: 160px; max-height: 420px; overflow: auto; margin: 0; background: var(--l-hondo); color: #cfe9df; border: 1px solid var(--l-regla); border-top: 0; font: 15px/1.45 Consolas, monospace; white-space: pre-wrap; }
+  .ejer { display: grid; gap: 8px; }
+  .ejer button { text-align: left; background: var(--l-hondo); color: var(--l-tinta); border: 1px solid var(--l-regla); padding: 10px 12px; font: 15px 'Schibsted Grotesk', sans-serif; cursor: pointer; min-height: 44px; }
+  .ejer button[aria-pressed="true"] { border-color: var(--l-acento); }
+  .ejer button .ok { color: var(--l-acento); font-weight: 700; }
+  .enunciado { font-size: 15px; line-height: 1.45; color: var(--l-tinta); }
+  .enunciado code { background: var(--l-hondo); color: var(--l-acento); }
+  .estado b { color: var(--l-acento); }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Consola de pandas: Python de verdad, sin instalar nada</h1>
+  <p class="bajada">Esta página carga Python (Pyodide) en su navegador y lee <code>bicicletas_dia.csv</code>, los 731 días reales de la clase. Elija un ejercicio, escriba el código y ejecútelo con el botón o con <kbd>Ctrl</kbd> + <kbd>Enter</kbd>. La página compara su resultado con el que calculó pandas al preparar la clase.</p>
+  <div class="rejilla">
+    <div>
+      <label for="codigo" class="nota" style="display:block;margin:0 0 6px">Código (la tabla ya está cargada como <code>df</code>; <code>pd</code> y <code>np</code> ya están importados)</label>
+      <textarea id="codigo" spellcheck="false"></textarea>
+      <div class="fila" style="margin:8px 0"><button id="correr" type="button" class="pri" disabled>Ejecutar</button><button id="pista" type="button">Ver una solución</button><button id="limpiar" type="button">Limpiar salida</button></div>
+      <pre id="salida" aria-live="polite">Cargando Python en el navegador. La primera vez tarda entre 10 y 30 segundos…</pre>
+    </div>
+    <div class="panel">
+      <h2>Ejercicios</h2>
+      <div class="ejer" id="lista"></div>
+      <h2>Enunciado</h2>
+      <p class="enunciado" id="enunciado"></p>
+      <p class="estado" id="estado"></p>
+    </div>
+  </div>
+  <div class="retos">
+    <h2>Para pensar</h2>
+    <ol>
+      <li>Cambie el ejercicio 3 para contar los días por encima de 7.000. ¿En qué año están casi todos?</li>
+      <li>En el ejercicio 5, multiplique la humedad por 0,1 antes de calcular. ¿Quién manda ahora en la distancia? ¿Cambió el clima de esos días?</li>
+      <li>Escriba un ciclo <code>for</code> que recorra <code>df["cnt"]</code> y cuente los días por encima de 5.000. Compare con la máscara del ejercicio 3.</li>
+    </ol>
+    <p class="nota">Python en el navegador con <a href="https://pyodide.org/" target="_blank" rel="noopener">Pyodide</a> 0.26.4 (licencia MPL 2.0). Si su navegador no lo carga, use el <a href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_2/Colab_Guiado_Semana_2.ipynb" target="_blank" rel="noopener">cuaderno en Colab</a>: es el mismo código. Datos: Bike Sharing, Fanaee-T y Gama (2013), UCI, CC BY 4.0.</p>
+  </div>
+</div>
+<script src="cifras.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+(function () {
+  var S = window.CIFRAS.resumen, D = S.distancias;
+  function es(x, d) { return Number(x).toFixed(d); }
+  var E = [
+    { t: '1. Forma y tipos', e: 'Muestre cuántas filas y columnas tiene la tabla, y cuántas columnas hay de cada tipo. Use <code>df.shape</code> y <code>df.dtypes.value_counts()</code>.', ini: 'print(df.shape)\n', sol: 'print(df.shape)\nprint(df.dtypes.value_counts())', esperado: ['(' + S.filas + ', ' + S.columnas + ')'] },
+    { t: '2. Sumar sin ciclos', e: 'Calcule el total de alquileres de los dos años con <code>df["cnt"].sum()</code> y el promedio por día con <code>.mean()</code>, redondeado a 2 decimales.', ini: 'total = \nprint(total)\n', sol: 'total = df["cnt"].sum()\nprint(total)\nprint(round(df["cnt"].mean(), 2))', esperado: [String(S.suma_numpy), es(S.media, 2)] },
+    { t: '3. Filtrar con una máscara', e: '¿Cuántos días pasaron de 5.000 alquileres? Construya la máscara <code>df["cnt"] &gt; 5000</code> y cuente las filas que la cumplen.', ini: 'mask = df["cnt"] > 5000\n', sol: 'mask = df["cnt"] > 5000\nprint(mask.sum())\nprint(df[mask].shape[0])', esperado: [String(S.dias_mas_5000)] },
+    { t: '4. Agrupar por estación', e: 'Calcule el promedio de alquileres por estación con <code>groupby</code>, redondeado a entero. La estación 1 es invierno.', ini: 'print(df.groupby("season")["cnt"].mean())\n', sol: 'print(df.groupby("season")["cnt"].mean().round().astype(int))', esperado: [String(S.media_por_estacion['1']), String(S.media_por_estacion['3'])] },
+    { t: '5. Distancia entre dos días (RAE 1.1)', e: 'Tome el día de más y el de menos alquileres. Con temperatura en °C (<code>temp * 41</code>), humedad en % (<code>hum * 100</code>) y viento en km/h (<code>windspeed * 67</code>), calcule las distancias Manhattan, euclidiana y suprema con NumPy, redondeadas a 2 decimales.', ini: 'df["temp_c"] = df["temp"] * 41\ndf["hum_pct"] = df["hum"] * 100\ndf["viento_kmh"] = df["windspeed"] * 67\ncols = ["temp_c", "hum_pct", "viento_kmh"]\na = df.loc[df["cnt"].idxmax(), cols].to_numpy(float)\nb = df.loc[df["cnt"].idxmin(), cols].to_numpy(float)\nd = np.abs(a - b)\n', sol: 'df["temp_c"] = df["temp"] * 41\ndf["hum_pct"] = df["hum"] * 100\ndf["viento_kmh"] = df["windspeed"] * 67\ncols = ["temp_c", "hum_pct", "viento_kmh"]\na = df.loc[df["cnt"].idxmax(), cols].to_numpy(float)\nb = df.loc[df["cnt"].idxmin(), cols].to_numpy(float)\nd = np.abs(a - b)\nprint(round(d.sum(), 2), round(np.sqrt((d ** 2).sum()), 2), round(d.max(), 2))', esperado: [es(D.manhattan, 2), es(D.euclidiana, 2), es(D.suprema, 2)] }
+  ];
+  var actual = 0, hecho = E.map(function () { return false; }), py = null, cod = document.getElementById('codigo'), sal = document.getElementById('salida');
+  function lista() {
+    document.getElementById('lista').innerHTML = E.map(function (x, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === actual) + '">' + x.t + (hecho[i] ? ' <span class="ok">· resuelto</span>' : '') + '</button>'; }).join('');
+    document.querySelectorAll('#lista button').forEach(function (b) { b.addEventListener('click', function () { elegir(+b.getAttribute('data-i')); }); });
+  }
+  function elegir(i) { actual = i; cod.value = E[i].ini; document.getElementById('enunciado').innerHTML = E[i].e; document.getElementById('estado').textContent = ''; lista(); }
+  function revisar(texto) {
+    var x = E[actual], faltan = x.esperado.filter(function (v) { return texto.indexOf(v) < 0; }), st = document.getElementById('estado');
+    if (!faltan.length) { hecho[actual] = true; st.innerHTML = '<b>Coincide con pandas.</b> Su salida contiene ' + x.esperado.join(', ') + '.'; lista(); }
+    else st.textContent = 'Todavía no aparece en su salida: ' + faltan.join(', ') + '. Revise el redondeo o imprima el resultado con print().';
+  }
+  function correr() {
+    if (!py) return;
+    var buf = [];
+    py.setStdout({ batched: function (s) { buf.push(s); } }); py.setStderr({ batched: function (s) { buf.push(s); } });
+    try { py.runPython(cod.value); } catch (e) { buf.push(String(e.message || e).split('\n').slice(-3).join('\n')); }
+    var t = buf.join('\n'); sal.textContent += '\n>>> ejercicio ' + (actual + 1) + '\n' + (t || '(sin salida: use print)'); sal.scrollTop = sal.scrollHeight; revisar(t);
+  }
+  document.getElementById('correr').addEventListener('click', correr);
+  cod.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); correr(); } if (e.key === 'Tab') { e.preventDefault(); var p = cod.selectionStart; cod.value = cod.value.slice(0, p) + '    ' + cod.value.slice(cod.selectionEnd); cod.selectionStart = cod.selectionEnd = p + 4; } });
+  document.getElementById('pista').addEventListener('click', function () { cod.value = E[actual].sol; });
+  document.getElementById('limpiar').addEventListener('click', function () { sal.textContent = ''; });
+  elegir(0);
+  (async function () {
+    try {
+      py = await loadPyodide();
+      await py.loadPackage(['pandas']);
+      var txt = await (await fetch('../Datos/bicicletas_dia.csv')).text();
+      py.FS.writeFile('bicicletas_dia.csv', txt);
+      py.runPython('import pandas as pd\nimport numpy as np\ndf = pd.read_csv("bicicletas_dia.csv", parse_dates=["dteday"])');
+      sal.textContent = 'Python listo: pandas ' + py.runPython('pd.__version__') + '. Tabla df cargada con ' + py.runPython('df.shape[0]') + ' filas.';
+      document.getElementById('correr').disabled = false;
+      window.CONSOLA_LISTA = true;
+    } catch (e) { sal.textContent = 'No se pudo cargar Python en este navegador (' + e + '). Use el cuaderno en Colab.'; }
+  })();
+})();
+</script>
+</body>
+</html>

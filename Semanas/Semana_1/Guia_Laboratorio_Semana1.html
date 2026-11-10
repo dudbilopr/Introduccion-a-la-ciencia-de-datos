@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 1: el futuro del científico de datos | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>El futuro del científico de datos: leer, exponer y abrir el repositorio</h1>
+  <p>Taller de la primera semana. Recorren un caso real por todo el ciclo de vida del dato, preparan en equipo una exposición basada en artículos e informes, usan NotebookLM como asistente de lectura sin perder el control de las cifras y crean el repositorio de GitHub del semestre.</p>
+  <div class="datos-clase"><span><b>Semana</b>1</span><span><b>Tiempo</b>100 minutos en clase</span><span><b>Herramientas</b>GitHub, NotebookLM, Colab</span><span><b>Entrega</b>Reto (40 %)</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#e1">1. El caso en Colab</a></li>
+  <li><a href="#e2">2. El simulador</a></li>
+  <li><a href="#e3">3. Exposición con artículos</a></li>
+  <li><a href="#e4">4. NotebookLM con criterio</a></li>
+  <li><a href="#e5">5. El repositorio en GitHub</a></li>
+  <li><a href="#entrega">Qué entregan</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+
+<section id="e1">
+  <h2><span class="num">1.</span> El caso en Colab</h2>
+  <p class="meta">10 minutos. No hace falta saber programar todavía.</p>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_1/Colab_Guiado_Semana_1.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="../Datos/bicicletas_dia.csv" download>Descargar el CSV</a>
+  </div>
+  <ol class="pasos">
+    <li>Abra el cuaderno con su cuenta de Google y ejecute cada celda con <kbd>Shift</kbd> + <kbd>Enter</kbd>.</li>
+    <li>Al lado de cada celda escriba en qué fase del ciclo de vida está: recolección, procesamiento, análisis, visualización o interpretación.</li>
+    <li>En la celda final, encuentre el día con más alquileres.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <p>731 filas y 16 columnas, 0 celdas vacías. Promedio: 4.504 alquileres por día. El mínimo es el 29 de octubre de 2012, con 22 alquileres, clima 3 (lluvia o nieve ligera) y 18,0 °C; el promedio de octubre de 2012 fue 6.414. El máximo es el sábado 15 de septiembre de 2012, con 8.714 alquileres y clima despejado.</p>
+  </div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> El simulador: ¿raro respecto a qué?</h2>
+  <p class="meta">10 minutos en parejas.</p>
+  <p>Abra el <a href="simulador_dias_raros.html">detective de días raros</a> y resuelva sus cuatro retos.</p>
+  <details><summary>Punto de control</summary><div>
+    <p>Con los 731 días y multiplicador 1,5 no hay ningún día raro: el límite inferior queda por debajo de cero porque el sistema creció mucho entre 2011 y 2012. Comparando cada día con su mes salen 26 días, entre ellos el 29 y el 30 de octubre de 2012. Comparando con el día de la semana no sale ninguno: el grupo mezcla inviernos y veranos y su dispersión es enorme. "Raro" depende de la comparación.</p>
+  </div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Exposición con artículos: ¿qué hará un científico de datos en 2030?</h2>
+  <p class="meta">50 minutos: 30 de lectura en equipo, 5 de exposición por equipo.</p>
+  <div class="tablon"><table>
+    <tr><th>Equipo</th><th>Fuente</th><th>Pregunta</th><th>Entregan</th></tr>
+    <tr><td>A</td><td>Donoho, D. (2017). 50 Years of Data Science. <em>Journal of Computational and Graphical Statistics</em>, 26(4), 745-766. <a href="https://doi.org/10.1080/10618600.2017.1384734" target="_blank" rel="noopener">doi:10.1080/10618600.2017.1384734</a></td><td>¿Qué es y qué no es la ciencia de datos?</td><td>Las seis divisiones de la "Greater Data Science", con un ejemplo propio de cada una.</td></tr>
+    <tr><td>B</td><td>Foro Económico Mundial (2025). <a href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/" target="_blank" rel="noopener">The Future of Jobs Report 2025</a>.</td><td>¿Qué empleos y habilidades crecen hacia 2030?</td><td>Tres cifras con la página exacta del informe donde aparecen.</td></tr>
+    <tr><td>C</td><td>Stanford HAI (2025). <a href="https://hai.stanford.edu/ai-index/2025-ai-index-report" target="_blank" rel="noopener">AI Index Report 2025</a>.</td><td>¿Qué cambió en la inteligencia artificial el último año?</td><td>Dos tendencias y una cifra que los sorprendió, con página.</td></tr>
+  </table></div>
+  <p>Si hay más de tres equipos, los nuevos toman Wing (2019), <a href="https://doi.org/10.1162/99608f92.e26845b4" target="_blank" rel="noopener">The Data Life Cycle</a>, o Cleveland (2001), <a href="https://doi.org/10.1111/j.1751-5823.2001.tb00477.x" target="_blank" rel="noopener">Data Science: an Action Plan</a>.</p>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th class="d">Puntos</th><th>Qué se espera</th></tr>
+    <tr><td>Claridad</td><td class="d">3</td><td>Responden la pregunta del equipo en una frase.</td></tr>
+    <tr><td>Cifras con página</td><td class="d">3</td><td>Cada número tiene su página del PDF y su contexto (año, población, muestra).</td></tr>
+    <tr><td>Conexión con el ciclo de vida</td><td class="d">2</td><td>Dicen en qué fase del ciclo trabaja lo que encontraron.</td></tr>
+    <tr><td>Tiempo</td><td class="d">2</td><td>Cinco minutos, sin pasarse.</td></tr>
+  </table></div>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> NotebookLM con criterio</h2>
+  <p class="meta">Durante la lectura del ejercicio 3.</p>
+  <ol class="pasos">
+    <li>Entre a <a href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM</a> con su cuenta de Google y cree un cuaderno con el nombre del equipo.</li>
+    <li>Suba como fuente el PDF original de su lectura. No suba resúmenes de otras personas.</li>
+    <li>Haga al menos tres preguntas del tipo "¿Qué evidencia presenta el autor para…?". Abra cada cita que el asistente señala y compruebe que el texto dice eso.</li>
+    <li>Anote una respuesta del asistente que <strong>no</strong> estuviera bien respaldada por el texto, si la hubo.</li>
+    <li>Toda cifra de la exposición sale de la página del PDF, no de la respuesta del asistente.</li>
+  </ol>
+  <div class="aviso"><strong>Declaración de uso de IA.</strong> En el README del repositorio escriban: herramienta, para qué la usaron, el prompt, la fecha y qué verificaron ustedes. Así lo piden la guía de aprendizaje y los <a href="https://unabdigital.unab.edu.co/landing-ia.html" target="_blank" rel="noopener">lineamientos de IA de la UNAB</a>.</div>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> El repositorio en GitHub</h2>
+  <p class="meta">20 minutos. Cada estudiante sale con su repositorio.</p>
+  <ol class="pasos">
+    <li>Cree su cuenta en <a href="https://github.com/signup" target="_blank" rel="noopener">github.com</a>. Si usa el correo institucional puede solicitar <a href="https://education.github.com/pack" target="_blank" rel="noopener">GitHub Education</a>.</li>
+    <li>Cree un repositorio público llamado <code>ciencia-datos-su-nombre</code>, marcando "Add a README file". La guía oficial <a href="https://docs.github.com/es/get-started/start-your-journey/hello-world" target="_blank" rel="noopener">Hello World</a> muestra cada paso.</li>
+    <li>Edite el README desde el navegador con esta plantilla:</li>
+  </ol>
+  <pre><code># Ciencia de Datos · su nombre
+
+**Pregunta que quiero responder con datos este semestre:** ...
+
+**Rol que más me atrae** (ingeniería de datos, análisis, ciencia de datos, experto del dominio) y por qué: ...
+
+## Semana 1
+- Fase del ciclo de vida que más me sorprendió: ...
+- Cifra de mi exposición y su página: ...
+
+## Declaración de uso de IA
+Herramienta: ... | Para qué: ... | Prompt: ... | Fecha: ... | Qué verifiqué: ...</code></pre>
+  <ol class="pasos" start="4">
+    <li>Guarde con "Commit changes" y un mensaje que diga qué cambió, por ejemplo "README con mi pregunta de semestre".</li>
+    <li>Suba el cuaderno de Colab al repositorio: en Colab, Archivo, "Guardar una copia en GitHub".</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>El repositorio es público, tiene README con las cuatro secciones, al menos dos commits y el cuaderno de la semana. Comparta el enlace en el grupo del curso.</p></div></details>
+</section>
+
+<section id="entrega">
+  <h2>Qué entregan</h2>
+  <ul>
+    <li>Enlace al repositorio con el README completo y el cuaderno de la semana.</li>
+    <li>Por equipo: la diapositiva o el documento de la exposición con cada cifra y su página.</li>
+    <li>La declaración de uso de IA.</li>
+  </ul>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Elija uno de los 26 días raros del simulador que no sea de octubre de 2012. Busque en una fuente confiable qué pasó ese día en Washington D.C. y escriba en el README tres líneas: fecha, hipótesis y fuente. Si no encuentra nada, escríbalo también: un dato raro sin explicación es una pregunta abierta, no un error.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <p>La <a href="Investigacion_Semana1.html">guía de investigación de la semana</a> reúne la bibliografía comentada, una lectura guiada de Donoho (2017), los videos verificados y cursos abiertos.</p>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 731; i++) o.push(i === 667 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

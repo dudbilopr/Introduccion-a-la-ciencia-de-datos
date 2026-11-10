@@ -1,451 +1,373 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <title>Ciencia de Datos - Semana 3</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-    <style>
-        :root {
-            --data-blue: #003865;
-            --data-orange: #E85C0B;
-            --cyber-dark: #050510;
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff007f;
-        }
-
-        body { font-family: 'Inter', sans-serif; }
-
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            color: var(--data-blue);
-            text-transform: none;
-            font-weight: 800;
-        }
-
-        .reveal h2 {
-            border-bottom: 3px solid var(--data-orange);
-            display: inline-block;
-            padding-bottom: 8px;
-            margin-bottom: 30px;
-        }
-
-        .accent { color: var(--data-orange) !important; font-weight: bold; }
-        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
-
-        .reveal .controls, .reveal .progress { color: var(--data-orange); }
-
-        .icon-container {
-            font-size: 5rem;
-            color: var(--data-orange);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .box-glass {
-            background: rgba(240, 244, 248, 0.9);
-            border-left: 6px solid var(--data-orange);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            margin-top: 15px;
-            color: #333;
-            font-size: 0.9em;
-        }
-
-        .callout-tip {
-            background: #e6f7ff;
-            border-left: 5px solid #1890ff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        /* Dark Mode / Cyber Mode slides */
-        .reveal.cyber-mode,
-        .reveal.cyber-mode .slide-background,
-        .reveal.cyber-mode .slide-background-content {
-            background-color: var(--cyber-dark) !important;
-        }
-
-        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
-            color: #fff !important;
-        }
-
-        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
-
-        .reveal.cyber-mode .box-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border-left: 6px solid var(--neon-cyan);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
-        }
-
-        .split-layout {
-            display: flex; gap: 30px; align-items: stretch;
-            height: 100%;
-        }
-        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-
-        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
-
-        .quote-container {
-            position: relative;
-            padding: 30px 40px;
-            background: #f9f9f9;
-            border-left: 8px solid var(--data-blue);
-            font-style: italic;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-            text-align: left;
-        }
-        .quote-container::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            font-size: 6rem;
-            color: rgba(0, 56, 101, 0.1);
-            font-family: Georgia, serif;
-        }
-        .quote-author {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            font-style: normal;
-            color: var(--data-orange);
-            text-align: right;
-        }
-
-        .reveal .slides section {
-            max-height: 95vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 10px;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
-
-        .plotly-container {
-            width: 100%;
-            height: 300px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            margin-top: 10px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 3 · Oficina de correos del dato | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: una oficina de correos. El mismo dato viaja en tres sobres distintos: CSV, JSON y XML. */
+  :root { --fondo: #15111d; --fondo-2: #231c30; --tinta: #f1edf7; --tinta-2: #ada3bf; --regla: rgba(173,163,191,.24); --punto: #6f6690; --compra: #ff7a1f; --acento-texto: #ffa263; --lila: #c7a6ff; }
+  :root[data-tema="claro"] { --fondo: #f5f2f8; --fondo-2: #e6e0ee; --tinta: #1d1529; --tinta-2: #5a5070; --regla: rgba(29,21,41,.2); --punto: #8c82aa; --compra: #e85c0b; --acento-texto: #b94504; --lila: #6a3fc2; }
+  .rot { font: 700 23px Consolas, 'Courier New', monospace; letter-spacing: .1em; color: var(--lila); text-transform: uppercase; }
+  svg text:not([font-family]) { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; }
+  .t-n { fill: var(--tinta); font-weight: 700; }
+  .t-s { fill: var(--tinta-2); }
+  .t-o { fill: var(--acento-texto); font-weight: 800; }
+  .t-l { fill: var(--lila); font-weight: 800; }
+  .sobre { background: var(--fondo-2); border-top: 8px solid var(--lila); padding: 18px 22px; font: 20px/1.45 Consolas, 'Courier New', monospace; white-space: pre-wrap; word-break: break-all; color: var(--tinta); overflow: hidden; }
+  .sobre b { color: var(--acento-texto); }
+  .sobre .et { display: block; font: 800 30px 'Schibsted Grotesk', sans-serif; color: var(--lila); margin-bottom: 10px; white-space: normal; }
+  .hoja { background: var(--fondo-2); border-left: 8px solid var(--lila); padding: 26px 30px; }
+  .hoja.naranja { border-left-color: var(--compra); }
+  .tipos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .tipos div { background: var(--fondo-2); padding: 22px 20px; border-top: 6px solid var(--lila); min-height: 330px; display: flex; flex-direction: column; gap: 10px; }
+  .tipos b { font-size: 32px; }
+  .tipos span { font-size: 23px; color: var(--tinta-2); line-height: 1.25; }
+  .tipos code { font: 22px Consolas, monospace; color: var(--acento-texto); }
+  .repos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .repos div { background: var(--fondo-2); padding: 18px 20px; border-left: 6px solid var(--lila); min-height: 150px; }
+  .repos b { display: block; font-size: 29px; margin-bottom: 6px; }
+  .repos span { font-size: 22px; color: var(--tinta-2); line-height: 1.25; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--lila); min-height: 262px; }
+  .glosa .ico { font-size: 46px; color: var(--lila); }
+  .glosa b { display: block; font-size: 27px; line-height: 1.08; margin: 10px 0 8px; }
+  .glosa span { font-size: 22.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .cita { font-size: 42px; line-height: 1.22; font-weight: 700; }
+</style>
 </head>
+<body data-cine="paneo">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
 
-<body>
-    <div class="reveal">
-        <div class="slides">
+<!-- 1 Portada -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:1424px">
+    <p class="rot">Oficina de correos del dato · Semana 3</p>
+    <h1 style="font-size:92px;margin-top:14px;line-height:1.03;width:1380px">Un mismo dato, <span class="acento">tres sobres</span>: CSV, JSON y XML.</h1>
+    <p class="sec" style="font-size:27px;margin-top:20px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <div style="position:absolute;left:88px;top:430px;width:1424px;display:grid;grid-template-columns:1fr 1.15fr 1.25fr;gap:18px">
+    <div class="sobre" style="font-size:26px"><span class="et">CSV</span>"Colombia","COL",…,"77.33686322","<b>79.34543299</b>",""</div>
+    <div class="sobre" style="font-size:26px"><span class="et">JSON</span>{"date":"2024",
+ "value":<b>79.34543299</b>}</div>
+    <div class="sobre" style="font-size:26px"><span class="et">XML</span>&lt;wb:date&gt;2024&lt;/wb:date&gt;
+&lt;wb:value&gt;<b>79.34543299</b>&lt;/wb:value&gt;</div>
+  </div>
+  <aside class="notas">Los tres fragmentos son reales: el porcentaje de la población de Colombia que usó internet en 2024, según el Banco Mundial (Indicadores del Desarrollo Mundial, con datos de la UIT). Se descargaron de la API oficial en los tres formatos. Pregunte qué tienen en común y qué cambia.</aside>
+</section>
 
-            <!-- Slide 1: Título -->
-            <section>
-                <div class="icon-container">
-                    <i class="fa-solid fa-database"></i>
-                </div>
-                <h1>Ciencia de Datos</h1>
-                <h3>Semana 3: <span class="accent">Numpy, Pandas y Adquisición</span></h3>
-                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
-            </section>
+<!-- 2 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Ruta de hoy · 7:00 a 10:00</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de la sesión"></svg>
+  <aside class="notas">La búsqueda del tesoro en repositorios abiertos es la actividad central (60 minutos), en equipos de tres.</aside>
+</section>
 
-            <!-- Slide 2: Introducción y RAE -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-rocket"></i> El Cuello de Botella</h2>
-                    <p>Python es fácil de leer, pero lento para ejecutar grandes volúmenes de datos.</p>
-                    <div class="box-glass">
-                        <p>Si procesas un archivo con 5 millones de registros iterando fila por fila con un bucle <code>for</code>, podrías esperar horas. Si usas las librerías adecuadas, lo harás en milisegundos.</p>
-                        <hr>
-                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta:</h4>
-                        <p class="text-center" style="font-weight:bold;">¿Por qué Python no es ideal para cálculos numéricos crudos y cómo resolvemos este problema?</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
-                    <div class="box-glass">
-                        <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Comprender y aplicar el concepto de Vectorización matemática en Numpy.</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Ingerir y transformar datos estructurados desde archivos locales y APIs web usando Pandas.</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Diferenciar las estructuras de Series y DataFrames, manipulando índices y columnas eficientemente.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 3: Agenda -->
-            <section>
-                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
-                <div class="split-layout">
-                    <div>
-                        <ul>
-                            <li class="fragment">Adquisición de Datos (Local vs Remoto)</li>
-                            <li class="fragment">Numpy y el Poder de C (Arrays)</li>
-                            <li class="fragment">Vectorización (Evitando el bucle For)</li>
-                            <li class="fragment">Pandas: DataFrames y Series</li>
-                            <li class="fragment">Importación de CSV, Excel y JSON</li>
-                            <li class="fragment">Glosario EMI & Pair Programming</li>
-                        </ul>
-                    </div>
-                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
-                        <i class="fa-solid fa-bolt text-gray-300" style="font-size:8rem;"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 4: Numpy y Vectorización -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-microchip"></i> Numpy: El Motor Bajo el Capó</h2>
-                    <div class="quote-container" style="font-size: 0.95rem;">
-                        "NumPy es la base sobre la cual se construye casi todo el ecosistema de ciencia de datos en Python. Su secreto no es ser Python, sino esconder código ultra-optimizado en <strong>lenguaje C</strong> detrás de una interfaz amigable."
-                        <span class="quote-author">— NumPy Cookbook</span>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h3 class="accent">El Array (ndArray)</h3>
-                        <p>A diferencia de las Listas de Python (donde cada elemento puede ser de un tipo distinto y están dispersos en la memoria), un Array de Numpy asegura que <strong>todos los elementos son del mismo tipo</strong> y se guardan en un bloque contiguo de RAM.</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-tachometer-alt"></i> La Ley de la Vectorización</h2>
-                    <p>La regla de oro del Data Scientist: <strong>Evita los bucles <code>for</code>.</strong></p>
-                    <div class="split-layout">
-                        <div class="box-glass">
-                            <h4 style="color:#d9534f;">Bucle Tradicional (Lento)</h4>
-                            <pre><code class="python" data-trim data-noescape>
-                            # Multiplicar cada elemento por 2
-                            lista = [1, 2, 3, 4, 5]
-                            nueva_lista = []
-                            for x in lista:
-                                nueva_lista.append(x * 2)
-                            </code></pre>
-                            <p style="font-size:0.8rem; color:#d9534f;">Python interpreta cada línea, verifica los tipos de datos en cada paso. Lento y costoso.</p>
-                        </div>
-                        <div class="box-glass fragment">
-                            <h4 style="color:#28a745;">Vectorización Numpy (Rápido)</h4>
-                            <pre><code class="python" data-trim data-noescape>
-                            import numpy as np
-
-                            # Multiplicar el array entero a la vez
-                            array = np.array([1, 2, 3, 4, 5])
-                            nuevo_array = array * 2
-                            </code></pre>
-                            <p style="font-size:0.8rem; color:#28a745;">El cálculo se empuja a un bucle interno en C. Se procesa como un bloque de memoria único.</p>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-chart-bar"></i> Comparativa de Rendimiento</h2>
-                    <div class="box-glass" style="padding: 10px 20px;">
-                        <h3 class="accent text-center">Multiplicando 1 Millón de Elementos</h3>
-                        <p style="font-size:0.7em; text-align:center;">Tiempo de ejecución en milisegundos (ms)</p>
-                        <div id="perfPlot" class="plotly-container" style="height: 250px;"></div>
-                    </div>
-                    <p class="fragment text-center mt-4">La vectorización de Numpy es aproximadamente <strong>50x a 100x más rápida</strong> que el código nativo de Python para tareas matemáticas pesadas.</p>
-                </section>
-            </section>
-
-            <!-- Slide 5: Pandas -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-table"></i> Pandas: Tu Hoja de Cálculo en Esteroides</h2>
-                    <div class="box-glass">
-                        <p>Pandas está construido directamente sobre NumPy, pero añade <strong>Índices y Etiquetas</strong>.</p>
-                        <p>Mientras NumPy requiere que sepas que la edad está en la columna 3, Pandas te permite llamarla por su nombre: <code>df['edad']</code>.</p>
-                    </div>
-                    <div class="split-layout mt-4">
-                        <div class="box-glass fragment">
-                            <h3 class="accent text-center">Series (1D)</h3>
-                            <p style="font-size: 0.9em;">Una sola columna de datos. Como una lista con superpoderes y un índice a su izquierda.</p>
-                        </div>
-                        <div class="box-glass fragment">
-                            <h3 class="accent text-center">DataFrame (2D)</h3>
-                            <p style="font-size: 0.9em;">Un diccionario de Series. Piensa en él como una tabla completa de Excel cargada en RAM.</p>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-download"></i> Ingesta de Datos (I/O)</h2>
-                    <p>La capacidad de Pandas para tragar casi cualquier formato de datos crudos.</p>
-                    <div class="box-glass">
-                        <pre><code class="python" data-trim data-noescape>
-                        import pandas as pd
-
-                        # Desde un archivo local
-                        df_csv = pd.read_csv("datos.csv")
-                        df_excel = pd.read_excel("ventas.xlsx")
-
-                        # ¡Directamente desde la web!
-                        url = "https://miservidor.com/datos.json"
-                        df_json = pd.read_json(url)
-
-                        # Leer tablas HTML directamente de Wikipedia
-                        tablas = pd.read_html("https://wikipedia.org/wiki/Poblacion")
-                        </code></pre>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 6: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Array:</strong> Arreglo (Estructura de Numpy).</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Vectorization:</strong> Vectorización.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>DataFrame / Series:</strong> Estructuras de Pandas.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Parse:</strong> Analizar / Interpretar (ej. texto a objeto).</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Row / Column:</strong> Fila / Columna.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Index:</strong> Índice (Llave identificadora).</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 7: Pair Programming -->
-            <section data-state="cyber-mode">
-                <h2><i class="fa-solid fa-terminal"></i> Pair Programming</h2>
-                <div class="box-glass">
-                    <h3 class="cyber-accent">Misión: Ingesta y Vectorización</h3>
-                    <p>Abran Google Colab y carguen el <code>Colab_Guiado_Semana_3.ipynb</code>.</p>
-                    <p>Importaremos Pandas y Numpy. Crearemos un Array gigantesco y lo procesaremos de dos formas (<code>for</code> vs Vectorizado) usando la magia de Jupyter <code>%%timeit</code> para probar nuestra teoría empíricamente.</p>
-                    <p>Luego, cargaremos un archivo CSV usando <code>pd.read_csv()</code> y exploraremos sus propiedades.</p>
-                    <p><i class="fa-solid fa-code" style="color: #00ffcc;"></i> ¡Manos a la obra!</p>
-                </div>
-            </section>
-
-            <!-- Slide 8: Cyber Status y Conclusiones -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
-                    <div class="box-glass" style="min-height: 200px;">
-                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
-                    <div class="box-glass" style="margin-bottom: 20px;">
-                        <ul>
-                            <li>El bucle <code>for</code> en Python es nuestro enemigo cuando manejamos Big Data. La <strong>Vectorización</strong> con Numpy es la solución técnica subyacente.</li>
-                            <li>Pandas es nuestra navaja suiza para ingerir archivos CSV, Excel o APIs web e indexarlos para un manejo rápido.</li>
-                            <li>Comprender la diferencia entre Series (1D) y DataFrames (2D) es vital para entender la estructura de la información.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
-                        <strong>Bibliografía de la Clase:</strong>
-                        <ul>
-                            <li>Idris, I. (2012). <em>NumPy Cookbook</em>. Packt Publishing.</li>
-                            <li>McKinney, W. (2017). <em>Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython</em>. O'Reilly Media.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
-
-        </div>
+<!-- 3 RAE -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:140px;top:100px;width:1320px">
+    <p class="rot">Resultado de aprendizaje 1.2</p>
+    <h2 style="font-size:52px;margin:16px 0 30px">Mide la distancia entre atributos categóricos, atributos ordinales y tipos mixtos.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="download" style="font-size:62px;color:var(--lila)"></i><p style="font-size:32px">Lees datos reales en CSV, JSON y XML con pandas.</p>
+      <i class="ico" data-i="tag" style="font-size:62px;color:var(--lila)"></i><p style="font-size:32px">Reconoces el tipo de cada atributo: nominal, ordinal, binario o numérico.</p>
+      <i class="ico" data-i="search" style="font-size:62px;color:var(--lila)"></i><p style="font-size:32px">Encuentras y evalúas un conjunto abierto con los principios FAIR.</p>
     </div>
+  </div>
+  <aside class="notas">RAE textual del syllabus. Hoy se aprende a reconocer el tipo de atributo en el momento de adquirir los datos; las distancias para cada tipo se calculan en la escena 11 y vuelven en la semana 13.</aside>
+</section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
-    
-    <script>
-        Reveal.initialize({
-            hash: true, transition: 'slide', controls: true, progress: true,
-            margin: 0.1, minScale: 0.2, maxScale: 2.0,
-            mathjax2: {
-                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
-                config: 'TeX-AMS_HTML-full',
-                tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    displayMath: [['$$','$$'], ['\\[','\\]']]
-                }
-            },
-            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
-        });
+<!-- 4 Apuesta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:64px;width:640px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Apuesta antes del dato</p>
+    <h2 style="font-size:56px;line-height:1.06">Los 731 días de bicicletas en tres formatos. ¿Cuál pesa más?</h2>
+    <p class="paso" style="font-size:30px">CSV: <b id="bC"></b> bytes. Una fila por día, comas entre valores.</p>
+    <p class="paso" style="font-size:30px">JSON: <b class="acento" id="bJ"></b> veces el CSV. Repite el nombre de cada columna en cada día.</p>
+    <p class="paso" style="font-size:30px">XML: <b class="acento" id="bX"></b> veces. Abre y cierra una etiqueta por valor.</p>
+    <p class="paso sec" style="font-size:26px">El peso no lo decide el dato, lo decide el sobre. Cada formato paga por algo: estructura, nombres, validación.</p>
+  </div>
+  <svg id="peso" class="diagrama" viewBox="0 0 780 760" style="position:absolute;left:770px;top:60px;width:780px;height:760px" role="img" aria-label="Tamaño en bytes del mismo conjunto en CSV, JSON y XML"></svg>
+  <aside class="notas">Tamaños calculados con pandas: to_json(orient="records") y to_xml(index=False) sobre la misma tabla. Pida que apuesten antes del primer paso. El tamaño importa cuando se descargan millones de filas desde una API.</aside>
+</section>
 
-        function drawPlotlyGraphs() {
-            var data = [{
-                x: ['Bucle For (Python Puro)', 'Vectorización (NumPy C-Backend)'],
-                y: [450, 8],
-                type: 'bar',
-                marker: {
-                    color: ['#d9534f', '#28a745']
-                }
-            }];
-            var layout = {
-                margin: {t:20, b:40, l:40, r:20},
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)'
-            };
-            Plotly.newPlot('perfPlot', data, layout, {displayModeBar: false});
-        }
+<!-- 5 CSV real -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Sobre 1 · CSV</p><h2 style="font-size:50px;margin-top:6px">El CSV del Banco Mundial no empieza en la línea 1</h2></div>
+  <svg id="csv" class="diagrama" viewBox="0 0 1424 520" style="position:absolute;left:88px;top:170px;width:1424px;height:520px" role="img" aria-label="Las cinco primeras líneas del archivo CSV del Banco Mundial"></svg>
+  <div style="position:absolute;left:88px;top:700px;width:1424px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px">
+    <p class="paso" style="font-size:27px"><b class="acento" id="cSkip"></b> líneas de metadatos antes del encabezado: <code>skiprows=4</code>.</p>
+    <p class="paso" style="font-size:27px"><b class="acento" id="cCols"></b> columnas: una por año, de 1960 a 2025.</p>
+    <p class="paso" style="font-size:27px">La coma final crea <b class="acento" id="cVac"></b> columna vacía llamada <code>Unnamed</code>.</p>
+  </div>
+  <aside class="notas">El estándar del formato es el RFC 4180 (Shafranovich, 2005), que en la práctica casi nadie cumple al pie de la letra. Muestre el error que da pd.read_csv sin skiprows: pandas intenta leer "Data Source" como encabezado.</aside>
+</section>
 
-        Reveal.on('ready', event => { drawPlotlyGraphs(); });
+<!-- 6 JSON -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Sobre 2 · JSON</p><h2 style="font-size:50px;margin-top:6px">JSON anida: un registro dentro de otro</h2></div>
+  <div class="sobre" style="position:absolute;left:88px;top:180px;width:820px;height:600px;font-size:19px" id="jTxt"></div>
+  <div style="position:absolute;left:950px;top:190px;width:560px;display:flex;flex-direction:column;gap:24px">
+    <p class="paso" style="font-size:29px">Es una lista de dos elementos: <b>metadatos</b> y <b>datos</b>.</p>
+    <p class="paso" style="font-size:29px"><b class="acento" id="jReg"></b> registros, de 2000 a 2024. Actualizado: <b id="jAct"></b>.</p>
+    <p class="paso" style="font-size:29px"><code>indicator</code> y <code>country</code> son objetos dentro del registro: hay que aplanarlos.</p>
+    <div class="sobre paso" style="font-size:19px;border-top-color:var(--compra)">J = requests.get(url).json()
+pd.json_normalize(J[1])</div>
+  </div>
+  <aside class="notas">JSON está definido en el RFC 8259 (2017). Es el formato de casi todas las API web. pd.json_normalize convierte los objetos anidados en columnas: indicator.id, indicator.value, country.value.</aside>
+</section>
 
-        var typedInstance = null;
+<!-- 7 XML -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Sobre 3 · XML</p><h2 style="font-size:50px;margin-top:6px">XML etiqueta cada valor y declara su espacio de nombres</h2></div>
+  <div class="sobre" style="position:absolute;left:88px;top:180px;width:820px;height:600px;font-size:19px" id="xTxt"></div>
+  <div style="position:absolute;left:950px;top:190px;width:560px;display:flex;flex-direction:column;gap:24px">
+    <p class="paso" style="font-size:29px">Cada dato va entre una etiqueta que abre y otra que cierra.</p>
+    <p class="paso" style="font-size:29px"><code>wb:</code> es un espacio de nombres: evita choques entre vocabularios.</p>
+    <p class="paso" style="font-size:29px"><b class="acento" id="xReg"></b> registros; <b id="xBytes"></b> bytes, frente a <b id="jBytes"></b> del JSON.</p>
+    <div class="sobre paso" style="font-size:19px;border-top-color:var(--compra)">pd.read_xml(ruta, xpath="//wb:data",
+  namespaces={"wb": "http://www.worldbank.org"})</div>
+  </div>
+  <aside class="notas">XML 1.0 es una recomendación del W3C. Sigue vivo en facturación electrónica, datos del sector público y documentos de oficina (.docx es XML comprimido). La prueba de la escena siguiente: ¿dicen lo mismo los tres archivos?</aside>
+</section>
 
-        Reveal.on('slidechanged', event => {
-            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
-                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
-                setTimeout(() => {
-                    typedInstance = new Typed('#typed-output', {
-                        strings: [
-                            "> Analizando estructuras de datos...",
-                            "> Detectados múltiples bucles FOR. Refactorizando...",
-                            "> Compilando instrucciones C en backend de NumPy.",
-                            "> Rendimiento incrementado en 5600%.",
-                            "> DataFrame en memoria listo.",
-                            "> [TAREA]: Iniciar ingestión de datos."
-                        ],
-                        typeSpeed: 30,
-                        backSpeed: 10,
-                        loop: false,
-                        showCursor: true,
-                        cursorChar: '█'
-                    });
-                }, 500);
-            } else if (typedInstance) {
-                typedInstance.destroy();
-                var el = document.getElementById('typed-output');
-                if(el) el.innerHTML = '';
-            }
-            
-            if (event.indexh === 3 && event.indexv === 2) {
-                window.dispatchEvent(new Event('resize'));
-            }
-        });
-    </script>
+<!-- 8 La serie -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Abrimos los tres sobres</p><h2 style="font-size:50px;margin-top:6px">Los tres dicen lo mismo: Colombia pasó la mitad conectada en <span class="acento" id="sCruce"></span></h2></div>
+  <svg id="serie" class="diagrama" viewBox="0 0 1500 640" style="position:absolute;left:50px;top:200px;width:1500px;height:640px" role="img" aria-label="Porcentaje de la población de Colombia que usa internet, 1990 a 2024"></svg>
+  <aside class="notas">Comparación hecha con NumPy: los valores de 2000 a 2024 coinciden en los tres formatos. 2000: 2,21 %; 2024: 79,35 %, un aumento de 77,1 puntos. En 2022 bajó levemente frente a 2021 (72,80 contra 73,03): ¿cambio real o de medición? Es una buena pregunta para la fuente original, la UIT.</aside>
+</section>
+
+<!-- 9 Ancho y largo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">De ancho a largo</p><h2 style="font-size:50px;margin-top:6px">Cada variable una columna, cada observación una fila</h2></div>
+  <svg id="largo" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:190px;width:1424px;height:560px" role="img" aria-label="Transformación de la tabla ancha con un año por columna a la tabla larga con una fila por año"></svg>
+  <p class="paso" style="position:absolute;left:88px;top:780px;width:1424px;font-size:28px">Wickham (2014) llama a esto <b>datos ordenados</b>: así se grafican y se agrupan sin esfuerzo. En pandas: <code>melt</code>.</p>
+  <aside class="notas">La tabla ancha del CSV tiene 1 fila y 66 columnas de años; la larga, 66 filas y una columna de año. Solo 32 años tienen dato: los demás quedan como vacíos, el tema de la semana 4.</aside>
+</section>
+
+<!-- 10 Tipos de atributo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">RAE 1.2 · Qué clase de dato llegó</p><h2 style="font-size:48px;margin:6px 0 24px">El número 3 puede ser una cantidad, un orden o solo un nombre</h2>
+    <div class="tipos">
+      <div class="paso"><i class="ico" data-i="tag" style="font-size:50px;color:var(--lila)"></i><b>Nominal</b><span>Categorías sin orden. Promediar no tiene sentido.</span><code>country, workclass, weathersit</code></div>
+      <div class="paso"><i class="ico" data-i="list-ordered" style="font-size:50px;color:var(--lila)"></i><b>Ordinal</b><span>Categorías con orden pero sin distancia fija.</span><code>Charge Amount (0 a 10), Age Group</code></div>
+      <div class="paso"><i class="ico" data-i="contrast" style="font-size:50px;color:var(--lila)"></i><b>Binario</b><span>Dos valores. Simétrico o asimétrico según importe más el 1.</span><code>holiday, Complains</code></div>
+      <div class="paso"><i class="ico" data-i="ruler" style="font-size:50px;color:var(--lila)"></i><b>Numérico</b><span>Cantidades: restar y promediar sí tiene sentido.</span><code>cnt, pct, hours_per_week</code></div>
+    </div>
+  </div>
+  <p class="paso sec" style="position:absolute;left:88px;top:780px;width:1424px;font-size:26px">Trampa: <code>season</code> y <code>weathersit</code> vienen como números, pero son categorías. pandas no lo sabe: lo decide usted.</p>
+  <aside class="notas">weathersit tiene un orden de severidad (1 despejado a 4 lluvia fuerte), así que se puede discutir si es ordinal. Esa discusión es el objetivo. Charge Amount y Age Group están en el conjunto de clientes de telecomunicaciones (semana 5).</aside>
+</section>
+
+<!-- 11 Distancias por tipo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">RAE 1.2 · Distancia según el tipo</p><h2 style="font-size:48px;margin:6px 0 20px">Cada tipo de atributo se compara de una forma distinta</h2></div>
+  <svg id="dtipos" class="diagrama" viewBox="0 0 1424 620" style="position:absolute;left:88px;top:180px;width:1424px;height:620px" role="img" aria-label="Ejemplos de distancia para atributos nominales, ordinales y mixtos"></svg>
+  <aside class="notas">Nominal: coincidencia simple, d = (p − m)/p, con p atributos y m coincidencias. Ordinal: se reemplaza cada nivel r por (r − 1)/(M − 1) y se trata como numérico. Mixtos: se promedian las distancias de cada atributo, cada una entre 0 y 1 (Gower, 1971). Es el contenido exacto del RAE 1.2.</aside>
+</section>
+
+<!-- 12 API -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Pedir datos por correo: una API</p><h2 style="font-size:50px;margin-top:6px">Una URL es una pregunta bien escrita</h2></div>
+  <svg id="url" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:190px;width:1424px;height:560px" role="img" aria-label="La URL de la API del Banco Mundial separada en sus partes"></svg>
+  <aside class="notas">Documentación de la API: datahelpdesk.worldbank.org. Cambie COL por MEX o BRA para comparar países, o el indicador por SP.POP.TOTL (población). Sin la parte format=json, la API responde en XML: así se obtuvo el tercer sobre.</aside>
+</section>
+
+<!-- 13 FAIR -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:120px;top:70px;width:1360px">
+    <p class="rot">Wilkinson y otros (2016) · principios FAIR</p>
+    <h2 style="font-size:48px;margin:12px 0 24px">Cuatro preguntas para saber si un tesoro sirve</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:22px 18px;align-items:center">
+      <i class="ico paso" data-i="search" style="font-size:56px;color:var(--lila)"></i><p class="paso" style="font-size:31px"><b>Encontrable:</b> ¿tiene identificador persistente (DOI) y metadatos?</p>
+      <i class="ico paso" data-i="lock-open" style="font-size:56px;color:var(--lila)"></i><p class="paso" style="font-size:31px"><b>Accesible:</b> ¿se descarga por un protocolo abierto, con o sin cuenta?</p>
+      <i class="ico paso" data-i="cable" style="font-size:56px;color:var(--lila)"></i><p class="paso" style="font-size:31px"><b>Interoperable:</b> ¿viene en un formato estándar (CSV, JSON, XML) y documentado?</p>
+      <i class="ico paso" data-i="shield-check" style="font-size:56px;color:var(--acento-texto)"></i><p class="paso" style="font-size:31px"><b>Reutilizable:</b> ¿tiene licencia clara (por ejemplo, CC BY 4.0) y dice de dónde viene?</p>
+    </div>
+  </div>
+  <aside class="notas">FAIR: Findable, Accessible, Interoperable, Reusable. Wilkinson y otros (2016), Scientific Data. Estas cuatro preguntas son la rúbrica de la búsqueda del tesoro.</aside>
+</section>
+
+<!-- 14 Búsqueda del tesoro -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Búsqueda del tesoro · 60 minutos · equipos de tres</p><h2 style="font-size:46px;margin:6px 0 20px">Seis islas, una misión: un conjunto real que cumpla cinco pistas</h2>
+    <div class="repos">
+      <div class="paso"><b>UCI ML Repository</b><span>Conjuntos clásicos con DOI y licencia.</span></div>
+      <div class="paso"><b>Kaggle Datasets</b><span>Miles de conjuntos; la licencia varía, hay que leerla.</span></div>
+      <div class="paso"><b>datos.gov.co</b><span>Datos abiertos del Estado colombiano, con API.</span></div>
+      <div class="paso"><b>Banco Mundial</b><span>Indicadores de todos los países, CSV, JSON y XML.</span></div>
+      <div class="paso"><b>Zenodo</b><span>Datos de investigación con DOI.</span></div>
+      <div class="paso"><b>OpenML</b><span>Conjuntos listos para aprendizaje automático.</span></div>
+    </div>
+  </div>
+  <p class="paso" style="position:absolute;left:88px;top:640px;width:1424px;font-size:27px"><b>Pistas:</b> al menos 1.000 filas · licencia explícita · un atributo nominal y uno ordinal · se lee con pandas sin errores · sirve para una pregunta sobre Colombia o sobre su carrera.</p>
+  <a class="boton" href="Guia_Laboratorio_Semana3.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía de la búsqueda</a>
+  <aside class="notas">Puntos: 1 por cada pista cumplida y 1 por cada letra FAIR verificada (máximo 9). Bonificación de 2 puntos si el conjunto viene en JSON o XML y lo leen. Cada equipo presenta su tesoro en un minuto al final.</aside>
+</section>
+
+<!-- 15 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="hoja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · reading a standard</p>
+    <p class="cita" style="margin:22px 0 18px">“The FAIR Principles put specific emphasis on enhancing the ability of <span class="acento">machines</span> to automatically find and use the data.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Wilkinson et al. (2016), Scientific Data, 3, 160018</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--lila)"></i><p class="paso" style="font-size:32px">Why would a machine, not a person, need to find the data?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--lila)"></i><p class="paso" style="font-size:32px">Which format is easier for a machine: CSV with 4 metadata lines, or JSON?</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--lila)"></i><p class="paso" style="font-size:32px">Describe your treasure: “Our dataset has… rows, its licence is…”.</p>
+    </div>
+    <p class="paso" style="font-size:25px;margin-top:22px;color:var(--tinta-2)"><b>Words:</b> file format · nested · tag · namespace · API · endpoint · licence · metadata</p>
+  </div>
+  <aside class="notas">Cita textual del resumen de Wilkinson y otros (2016). Cinco minutos en parejas y cinco en plenaria.</aside>
+</section>
+
+<!-- 16 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Sellos del correo</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="file-spreadsheet"></i><b>CSV</b><span>Texto con valores separados por comas; una fila por línea.</span></div>
+      <div><i class="ico" data-i="file-json"></i><b>JSON</b><span>Objetos y listas anidados; el idioma de las API.</span></div>
+      <div><i class="ico" data-i="code-xml"></i><b>XML</b><span>Etiquetas que abren y cierran; admite espacios de nombres.</span></div>
+      <div><i class="ico" data-i="webhook"></i><b>API</b><span>Dirección web que responde datos a una pregunta.</span></div>
+      <div><i class="ico" data-i="layers"></i><b>Metadatos</b><span>Datos sobre los datos: fuente, fecha, licencia.</span></div>
+      <div><i class="ico" data-i="arrow-down-narrow-wide"></i><b>Ancho y largo</b><span>Años como columnas o como filas: melt.</span></div>
+      <div><i class="ico" data-i="tag"></i><b>Nominal</b><span>Categoría sin orden.</span></div>
+      <div><i class="ico" data-i="list-ordered"></i><b>Ordinal</b><span>Categoría con orden, sin distancia fija.</span></div>
+      <div><i class="ico" data-i="shield-check"></i><b>Licencia</b><span>Lo que se permite hacer con el dato.</span></div>
+      <div><i class="ico" data-i="search-check"></i><b>FAIR</b><span>Encontrable, accesible, interoperable, reutilizable.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Nominal, ordinal y distancia de tipos mixtos vuelven en la semana 13.</aside>
+</section>
+
+<!-- 17 Cierre -->
+<section class="esc">
+  <div class="hoja naranja" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:54px;margin:12px 0 30px">Tres ideas para llevarse</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="mail-warning" style="font-size:60px;color:var(--lila)"></i><p class="paso" style="font-size:34px"><b>Abra el sobre antes de leerlo:</b> mire las primeras líneas del archivo.</p>
+      <i class="ico paso" data-i="git-compare" style="font-size:60px;color:var(--lila)"></i><p class="paso" style="font-size:34px"><b>Compruebe que dos fuentes dicen lo mismo</b> antes de confiar en una.</p>
+      <i class="ico paso" data-i="tag" style="font-size:60px;color:var(--lila)"></i><p class="paso" style="font-size:34px"><b>Un número no siempre es cantidad:</b> decida el tipo de cada atributo.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 4: limpieza de datos con vacíos y atípicos reales del censo de Estados Unidos.</p>
+  </div>
+  <aside class="notas">Pregunta de salida: ¿qué licencia tiene el tesoro de su equipo y qué les permite hacer?</aside>
+</section>
+
+<!-- 18 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px" class="bib">
+    <p class="rot">Fuentes del correo</p>
+    <h2 style="font-size:48px;margin:6px 0 16px">Bibliografía y datos</h2>
+    <p>Banco Mundial (2026). <em>Individuals using the Internet (% of population), Colombia</em> [IT.NET.USER.ZS]. Indicadores del Desarrollo Mundial, con datos de la UIT. CC BY 4.0. Descargado el 2026-11-10 de api.worldbank.org.</p>
+    <p>Shafranovich, Y. (2005). <em>Common Format and MIME Type for Comma-Separated Values (CSV) Files</em> (RFC 4180). IETF. <a href="https://doi.org/10.17487/RFC4180" target="_blank" rel="noopener">doi:10.17487/RFC4180</a></p>
+    <p>Bray, T. (Ed.) (2017). <em>The JavaScript Object Notation (JSON) Data Interchange Format</em> (RFC 8259). IETF. <a href="https://doi.org/10.17487/RFC8259" target="_blank" rel="noopener">doi:10.17487/RFC8259</a></p>
+    <p>Wickham, H. (2014). Tidy data. <em>Journal of Statistical Software</em>, 59(10). <a href="https://doi.org/10.18637/jss.v059.i10" target="_blank" rel="noopener">doi:10.18637/jss.v059.i10</a></p>
+    <p>Wilkinson, M. D. y otros (2016). The FAIR Guiding Principles for scientific data management and stewardship. <em>Scientific Data</em>, 3, 160018. <a href="https://doi.org/10.1038/sdata.2016.18" target="_blank" rel="noopener">doi:10.1038/sdata.2016.18</a></p>
+    <p>W3C (2008). <em>Extensible Markup Language (XML) 1.0</em> (5.ª ed.). <a href="https://www.w3.org/TR/xml/" target="_blank" rel="noopener">w3.org/TR/xml</a> · Iconos: Lucide, ISC. Cifras: <span class="mono">cifras_1a6.py</span>. Uso de IA: Claude ayudó a programar y redactar; el docente revisó cada cifra y cita.</p>
+  </div>
+  <aside class="notas">Cifras: Material_Privado/Cifras/cifras_s03.json. La licencia del indicador se confirmó en el catálogo de datos del Banco Mundial (World Development Indicators: CC BY 4.0).</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, ic = CUR.ic, num = DS.num, txt = DS.txt, B = S.bicicletas_tres_formatos_bytes;
+  function pon(id, v) { document.getElementById(id).textContent = v; }
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  pon('bC', num(B.csv)); pon('bJ', num(B.json_sobre_csv, 1)); pon('bX', num(B.xml_sobre_csv, 1));
+  pon('cSkip', S.csv.lineas_antes_encabezado); pon('cCols', S.csv.anios); pon('cVac', S.csv.columnas_vacias === 1 ? 'una' : S.csv.columnas_vacias);
+  pon('jReg', S.json.registros); pon('jAct', S.json.actualizado); pon('xReg', S.xml.registros); pon('xBytes', num(S.xml.bytes)); pon('jBytes', num(S.json.bytes)); pon('sCruce', S.cruce_50);
+
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apuesta', 'dice-5'], ['7:10', 'CSV', 'file-spreadsheet'], ['7:30', 'JSON y XML', 'file-json'], ['7:55', 'Tipos', 'tag'], ['8:20', 'Pausa', 'coffee'], ['8:35', 'English', 'languages'], ['8:45', 'Tesoro', 'map'], ['9:45', 'Galería', 'presentation']], 6, { color: 'var(--lila)' }));
+
+  /* Peso de los tres sobres */
+  var p = '', mx = B.xml, Y0 = 640;
+  [['CSV', B.csv], ['JSON', B.json], ['XML', B.xml]].forEach(function (f, i) {
+    var h = f[1] / mx * 520, x = 80 + i * 230;
+    p += '<g' + (i ? ' class="paso-capa"' : '') + '><rect x="' + x + '" y="' + (Y0 - h) + '" width="170" height="' + h + '" fill="' + (i ? 'var(--lila)' : 'var(--punto)') + '"/>' + txt(x + 85, Y0 - h - 20, num(f[1] / 1024, 0) + ' KB', 't-n', ' text-anchor="middle" font-size="34"') + txt(x + 85, Y0 + 46, f[0], 't-l', ' text-anchor="middle" font-size="32"') + '</g>';
+  });
+  p += txt(80, 720, 'Mismos 731 días, 16 columnas', 't-s', ' font-size="24"');
+  CUR.poner('peso', p);
+
+  /* Las primeras líneas reales del CSV */
+  var cs = '';
+  C.csv_lineas.forEach(function (l, i) {
+    var y = 50 + i * 92, corto = l.length > 92 ? l.slice(0, 92) + ' …' : l, meta = i < 4;
+    cs += txt(0, y, 'línea ' + (i + 1), 't-s', ' font-size="20"') + '<text x="120" y="' + y + '" font-size="21" font-family="Consolas, monospace" style="fill:' + (meta ? 'var(--tinta-2)' : 'var(--tinta)') + '">' + esc(corto || '(vacía)') + '</text>';
+    if (i === 4) cs += '<rect x="112" y="' + (y - 30) + '" width="1300" height="44" fill="none" stroke="var(--lila)" stroke-width="3"/>' + txt(120, y + 46, 'encabezado: Country Name, Country Code, Indicator Name, Indicator Code, 1960, 1961, …, 2025, (vacía)', 't-l', ' font-size="22"');
+  });
+  cs += '<g class="paso"><rect x="112" y="16" width="1300" height="320" fill="none" stroke="var(--compra)" stroke-width="3" stroke-dasharray="10 8"/>' + txt(1400, 360, 'metadatos: se saltan', 't-o', ' text-anchor="end" font-size="24"') + '</g>';
+  CUR.poner('csv', cs);
+
+  /* JSON y XML reales */
+  document.getElementById('jTxt').innerHTML = esc(C.json_inicio.replace(/,\{"indicator"/, ',\n {"indicator"').replace(/\},\{/g, '},\n {').replace(/,"/g, ', "')).replace(/(79\.34543299)/, '<b>$1</b>') + ' …';
+  document.getElementById('xTxt').innerHTML = esc(C.xml_inicio.replace(/></g, '>\n<')).replace(/(79\.34543299)/, '<b>$1</b>') + ' …';
+
+  /* Serie de internet */
+  var ser = C.serie.filter(function (d) { return d[0] >= 1990; }), e = DS.ejes({ x: 110, y: 30, w: 1340, h: 480, xd: [1990, 2024], yd: [0, 100], yt: [0, 25, 50, 75, 100], xt: [1990, 2000, 2010, 2020, 2024], fx: function (v) { return v; }, fy: function (v) { return v + ' %'; } });
+  var s = e.s, dd = '';
+  ser.forEach(function (d, i) { dd += (i ? 'L' : 'M') + e.X(d[0]).toFixed(1) + ' ' + e.Y(d[1]).toFixed(1); });
+  s += '<line x1="110" x2="1450" y1="' + e.Y(50) + '" y2="' + e.Y(50) + '" stroke="var(--compra)" stroke-width="2.5" stroke-dasharray="10 8"/>';
+  s += '<path d="' + dd + '" fill="none" stroke="var(--lila)" stroke-width="5"/>';
+  ser.forEach(function (d) { s += '<circle cx="' + e.X(d[0]).toFixed(1) + '" cy="' + e.Y(d[1]).toFixed(1) + '" r="5" fill="var(--lila)"/>'; });
+  var v13 = ser.filter(function (d) { return d[0] === S.cruce_50; })[0], v24 = ser[ser.length - 1], v00 = ser.filter(function (d) { return d[0] === 2000; })[0];
+  s += '<g class="paso">' + '<circle cx="' + e.X(v13[0]) + '" cy="' + e.Y(v13[1]) + '" r="12" fill="none" stroke="var(--compra)" stroke-width="4"/>' + txt(e.X(v13[0]) - 20, e.Y(v13[1]) - 24, v13[0] + ': ' + num(v13[1], 1) + ' %', 't-o', ' text-anchor="end" font-size="28"') + '</g>';
+  s += txt(e.X(2024) - 10, e.Y(v24[1]) - 22, '2024: ' + num(v24[1], 2) + ' %', 't-n', ' text-anchor="end" font-size="28"') + txt(e.X(2000) - 6, e.Y(v00[1]) - 46, '2000: ' + num(v00[1], 2) + ' %', 't-s', ' font-size="24"');
+  s += txt(110, 10, 'Personas que usan internet, % de la población de Colombia', 't-s', ' font-size="22"');
+  CUR.poner('serie', s);
+
+  /* Ancho a largo */
+  var l = '', yrs = ['2020', '2021', '2022', '2023', '2024'];
+  l += txt(0, 30, 'Ancha: 1 fila, 66 columnas de años', 't-l', ' font-size="26"');
+  ['Country', '…'].concat(yrs).forEach(function (c, j) { l += '<rect x="' + (j * 96) + '" y="50" width="92" height="44" fill="var(--fondo-2)"/>' + txt(j * 96 + 46, 80, c, 't-n', ' text-anchor="middle" font-size="20"'); });
+  ['COL', '…'].concat(yrs.map(function (y) { return num(S.valores[y], 1); })).forEach(function (c, j) { l += '<rect x="' + (j * 96) + '" y="98" width="92" height="44" fill="var(--fondo)" stroke="var(--regla)"/>' + txt(j * 96 + 46, 128, c, 't-s', ' text-anchor="middle" font-size="20"'); });
+  l += '<g class="paso"><path d="M700 100 H860" stroke="var(--compra)" stroke-width="5" marker-end="url(#fl)"/>' + txt(780, 84, 'melt', 't-o', ' text-anchor="middle" font-size="26" font-family="Consolas, monospace"');
+  l += '<defs><marker id="fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--compra)"/></marker></defs>';
+  l += txt(900, 30, 'Larga: 66 filas, una por año', 't-l', ' font-size="26"');
+  [['país', 'año', 'pct']].concat(yrs.map(function (y) { return ['COL', y, num(S.valores[y], 2)]; })).forEach(function (f, i) {
+    f.forEach(function (c, j) { l += '<rect x="' + (900 + j * 160) + '" y="' + (50 + i * 48) + '" width="156" height="44" fill="' + (i ? 'var(--fondo)' : 'var(--fondo-2)') + '" stroke="var(--regla)"/>' + txt(900 + j * 160 + 78, 80 + i * 48, c, i ? 't-s' : 't-n', ' text-anchor="middle" font-size="21"'); });
+  });
+  l += txt(900, 370, '… 60 filas más; 34 años sin dato', 't-s', ' font-size="22"') + '</g>';
+  CUR.poner('largo', l);
+
+  /* Distancias por tipo */
+  var dt = '';
+  dt += txt(0, 40, 'Nominal · coincidencia simple', 't-l', ' font-size="30"') + txt(0, 84, 'Cliente A: Horeca, Lisboa · Cliente B: Horeca, Oporto', 't-n', ' font-size="26"') + txt(0, 124, 'm = 1 coincidencia de p = 2  →  d = (2 − 1) / 2 = 0,5', 't-s', ' font-size="26"');
+  dt += '<g class="paso">' + txt(0, 220, 'Ordinal · Charge Amount de 0 a 10 (M = 11 niveles)', 't-l', ' font-size="30"') + txt(0, 264, 'nivel 2 → (3 − 1)/10 = 0,2  ·  nivel 7 → (8 − 1)/10 = 0,7', 't-n', ' font-size="26"') + txt(0, 304, 'd = |0,2 − 0,7| = 0,5', 't-s', ' font-size="26"') + '</g>';
+  dt += '<g class="paso">' + txt(0, 400, 'Mixto · Gower: promedio de distancias entre 0 y 1', 't-l', ' font-size="30"') + txt(0, 444, 'canal (nominal) 0 · región (nominal) 1 · gasto (numérico, |a − b| / rango) 0,30', 't-n', ' font-size="26"') + txt(0, 484, 'd = (0 + 1 + 0,30) / 3 = 0,43', 't-o', ' font-size="28"') + '</g>';
+  dt += txt(0, 590, 'Ejemplo ilustrativo de cálculo; las categorías son las de los conjuntos del curso.', 't-s', ' font-size="22"');
+  CUR.poner('dtipos', dt);
+
+  /* La URL como pregunta */
+  var partes = [['https://api.worldbank.org/v2', 'servidor y versión'], ['/country/COL', '¿de qué país?'], ['/indicator/IT.NET.USER.ZS', '¿qué indicador?'], ['?format=json', '¿en qué sobre?'], ['&date=2000:2024', '¿qué años?']], u = '', x = 0;
+  partes.forEach(function (pt, i) {
+    var w = pt[0].length * 13.2 + 20;
+    u += '<g class="' + (i ? 'paso' : '') + '"><rect x="' + x + '" y="60" width="' + w + '" height="64" fill="var(--fondo-2)" stroke="' + (i % 2 ? 'var(--lila)' : 'var(--compra)') + '" stroke-width="3"/>' + '<text x="' + (x + 10) + '" y="102" font-size="22" font-family="Consolas, monospace" style="fill:var(--tinta)">' + pt[0] + '</text>' + txt(x + w / 2, 170 + (i % 2) * 44, pt[1], i % 2 ? 't-l' : 't-o', ' text-anchor="middle" font-size="25"') + '</g>';
+    x += w + 6;
+  });
+  u += '<g class="paso"><text x="0" y="330" font-size="26" font-family="Consolas, monospace" style="fill:var(--tinta)">import requests</text><text x="0" y="372" font-size="26" font-family="Consolas, monospace" style="fill:var(--tinta)">J = requests.get(url).json()</text><text x="0" y="414" font-size="26" font-family="Consolas, monospace" style="fill:var(--tinta)">df = pd.json_normalize(J[1])[["date", "value"]]</text>' + txt(0, 480, 'Tres líneas: la respuesta llega como tabla, con ' + S.json.registros + ' años.', 't-s', ' font-size="26"') + '</g>';
+  CUR.poner('url', u);
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
 </body>
 </html>

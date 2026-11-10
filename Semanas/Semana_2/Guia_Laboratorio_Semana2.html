@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 2: Python, NumPy y pandas en parejas | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Python, NumPy y pandas: cinco estaciones en parejas</h1>
+  <p>Taller guiado de programación en parejas. Escriben sus primeras líneas sobre los 731 días reales de bicicletas, aprenden a preguntarle cinco cosas a cualquier tabla, calculan la distancia entre dos días y suben el cuaderno a GitHub.</p>
+  <div class="datos-clase"><span><b>Semana</b>2</span><span><b>Tiempo</b>70 minutos en clase</span><span><b>Herramienta</b>Google Colab</span><span><b>Resultado</b>RAE 1.1</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Python: tipos y listas</a></li>
+  <li><a href="#e2">2. NumPy: sumar sin ciclos</a></li>
+  <li><a href="#e3">3. pandas: cinco preguntas</a></li>
+  <li><a href="#e4">4. Distancia entre dos días</a></li>
+  <li><a href="#e5">5. Push a GitHub</a></li>
+  <li><a href="#entrega">Qué entregan</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_2/Colab_Guiado_Semana_2.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="consola_pandas.html">Consola de pandas en el navegador</a>
+  </div>
+  <p><strong>Roles:</strong> piloto (escribe y dice en voz alta lo que hace) y navegante (lee la guía, revisa cada línea y compara con el punto de control). Cambian de rol en cada estación.</p>
+  <div class="aviso">Si Colab no abre en su equipo, la <a href="consola_pandas.html">consola de pandas</a> corre Python dentro del navegador con los mismos datos y revisa sola los resultados.</div>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Python: tipos y listas</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Ejecute la primera celda. Escriba al lado de cada variable su tipo: <code>int</code>, <code>float</code>, <code>str</code> o <code>bool</code>.</li>
+    <li>Convierta la temperatura a grados: multiplique por 41.</li>
+    <li>Agregue un cuarto día a la lista con <code>dias.append(1562)</code> e imprima su largo.</li>
+    <li>Agregue al diccionario el código 4, "lluvia fuerte".</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>La temperatura del 1 de enero de 2011 es 14,11 °C. <code>dias[0]</code> es 985 porque Python cuenta desde cero; <code>dias[-1]</code> es el último. Tras <code>append</code>, <code>len(dias)</code> es 4.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> NumPy: sumar sin ciclos</h2>
+  <p class="meta">12 minutos. Antes de correr, el navegante apuesta cuál forma será más rápida.</p>
+  <ol class="pasos">
+    <li>Cargue la tabla y sume los alquileres de dos formas: con un ciclo <code>for</code> y con <code>arr.sum()</code>.</li>
+    <li>Mida el tiempo de cada una con <code>%timeit</code> y anótelo. Los tiempos dependen del computador.</li>
+    <li>Compare los primeros 12 días con 5.000: <code>arr[:12] &gt; 5000</code>. ¿Qué tipo de valores devuelve?</li>
+  </ol>
+  <pre><code>%timeit sum(lista)
+%timeit arr.sum()</code></pre>
+  <details><summary>Punto de control</summary><div><p>Las dos formas dan 3.292.679 alquileres. El arreglo es <code>int64</code>: 731 casillas de 8 bytes, 5.848 bytes. La comparación devuelve 12 valores <code>False</code>: ningún día de enero de 2011 pasó de 5.000. En la mayoría de equipos <code>arr.sum()</code> es bastante más rápido.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> pandas: las cinco preguntas, filtrar y agrupar</h2>
+  <p class="meta">20 minutos.</p>
+  <ol class="pasos">
+    <li>Haga las cinco preguntas: <code>df.shape</code>, <code>df.dtypes</code>, <code>df.head()</code>, <code>df.isna().sum()</code> y <code>df["cnt"].describe()</code>.</li>
+    <li>Cuente los días con más de 5.000 alquileres usando una máscara.</li>
+    <li>Calcule el promedio por estación con <code>groupby</code>.</li>
+    <li>Encuentre el día con más alquileres con <code>idxmax</code>.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Pregunta</th><th>Resultado</th></tr>
+      <tr><td>Forma</td><td>(731, 16)</td></tr>
+      <tr><td>Tipos</td><td>11 int64, 4 float64 y 1 fecha</td></tr>
+      <tr><td>Vacíos</td><td>0</td></tr>
+      <tr><td>Media y mediana de cnt</td><td>4.504,35 y 4.548</td></tr>
+      <tr><td>Días con más de 5.000</td><td>286 (39,1 %)</td></tr>
+      <tr><td>Promedio por estación 1, 2, 3, 4</td><td>2.604, 4.992, 5.644, 4.728</td></tr>
+      <tr><td>Día máximo</td><td>2012-09-15, 8.714 alquileres</td></tr>
+    </table>
+    <p>La estación 1 tiene el promedio más bajo: por las fechas es invierno, aunque la documentación diga otra cosa (semana 7).</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Distancia entre dos días (RAE 1.1)</h2>
+  <p class="meta">18 minutos.</p>
+  <ol class="pasos">
+    <li>Tome el día de más alquileres (<code>idxmax</code>) y el de menos (<code>idxmin</code>), con temperatura en °C, humedad en % y viento en km/h.</li>
+    <li>Calcule a mano en papel la distancia Manhattan con las diferencias que imprime el cuaderno. Luego compruébela con NumPy.</li>
+    <li>Calcule la euclidiana y la suprema. Verifique que Manhattan ≥ euclidiana ≥ suprema.</li>
+    <li>Calcule qué porcentaje de la euclidiana al cuadrado aporta cada variable. Después estandarice y repita.</li>
+  </ol>
+  <p>La fórmula general es la de Minkowski: <code>(Σ |aᵢ − bᵢ|^p)^(1/p)</code>. Con p = 1 es Manhattan, con p = 2 euclidiana y cuando p crece sin límite se vuelve la suprema, el máximo de las diferencias.</p>
+  <details><summary>Punto de control</summary><div>
+    <p>Diferencias: 6,90 °C, 37,83 puntos de humedad y 7,42 km/h. Manhattan 52,15; euclidiana 39,17; suprema 37,83. La humedad aporta el 93,3 % de la euclidiana al cuadrado solo porque sus números son grandes. Estandarizada, la euclidiana es 3,153 y ya no manda una sola variable. Por eso, antes de agrupar (semana 13), se estandariza.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Push a GitHub</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>En Colab: Entorno de ejecución, "Reiniciar y ejecutar todo". Si una celda falla, corríjala antes de seguir.</li>
+    <li>Archivo, "Guardar una copia en GitHub", en el repositorio de la semana 1, con un mensaje de commit claro: "Semana 2: taller de pandas en parejas".</li>
+    <li>En el README, agregue la sección "Semana 2" con el nombre de su pareja y la línea de código que más les costó leer, explicada.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>El cuaderno aparece en GitHub con todas las salidas visibles y en orden: los números entre corchetes van de 1 en adelante sin saltos. Pimentel y otros (2019), que estudiaron 1,4 millones de cuadernos de GitHub, muestran por qué este paso importa.</p></div></details>
+</section>
+
+<section id="entrega">
+  <h2>Qué entregan</h2>
+  <p>El cuaderno ejecutado de principio a fin en el repositorio de cada integrante, con la sección "Semana 2" del README y la declaración de uso de IA si la hubo.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Escriba una función <code>minkowski(a, b, p)</code> que reciba dos arreglos y el valor de p. Compruebe que con p = 1 y p = 2 da lo mismo que el ejercicio 4, y grafique cómo cambia la distancia entre los dos días para p = 1, 2, 3, …, 20. ¿Hacia qué número se acerca? Pista: compárelo con la suprema.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <p>La <a href="Investigacion_Semana2.html">guía de investigación de la semana</a> trae la lectura guiada de Harris y otros (2020), los artículos sobre cuadernos y programación en parejas, y videos verificados.</p>
+</section>
+</main>
+</div>
+<script>window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 731; i++) o.push(i === 623 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

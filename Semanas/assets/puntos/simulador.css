@@ -1,0 +1,37 @@
+/* Simuladores propios del curso. Cada página define su paleta en :root con --l-fondo, --l-panel, --l-tinta, --l-tinta2, --l-regla, --l-acento y --l-naranja. */
+body { background: var(--l-fondo); color: var(--l-tinta); margin: 0; }
+.sim { max-width: 1320px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 32px) 60px; }
+.sim h1 { font-size: clamp(26px, 3.4vw, 40px); margin: 0 0 6px; color: var(--l-tinta); line-height: 1.08; }
+.sim .bajada { color: var(--l-tinta2); font-size: 17px; max-width: 900px; margin: 0 0 18px; }
+.sim a { color: var(--l-acento); }
+.rejilla { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 22px; align-items: start; }
+@media (max-width: 980px) { .rejilla { grid-template-columns: minmax(0, 1fr); } }
+.rejilla > * { min-width: 0; }
+.lienzo { background: var(--l-hondo, #0b0b0b); border: 1px solid var(--l-regla); position: relative; }
+.lienzo canvas, .lienzo svg { width: 100%; height: auto; display: block; }
+.panel { background: var(--l-panel); padding: 18px 18px 20px; border-top: 6px solid var(--l-acento); min-width: 0; }
+.panel h2 { font-size: 19px; margin: 18px 0 8px; color: var(--l-acento); text-transform: uppercase; letter-spacing: .06em; }
+.panel h2:first-child { margin-top: 0; }
+.panel label { display: block; font-size: 15px; color: var(--l-tinta2); margin: 10px 0 4px; }
+.panel select, .panel input[type=range], .panel textarea { width: 100%; max-width: 100%; }
+.panel select, .panel textarea, .panel input[type=number] { background: var(--l-hondo, #0b0b0b); color: var(--l-tinta); border: 1px solid var(--l-regla); padding: 6px; font: 15px 'Schibsted Grotesk', sans-serif; }
+.fila { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.fila button { flex: 1 1 auto; min-width: 0; background: var(--l-hondo, #0b0b0b); color: var(--l-tinta); border: 1px solid var(--l-acento); padding: 9px 10px; font: 600 15px 'Schibsted Grotesk', sans-serif; cursor: pointer; min-height: 40px; }
+.fila button.pri, .fila button[aria-pressed="true"] { background: var(--l-acento); color: var(--l-fondo); }
+.fila button:hover { filter: brightness(1.15); }
+.metricas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.metricas div { background: var(--l-hondo, #0b0b0b); padding: 10px 12px; }
+.metricas b { display: block; font-size: 26px; color: var(--l-naranja); font-variant-numeric: tabular-nums; }
+.metricas span { font-size: 13px; color: var(--l-tinta2); }
+.estado { font-size: 15px; color: var(--l-tinta2); min-height: 44px; margin-top: 10px; line-height: 1.4; }
+.estado b { color: var(--l-tinta); }
+.tabla { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; color: var(--l-tinta); }
+.tabla th, .tabla td { border-bottom: 1px solid var(--l-regla); padding: 4px 6px; text-align: right; }
+.tabla th:first-child, .tabla td:first-child { text-align: left; }
+.retos { margin-top: 26px; background: var(--l-panel); padding: 18px 22px; }
+.retos h2 { color: var(--l-acento); font-size: 22px; margin: 0 0 8px; }
+.retos li { margin: 8px 0; font-size: 16px; line-height: 1.4; color: var(--l-tinta); }
+.retos details { border-color: var(--l-regla); }
+.nota { font-size: 13px; color: var(--l-tinta2); margin-top: 18px; }
+.leyenda { position: absolute; left: 12px; top: 10px; font-size: 13px; color: var(--l-tinta2); background: rgba(0,0,0,.55); padding: 4px 8px; }
+.validado { display: inline-block; font-size: 13px; padding: 3px 9px; border: 1px solid var(--l-acento); color: var(--l-acento); margin-top: 6px; }

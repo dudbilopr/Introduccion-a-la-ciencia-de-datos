@@ -1,0 +1,10 @@
+/* Guías de investigación semanales: videos en rejilla y recuadro del método. Se carga después de guia.css. */
+.vids { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin: 14px 0; }
+.vids article { background: var(--papel-2, #ece9df); padding: 0 0 12px; }
+.vids img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.vids h3 { font-size: 16px; margin: 10px 12px 4px; line-height: 1.25; }
+.vids p { font-size: 14.5px; margin: 4px 12px; line-height: 1.35; }
+.etq { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #00213d; color: #fff; margin-right: 4px; }
+.metodo { background: #00213d; color: #eaf1f7; padding: 18px 22px; border-radius: 4px; }
+.metodo b { color: #ff9a63; }
+.metodo table td, .metodo table th { color: #eaf1f7; border-color: rgba(255,255,255,.2); }
