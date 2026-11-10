@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesa de limpieza: censo Adult | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="../assets/puntos/simulador.css">
+<style>
+  :root { --l-fondo: #17120f; --l-panel: #261d18; --l-hondo: #100c0a; --l-tinta: #f5efe8; --l-tinta2: #b9ab9d; --l-regla: rgba(185,171,157,.24); --l-acento: #ffd23f; --l-naranja: #ff7a1f; }
+  .resultados { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .resultados div { background: var(--l-panel); padding: 12px 14px; border-top: 4px solid var(--l-acento); }
+  .resultados b { display: block; font-size: 28px; color: var(--l-tinta); font-variant-numeric: tabular-nums; }
+  .resultados b.cambio { color: var(--l-naranja); }
+  .resultados span { font-size: 13.5px; color: var(--l-tinta2); display: block; }
+  .resultados small { font-size: 13px; color: var(--l-tinta2); }
+  #bitacora { font: 14px/1.5 Consolas, monospace; background: var(--l-hondo); color: #e8dccd; padding: 12px; white-space: pre-wrap; min-height: 140px; margin: 0; border: 1px solid var(--l-regla); }
+  .validacion { font-size: 14px; color: var(--l-tinta2); }
+  .validacion b { color: var(--l-acento); }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Mesa de limpieza: 32.561 personas del censo de 1994</h1>
+  <p class="bajada">Elija qué hacer con cada evidencia y mire cómo cambian las conclusiones. No hay una limpieza correcta: hay decisiones que se justifican y se documentan. Datos: Adult, Becker y Kohavi (1996), UCI, CC BY 4.0. Ingreso alto: más de 50.000 dólares al año.</p>
+  <div class="rejilla">
+    <div>
+      <div class="resultados" id="res"></div>
+      <h2 style="color:var(--l-acento);font-size:19px;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px">Horas por semana tras la limpieza</h2>
+      <div class="lienzo"><svg id="g" viewBox="0 0 900 330" role="img" aria-label="Histograma de horas por semana; en naranja, las filas que la regla elegida marca como atípicas"></svg></div>
+      <h2 style="color:var(--l-acento);font-size:19px;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px">Bitácora de limpieza (cópiela a su cuaderno)</h2>
+      <pre id="bitacora"></pre>
+    </div>
+    <div class="panel">
+      <h2>Vacíos ("?")</h2>
+      <label for="vac">workclass, occupation y native_country</label>
+      <select id="vac"><option value="nada">No hacer nada (dejar "?")</option><option value="borrar">Borrar filas con algún "?"</option><option value="moda">Imputar con la moda</option><option value="desc">Categoría "Desconocido" + indicador</option></select>
+      <h2>Duplicados</h2>
+      <select id="dup" aria-label="Duplicados"><option value="dejar">Conservar las 24 copias</option><option value="quitar">Quitar las copias</option></select>
+      <h2>Ganancias de 99.999</h2>
+      <select id="tope" aria-label="Tope de ganancias"><option value="dejar">Dejar 99.999</option><option value="nan">Marcar como desconocido</option></select>
+      <h2>Regla de atípicos en horas</h2>
+      <select id="regla" aria-label="Regla de atípicos"><option value="z">Media ± k desviaciones</option><option value="iqr" selected>Q1 − k·RIC, Q3 + k·RIC</option><option value="mad">Mediana ± k·1,4826·MAD</option></select>
+      <label for="k">k = <b id="kv">1,5</b></label>
+      <input id="k" type="range" min="1" max="4" step="0.5" value="1.5">
+      <label for="acc">Con los atípicos</label>
+      <select id="acc"><option value="marcar">Solo marcarlos</option><option value="borrar">Borrar esas filas</option></select>
+      <p class="validacion" id="val"></p>
+    </div>
+  </div>
+  <div class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>Elija "Borrar filas con algún ?". ¿Cuánto cambia la tasa de ingreso alto? ¿Y la de los menores de 25?</li>
+      <li>Elija "Imputar con la moda". ¿Qué pasa con la tasa de ingreso alto del grupo Prof-specialty? Explique por qué.</li>
+      <li>Con la regla del rango intercuartílico y k = 1,5, ¿qué porcentaje de las filas queda marcado? Suba k hasta 3. ¿Desaparece el problema?</li>
+      <li>Elija la combinación que defendería ante un comité y escriba en la bitácora el motivo de cada decisión.</li>
+    </ol>
+    <p class="nota">Cuartiles con interpolación lineal, como pandas; desviación estándar muestral (n − 1); MAD sin escalar multiplicada por 1,4826, como sugieren Leys y otros (2013).</p>
+  </div>
+</div>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, N = C.edad.length, signo = C.wc_cat.indexOf('?'), signoOc = C.oc_cat.indexOf('?');
+  var WCmoda = C.wc_cat.indexOf(S.imputar_moda.moda), OCmoda = C.oc_cat.indexOf(S.ocupacion.moda), PRIV = C.wc_cat.indexOf('Private');
+  function fmt(x, d) { var s = (d ? x.toFixed(d) : Math.round(x).toString()).replace('.', ','); return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function cuantil(v, p) { var s = v.slice().sort(function (a, b) { return a - b; }), h = (s.length - 1) * p, lo = Math.floor(h); return s[lo] + (h - lo) * ((s[lo + 1] === undefined ? s[lo] : s[lo + 1]) - s[lo]); }
+  function media(v) { return v.reduce(function (a, b) { return a + b; }, 0) / v.length; }
+  function de(v) { var m = media(v); return Math.sqrt(v.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0) / (v.length - 1)); }
+  var base = null;
+  function calcular() {
+    var vac = document.getElementById('vac').value, dup = document.getElementById('dup').value, tope = document.getElementById('tope').value, regla = document.getElementById('regla').value, k = +document.getElementById('k').value, acc = document.getElementById('acc').value;
+    document.getElementById('kv').textContent = fmt(k, 1);
+    var filas = [];
+    for (var i = 0; i < N; i++) {
+      var tieneSigno = C.wc[i] === signo || C.oc[i] === signoOc || C.pais_signo[i];
+      if (vac === 'borrar' && tieneSigno) continue;
+      if (dup === 'quitar' && C.dup[i]) continue;
+      var wc = C.wc[i], oc = C.oc[i];
+      if (vac === 'moda') { if (wc === signo) wc = WCmoda; if (oc === signoOc) oc = OCmoda; }
+      filas.push({ i: i, wc: wc, oc: oc, gan: (tope === 'nan' && C.gan[i] === 99999) ? null : C.gan[i] });
+    }
+    var horas = filas.map(function (f) { return C.horas[f.i]; }), lo, hi;
+    if (regla === 'z') { var m = media(horas), s = de(horas); lo = m - k * s; hi = m + k * s; }
+    else if (regla === 'iqr') { var q1 = cuantil(horas, .25), q3 = cuantil(horas, .75); lo = q1 - k * (q3 - q1); hi = q3 + k * (q3 - q1); }
+    else { var md = cuantil(horas, .5), mad = cuantil(horas.map(function (h) { return Math.abs(h - md); }), .5); lo = md - k * 1.4826 * mad; hi = md + k * 1.4826 * mad; }
+    var marcadas = filas.filter(function (f) { var h = C.horas[f.i]; return h < lo || h > hi; }).length;
+    if (acc === 'borrar') filas = filas.filter(function (f) { var h = C.horas[f.i]; return h >= lo && h <= hi; });
+    var n = filas.length, alto = filas.filter(function (f) { return C.alto[f.i]; }).length;
+    var jov = filas.filter(function (f) { return C.edad[f.i] < 25; }), may = filas.filter(function (f) { return C.edad[f.i] >= 60; });
+    var conWc = filas.filter(function (f) { return f.wc !== signo; }), priv = conWc.filter(function (f) { return f.wc === PRIV; }).length;
+    var prof = filas.filter(function (f) { return f.oc === OCmoda; }), gan = filas.map(function (f) { return f.gan; }).filter(function (g) { return g !== null; });
+    var r = { n: n, alto: alto / n * 100, jov: jov.filter(function (f) { return C.alto[f.i]; }).length / jov.length * 100, may: may.filter(function (f) { return C.alto[f.i]; }).length / may.length * 100,
+      priv: priv / conWc.length * 100, prof: prof.filter(function (f) { return C.alto[f.i]; }).length / prof.length * 100, gan: media(gan), horas: media(filas.map(function (f) { return C.horas[f.i]; })), marcadas: marcadas, lo: lo, hi: hi };
+    if (!base) base = r;
+    pintar(r, { vac: vac, dup: dup, tope: tope, regla: regla, k: k, acc: acc }, filas, lo, hi);
+    validar(r, { vac: vac, dup: dup, tope: tope, regla: regla, k: k, acc: acc });
+  }
+  function caja(et, v, b, d, suf) { var c = Math.abs(v - b) > 1e-9; return '<div><b class="' + (c ? 'cambio' : '') + '">' + fmt(v, d) + (suf || '') + '</b><span>' + et + '</span>' + (c ? '<small>antes ' + fmt(b, d) + (suf || '') + '</small>' : '') + '</div>'; }
+  function pintar(r, o, filas, lo, hi) {
+    var b = base;
+    document.getElementById('res').innerHTML = caja('Filas', r.n, b.n, 0) + caja('Ingreso alto, todos', r.alto, b.alto, 1, ' %') + caja('Ingreso alto, menores de 25', r.jov, b.jov, 1, ' %') + caja('Ingreso alto, 60 o más', r.may, b.may, 1, ' %') +
+      caja('"Private" entre los que tienen tipo de empleo', r.priv, b.priv, 1, ' %') + caja('Ingreso alto en Prof-specialty', r.prof, b.prof, 1, ' %') + caja('Media de ganancias de capital', r.gan, b.gan, 0) + caja('Filas con horas atípicas', r.marcadas, r.marcadas, 0);
+    var cont = new Array(50).fill(0), mx = 0;
+    filas.forEach(function (f) { var kk = Math.min(49, Math.floor(C.horas[f.i] / 2)); cont[kk]++; });
+    mx = Math.max.apply(null, cont);
+    var s = '';
+    cont.forEach(function (c, kk) { var x = 40 + kk * 16.6, h = c / mx * 260, h0 = kk * 2, fuera = h0 + 1 < lo || h0 > hi; s += '<rect x="' + x.toFixed(1) + '" y="' + (290 - h).toFixed(1) + '" width="15" height="' + h.toFixed(1) + '" fill="' + (h0 === 40 ? 'var(--l-acento)' : fuera ? 'var(--l-naranja)' : '#7b6c60') + '"/>'; });
+    [0, 20, 40, 60, 80, 99].forEach(function (t) { s += '<text x="' + (40 + t / 2 * 16.6) + '" y="318" fill="var(--l-tinta2)" font-size="15" text-anchor="middle">' + t + '</text>'; });
+    s += '<text x="880" y="24" fill="var(--l-tinta2)" font-size="15" text-anchor="end">Límites: ' + fmt(lo, 1) + ' y ' + fmt(hi, 1) + ' horas</text>';
+    document.getElementById('g').innerHTML = s;
+    var nv = { nada: 'se dejan los "?" como texto', borrar: 'se borran las filas con algún "?"', moda: 'se imputa la moda (' + S.imputar_moda.moda + ' y ' + S.ocupacion.moda + ')', desc: 'se recodifica "?" como "Desconocido" y se agrega un indicador' };
+    var nr = { z: 'media ± ' + fmt(o.k, 1) + ' desviaciones', iqr: 'Q1 − ' + fmt(o.k, 1) + '·RIC y Q3 + ' + fmt(o.k, 1) + '·RIC', mad: 'mediana ± ' + fmt(o.k, 1) + '·1,4826·MAD' };
+    document.getElementById('bitacora').textContent = '# Bitácora de limpieza, censo Adult (32.561 filas)\n1. Vacíos: ' + nv[o.vac] + '. Motivo: ...\n2. Duplicados: ' + (o.dup === 'quitar' ? 'se quitan las 24 copias' : 'se conservan las 24 copias') + '. Motivo: ...\n3. Ganancias de 99.999: ' + (o.tope === 'nan' ? 'se marcan como desconocidas' : 'se dejan como están') + '. Motivo: ...\n4. Horas: regla ' + nr[o.regla] + ' (' + fmt(r.lo, 1) + ' a ' + fmt(r.hi, 1) + '); ' + fmt(r.marcadas, 0) + ' filas marcadas; ' + (o.acc === 'borrar' ? 'se borran' : 'solo se marcan') + '. Motivo: ...\nEfecto: ' + fmt(r.n, 0) + ' filas; ingreso alto ' + fmt(r.alto, 1) + ' % (antes ' + fmt(base.alto, 1) + ' %).';
+  }
+  function validar(r, o) {
+    var py = [], ok = true, cerca = function (a, b, d) { return Math.abs(a - b) <= d; };
+    if (o.vac === 'borrar' && o.dup === 'dejar' && o.acc === 'marcar') { py.push('filas ' + fmt(S.tras_borrar.filas, 0) + ' y tasa ' + fmt(S.tras_borrar.tasa_alto_ingreso, 1) + ' %'); ok = ok && r.n === S.tras_borrar.filas && cerca(r.alto, S.tras_borrar.tasa_alto_ingreso, .05); }
+    if (o.vac === 'moda' && o.dup === 'dejar' && o.acc === 'marcar') { py.push('Private ' + fmt(S.imputar_moda.pct_despues, 1) + ' % y Prof-specialty ' + fmt(S.ocupacion.tasa_alto_ingreso_moda_despues, 1) + ' %'); ok = ok && cerca(r.priv, S.imputar_moda.pct_despues, .05) && cerca(r.prof, S.ocupacion.tasa_alto_ingreso_moda_despues, .05); }
+    if (o.vac === 'nada' && o.dup === 'dejar') {
+      if (o.regla === 'iqr' && o.k === 1.5) { py.push(fmt(S.horas.iqr_fuera, 0) + ' filas con el RIC'); ok = ok && r.marcadas === S.horas.iqr_fuera; }
+      if (o.regla === 'z' && o.k === 3) { py.push(fmt(S.horas.z3_fuera, 0) + ' filas con 3 desviaciones'); ok = ok && r.marcadas === S.horas.z3_fuera; }
+      if (o.regla === 'mad' && o.k === 3) { py.push(fmt(S.horas.mad_3_fuera, 0) + ' filas con 3 MAD'); ok = ok && r.marcadas === S.horas.mad_3_fuera; }
+      if (o.tope === 'nan' && o.acc === 'marcar') { py.push('media de ganancias ' + fmt(S.capital_gain.media_sin_99999, 0)); ok = ok && cerca(r.gan, S.capital_gain.media_sin_99999, .5); }
+    }
+    document.getElementById('val').innerHTML = py.length ? (ok ? '<b>Coincide con pandas:</b> ' : '<b>No coincide con pandas:</b> ') + py.join('; ') + '.' : 'Validación con pandas disponible para: borrar filas, imputar con la moda, cada regla con k = 1,5 o 3, y el tope de ganancias.';
+    window.LIMPIEZA_OK = py.length ? ok : null;
+  }
+  ['vac', 'dup', 'tope', 'regla', 'k', 'acc'].forEach(function (id) { document.getElementById(id).addEventListener('input', calcular); });
+  calcular();
+})();
+</script>
+</body>
+</html>

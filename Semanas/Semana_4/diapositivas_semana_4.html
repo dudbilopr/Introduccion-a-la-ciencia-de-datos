@@ -1,439 +1,376 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <title>Ciencia de Datos - Semana 4</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
-
-    <style>
-        :root {
-            --data-blue: #003865;
-            --data-orange: #E85C0B;
-            --cyber-dark: #050510;
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff007f;
-        }
-
-        body { font-family: 'Inter', sans-serif; }
-
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            color: var(--data-blue);
-            text-transform: none;
-            font-weight: 800;
-        }
-
-        .reveal h2 {
-            border-bottom: 3px solid var(--data-orange);
-            display: inline-block;
-            padding-bottom: 8px;
-            margin-bottom: 30px;
-        }
-
-        .accent { color: var(--data-orange) !important; font-weight: bold; }
-        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
-
-        .reveal .controls, .reveal .progress { color: var(--data-orange); }
-
-        .icon-container {
-            font-size: 5rem;
-            color: var(--data-orange);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .box-glass {
-            background: rgba(240, 244, 248, 0.9);
-            border-left: 6px solid var(--data-orange);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            margin-top: 15px;
-            color: #333;
-            font-size: 0.9em;
-        }
-
-        .callout-warning {
-            background: #fff3e0;
-            border-left: 5px solid #ff9800;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        /* Dark Mode / Cyber Mode slides */
-        .reveal.cyber-mode,
-        .reveal.cyber-mode .slide-background,
-        .reveal.cyber-mode .slide-background-content {
-            background-color: var(--cyber-dark) !important;
-        }
-
-        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
-            color: #fff !important;
-        }
-
-        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
-
-        .reveal.cyber-mode .box-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border-left: 6px solid var(--neon-cyan);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
-        }
-
-        .split-layout {
-            display: flex; gap: 30px; align-items: stretch;
-            height: 100%;
-        }
-        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-
-        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
-
-        .quote-container {
-            position: relative;
-            padding: 30px 40px;
-            background: #f9f9f9;
-            border-left: 8px solid var(--data-blue);
-            font-style: italic;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-            text-align: left;
-        }
-        .quote-container::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            font-size: 6rem;
-            color: rgba(0, 56, 101, 0.1);
-            font-family: Georgia, serif;
-        }
-        .quote-author {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            font-style: normal;
-            color: var(--data-orange);
-            text-align: right;
-        }
-
-        .reveal .slides section {
-            max-height: 95vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 10px;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--data-orange); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
-
-        /* SQL vs Pandas Table */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            margin-top: 15px;
-        }
-        .comparison-table th { background: var(--data-blue); color: white; padding: 10px; }
-        .comparison-table td { padding: 10px; border-bottom: 1px solid #ddd; }
-        .comparison-table code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; color: #d14; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 4 · Laboratorio forense del dato | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: un laboratorio forense. Cada vacío y cada valor raro es una evidencia: se fotografía, se explica y se documenta antes de tocarla. */
+  :root { --fondo: #17120f; --fondo-2: #261d18; --tinta: #f5efe8; --tinta-2: #b9ab9d; --regla: rgba(185,171,157,.24); --punto: #7b6c60; --compra: #ff7a1f; --acento-texto: #ffa263; --cinta: #ffd23f; }
+  :root[data-tema="claro"] { --fondo: #f6f2ea; --fondo-2: #e8e0d2; --tinta: #221812; --tinta-2: #5d4f44; --regla: rgba(34,24,18,.2); --punto: #9a8a7c; --compra: #e85c0b; --acento-texto: #b94504; --cinta: #9a7400; }
+  .rot { font: 700 23px Consolas, 'Courier New', monospace; letter-spacing: .1em; color: var(--cinta); text-transform: uppercase; }
+  svg text:not([font-family]) { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; }
+  .t-n { fill: var(--tinta); font-weight: 700; }
+  .t-s { fill: var(--tinta-2); }
+  .t-o { fill: var(--acento-texto); font-weight: 800; }
+  .t-c { fill: var(--cinta); font-weight: 800; }
+  .cinta { background: repeating-linear-gradient(-45deg, var(--cinta) 0 28px, #17120f 28px 56px); height: 22px; }
+  .hoja { background: var(--fondo-2); border-left: 8px solid var(--cinta); padding: 26px 30px; }
+  .hoja.naranja { border-left-color: var(--compra); }
+  .evid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .evid div { background: var(--fondo-2); padding: 20px 22px; border-top: 6px solid var(--cinta); min-height: 196px; }
+  .evid em { font-style: normal; font: 700 20px Consolas, monospace; color: var(--cinta); }
+  .evid b { display: block; font-size: 46px; line-height: 1; margin: 10px 0 8px; color: var(--acento-texto); }
+  .evid span { font-size: 23px; color: var(--tinta-2); line-height: 1.25; display: block; }
+  .codigo { background: var(--fondo-2); border-left: 6px solid var(--cinta); font: 25px/1.5 Consolas, 'Courier New', monospace; padding: 16px 22px; white-space: pre; }
+  .codigo b { color: var(--acento-texto); }
+  .codigo i { color: var(--tinta-2); font-style: italic; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--cinta); min-height: 262px; }
+  .glosa .ico { font-size: 46px; color: var(--cinta); }
+  .glosa b { display: block; font-size: 27px; line-height: 1.08; margin: 10px 0 8px; }
+  .glosa span { font-size: 22.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .cita { font-size: 40px; line-height: 1.24; font-weight: 700; }
+</style>
 </head>
+<body data-cine="paneo">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
 
-<body>
-    <div class="reveal">
-        <div class="slides">
+<!-- 1 Portada -->
+<section class="esc">
+  <div class="cinta" style="position:absolute;left:0;right:0;top:40px"></div>
+  <div style="position:absolute;left:88px;top:120px;width:1424px">
+    <p class="rot">Laboratorio forense del dato · Semana 4</p>
+    <h1 style="font-size:96px;margin-top:14px;line-height:1.03;width:1350px">Antes de limpiar, <span class="acento">se investiga</span>: cada vacío es una evidencia.</h1>
+    <p class="sec" style="font-size:27px;margin-top:22px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <div class="codigo" style="position:absolute;left:88px;top:600px;width:900px">df.isna().sum().sum()       <i># pandas: ningún vacío</i>
+<b id="pIsna"></b>
+(df == "?").sum().sum()      <i># la escena real</i>
+<b id="pSignos"></b></div>
+  <div class="cinta" style="position:absolute;left:0;right:0;bottom:40px"></div>
+  <aside class="notas">Datos: censo de Estados Unidos de 1994 (Adult, UCI, CC BY 4.0), 32.561 personas. Es el mismo conjunto de la semana 15 (ética). Pregunte: si pandas dice cero vacíos, ¿por qué no confiar? Porque los vacíos vienen escritos como "?".</aside>
+</section>
 
-            <!-- Slide 1: Título -->
-            <section>
-                <div class="icon-container">
-                    <i class="fa-solid fa-broom"></i>
-                </div>
-                <h1>Ciencia de Datos</h1>
-                <h3>Semana 4: <span class="accent">Preprocesamiento y SQL Básico</span></h3>
-                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
-            </section>
+<!-- 2 Apuesta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Apuesta antes del dato</p>
+    <h2 style="font-size:58px;line-height:1.06">Si borramos las filas incompletas, ¿cambia la conclusión?</h2>
+    <p class="paso" style="font-size:31px">Se pierden <b class="acento" id="pPerd"></b> de las filas: parece poco.</p>
+    <p class="paso" style="font-size:31px">La tasa de ingresos altos pasa de <b id="pT0"></b> a <b class="acento" id="pT1"></b>.</p>
+    <p class="paso" style="font-size:31px">Porque las filas borradas no eran al azar: ganaban más de 50.000 dólares solo el <b class="acento" id="pT2"></b>.</p>
+    <p class="paso sec" style="font-size:26px">Borrar es una decisión con consecuencias. Hoy se aprende a tomarla con evidencia.</p>
+  </div>
+  <svg id="apuesta" class="diagrama" viewBox="0 0 720 760" style="position:absolute;left:830px;top:60px;width:720px;height:760px" role="img" aria-label="Porcentaje de personas con ingresos altos: todas, filas completas y filas con algún vacío"></svg>
+  <aside class="notas">Ingreso alto: más de 50.000 dólares al año (la columna income). 2.399 filas tienen al menos un "?". Esta escena es el corazón de la clase: los datos faltantes casi nunca faltan al azar.</aside>
+</section>
 
-            <!-- Slide 2: Introducción y RAE -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-trash-can-arrow-up"></i> El Mito de la Inteligencia Artificial</h2>
-                    <p>Garbage In, Garbage Out.</p>
-                    <div class="box-glass">
-                        <p>Los algoritmos de Machine Learning son estúpidos matemáticos rápidos. Si les entregas datos sesgados, vacíos o mal formateados, aprenderán el error a la perfección.</p>
-                        <hr>
-                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta:</h4>
-                        <p class="text-center" style="font-weight:bold;">Si entrenar el modelo toma el 5% del tiempo del proyecto, ¿en qué gasta el científico de datos el otro 95%?</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
-                    <div class="box-glass">
-                        <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Identificar y mitigar datos faltantes (NaN) o atípicos (Outliers).</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Comprender el rol de las Bases de Datos Relacionales (SQL) en el ecosistema.</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Mapear las sentencias declarativas de SQL a operaciones funcionales en Pandas (Merge, GroupBy).</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
+<!-- 3 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Ruta de hoy · 7:00 a 10:00</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de la sesión"></svg>
+  <aside class="notas">El Dirty Data Challenge (aprendizaje basado en problemas) ocupa 70 minutos: los equipos diagnostican, deciden y documentan cada limpieza.</aside>
+</section>
 
-            <!-- Slide 3: Agenda -->
-            <section>
-                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
-                <div class="split-layout">
-                    <div>
-                        <ul>
-                            <li class="fragment">Data Janitor Work (Limpieza de Datos)</li>
-                            <li class="fragment">Tratamiento de Valores Faltantes</li>
-                            <li class="fragment">SQL Básico (SELECT, WHERE, JOIN)</li>
-                            <li class="fragment">Equivalencias: Pandas vs SQL</li>
-                            <li class="fragment">Glosario EMI & Pair Programming</li>
-                        </ul>
-                    </div>
-                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
-                        <i class="fa-solid fa-sink text-gray-300" style="font-size:8rem;"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 4: Data Janitor -->
-            <section>
-                <h2><i class="fa-solid fa-broom"></i> Data Janitor Work</h2>
-                <div class="split-layout">
-                    <div class="quote-container" style="font-size: 0.95rem;">
-                        "Los Científicos de Datos gastan el 80% de su tiempo limpiando y organizando datos, y el otro 20% de su tiempo quejándose sobre la limpieza de los datos."
-                        <span class="quote-author">— Cleaning Data for Effective Data Science</span>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h3 class="accent">¿Qué limpiamos?</h3>
-                        <ul>
-                            <li><strong>Datos Faltantes (NaN):</strong> ¿Los borramos? ¿Los imputamos con el promedio?</li>
-                            <li><strong>Inconsistencias:</strong> "Nueva York", "New York", "NY". (Son la misma entidad).</li>
-                            <li><strong>Formatos:</strong> Fechas como strings (<code>"12/10/2021"</code> vs <code>"10-12-21"</code>).</li>
-                            <li><strong>Outliers:</strong> Valores absurdos (Ej. Edad = 1500 años).</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 5: NaN y Filtros -->
-            <section>
-                <h2><i class="fa-solid fa-eraser"></i> Manejo de Valores Faltantes en Pandas</h2>
-                <p>Las dos estrategias principales para enfrentar los <code>NaN</code> (Not a Number).</p>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <h4 style="color:#d9534f;">1. Eliminación (Drop)</h4>
-                        <pre><code class="python" data-trim data-noescape>
-                        # Elimina cualquier fila que tenga un NaN
-                        df_limpio = df.dropna()
-
-                        # Elimina la columna entera si tiene NaN
-                        df_columnas = df.dropna(axis=1)
-                        </code></pre>
-                        <p style="font-size:0.8rem;"><strong>Peligro:</strong> Podrías borrar la mitad de tu base de datos si eres demasiado estricto.</p>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h4 style="color:#28a745;">2. Imputación (Fill)</h4>
-                        <pre><code class="python" data-trim data-noescape>
-                        # Llenar con un valor por defecto (0)
-                        df['salario'] = df['salario'].fillna(0)
-
-                        # Llenar con la media (promedio)
-                        media_salario = df['salario'].mean()
-                        df['salario'].fillna(media_salario)
-                        </code></pre>
-                        <p style="font-size:0.8rem;"><strong>Ventaja:</strong> Mantienes las filas, pero assumes un valor estadístico que añade ruido artificial.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 6: SQL vs Pandas -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-database"></i> SQL Básico</h2>
-                    <p>SQL (Structured Query Language) es el estándar industrial para hablar con Bases de Datos Relacionales.</p>
-                    <div class="box-glass">
-                        <pre><code class="sql" data-trim data-noescape>
-                        SELECT nombre, salario
-                        FROM Empleados
-                        WHERE salario > 50000
-                        ORDER BY salario DESC;
-                        </code></pre>
-                        <p style="font-size: 0.9em;">SQL es <strong>Declarativo</strong>: Le dices a la base de datos QUÉ quieres, no CÓMO conseguirlo.</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-code-compare"></i> Equivalencias: SQL vs Pandas</h2>
-                    <p>La filosofía relacional vive dentro de Pandas.</p>
-                    <table class="comparison-table box-glass">
-                        <tr>
-                            <th>Operación</th>
-                            <th>SQL</th>
-                            <th>Pandas</th>
-                        </tr>
-                        <tr>
-                            <td><strong>SELECT</strong></td>
-                            <td><code>SELECT col1, col2 FROM df</code></td>
-                            <td><code>df[['col1', 'col2']]</code></td>
-                        </tr>
-                        <tr>
-                            <td><strong>WHERE</strong></td>
-                            <td><code>SELECT * FROM df WHERE col1 > 10</code></td>
-                            <td><code>df[df['col1'] > 10]</code></td>
-                        </tr>
-                        <tr>
-                            <td><strong>GROUP BY</strong></td>
-                            <td><code>SELECT col1, SUM(col2) GROUP BY col1</code></td>
-                            <td><code>df.groupby('col1')['col2'].sum()</code></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ORDER BY</strong></td>
-                            <td><code>ORDER BY col1 DESC</code></td>
-                            <td><code>df.sort_values('col1', ascending=False)</code></td>
-                        </tr>
-                        <tr>
-                            <td><strong>JOIN / Merge</strong></td>
-                            <td><code>SELECT * FROM t1 JOIN t2 ON t1.id = t2.id</code></td>
-                            <td><code>pd.merge(t1, t2, on='id')</code></td>
-                        </tr>
-                    </table>
-                </section>
-            </section>
-
-            <!-- Slide 7: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Data Cleansing:</strong> Limpieza de datos.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Missing Values (NaN):</strong> Valores faltantes.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Imputation:</strong> Imputación (Rellenar vacíos).</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Query:</strong> Consulta (en SQL).</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Join / Merge:</strong> Unión de tablas.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Outlier:</strong> Valor atípico extremo.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 8: Pair Programming -->
-            <section data-state="cyber-mode">
-                <h2><i class="fa-solid fa-terminal"></i> Pair Programming</h2>
-                <div class="box-glass">
-                    <h3 class="cyber-accent">Misión: El Conserje de Datos</h3>
-                    <p>Abran Google Colab y carguen el <code>Colab_Guiado_Semana_4.ipynb</code>.</p>
-                    <p>Hoy recibiremos un Dataset intencionalmente "sucio". Usaremos <code>.info()</code> e <code>.isnull().sum()</code> para auditar el daño.</p>
-                    <p>Imputaremos valores numéricos, borraremos filas irrecuperables y cruzaremos (Merge) dos tablas distintas imitando un JOIN de SQL.</p>
-                    <p><i class="fa-solid fa-code" style="color: #00ffcc;"></i> ¡Pónganse los guantes!</p>
-                </div>
-            </section>
-
-            <!-- Slide 9: Cyber Status y Conclusiones -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
-                    <div class="box-glass" style="min-height: 200px;">
-                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
-                    <div class="box-glass" style="margin-bottom: 20px;">
-                        <ul>
-                            <li>La calidad del modelo predictivo nunca superará la calidad de los datos de entrada. La limpieza es la fase más crítica.</li>
-                            <li>Pandas adopta y emula el poder de SQL mediante operaciones relacionales como <code>merge</code> y <code>groupby</code>, permitiendo transformar datos estructuralmente.</li>
-                            <li>Eliminar datos faltantes es fácil pero peligroso; imputarlos es inteligente pero introduce ruido artificial. El Data Scientist debe equilibrar ambos.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
-                        <strong>Bibliografía de la Clase:</strong>
-                        <ul>
-                            <li>Mertz, D. (2021). <em>Cleaning Data for Effective Data Science: Doing the other 80% of the work with Python, R, and command-line tools</em>. Packt Publishing.</li>
-                            <li>Forta, B. (2012). <em>Sams Teach Yourself SQL in 10 Minutes</em>. Sams Publishing.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
-
-        </div>
+<!-- 4 RAE -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:140px;top:100px;width:1320px">
+    <p class="rot">Resultado de aprendizaje 1.2</p>
+    <h2 style="font-size:52px;margin:16px 0 30px">Mide la distancia entre atributos categóricos, atributos ordinales y tipos mixtos.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="scan-search" style="font-size:62px;color:var(--cinta)"></i><p style="font-size:32px">Encuentras vacíos disfrazados y valores imposibles en datos mixtos.</p>
+      <i class="ico" data-i="scale" style="font-size:62px;color:var(--cinta)"></i><p style="font-size:32px">Comparas borrar, imputar o marcar, y mides el efecto de cada decisión.</p>
+      <i class="ico" data-i="clipboard-list" style="font-size:62px;color:var(--cinta)"></i><p style="font-size:32px">Documentas cada limpieza en una bitácora reproducible.</p>
     </div>
+  </div>
+  <aside class="notas">Un conjunto con atributos mixtos (edad numérica, ocupación nominal, educación ordinal) es justo el que necesita la distancia de Gower: pero si tiene vacíos, primero hay que decidir qué hacer con ellos. Por eso la limpieza va antes que el agrupamiento.</aside>
+</section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
-    
-    <script>
-        Reveal.initialize({
-            hash: true, transition: 'slide', controls: true, progress: true,
-            margin: 0.1, minScale: 0.2, maxScale: 2.0,
-            mathjax2: {
-                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
-                config: 'TeX-AMS_HTML-full',
-                tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    displayMath: [['$$','$$'], ['\\[','\\]']]
-                }
-            },
-            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
-        });
+<!-- 5 Inventario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Inventario de evidencias</p><h2 style="font-size:50px;margin:6px 0 24px">Seis hallazgos en 32.561 filas que pandas no señala solo</h2>
+    <div class="evid">
+      <div class="paso"><em>workclass == "?"</em><b id="e1"></b><span>personas sin tipo de empleo registrado.</span></div>
+      <div class="paso"><em>occupation == "?"</em><b id="e2"></b><span>personas sin ocupación registrada.</span></div>
+      <div class="paso"><em>native_country == "?"</em><b id="e3"></b><span>personas sin país de origen.</span></div>
+      <div class="paso"><em>df.duplicated()</em><b id="e4"></b><span>filas idénticas a otra, columna por columna.</span></div>
+      <div class="paso"><em>capital_gain == 99999</em><b id="e5"></b><span>ganancias exactamente en 99.999: un tope.</span></div>
+      <div class="paso"><em>age == 90</em><b id="e6"></b><span>personas de 90 años, y ninguna de 89.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Ninguno de estos hallazgos aparece con isna(). Todos salen de mirar: value_counts(), describe() y un histograma. La primera regla del laboratorio: inventariar antes de tocar.</aside>
+</section>
 
-        var typedInstance = null;
+<!-- 6 Por qué faltan -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:640px;display:flex;flex-direction:column;gap:20px">
+    <p class="rot">Rubin (1976) · por qué falta un dato</p>
+    <h2 style="font-size:50px;line-height:1.08">¿Faltan al azar? La edad dice que no</h2>
+    <p class="paso" style="font-size:28px"><b>MCAR:</b> falta completamente al azar; nada lo predice.</p>
+    <p class="paso" style="font-size:28px"><b>MAR:</b> falta según otras variables observadas, como la edad.</p>
+    <p class="paso" style="font-size:28px"><b>MNAR:</b> falta según el propio valor que no se ve.</p>
+    <p class="paso" style="font-size:28px">Sin tipo de empleo hay muchos más <b class="acento">jóvenes y mayores de 60</b>: estudiantes y jubilados.</p>
+  </div>
+  <svg id="edades" class="diagrama" viewBox="0 0 780 760" style="position:absolute;left:770px;top:50px;width:780px;height:760px" role="img" aria-label="Porcentaje de menores de 25 y mayores de 60 entre quienes tienen y no tienen tipo de empleo"></svg>
+  <aside class="notas">Rubin (1976), Biometrika: ignorar el proceso que genera los vacíos solo es correcto bajo ciertas condiciones, como que falten al azar. Mediana de edad sin workclass: 35, pero con cuartiles 21 y 61: la distribución es de dos jorobas. No se puede saber con los datos si es MNAR; sí se puede descartar MCAR.</aside>
+</section>
 
-        Reveal.on('slidechanged', event => {
-            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
-                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
-                setTimeout(() => {
-                    typedInstance = new Typed('#typed-output', {
-                        strings: [
-                            "> Escaneando integridad del DataFrame...",
-                            "> ADVERTENCIA: 23% de valores NaN detectados.",
-                            "> Iniciando protocolo de imputación estadística...",
-                            "> Ejecutando Inner Join (Merge) con tabla de metadatos.",
-                            "> Limpieza completada. Datos listos para entrenamiento.",
-                            "> [SISTEMA] Garbage In neutralizado."
-                        ],
-                        typeSpeed: 30,
-                        backSpeed: 10,
-                        loop: false,
-                        showCursor: true,
-                        cursorChar: '█'
-                    });
-                }, 500);
-            } else if (typedInstance) {
-                typedInstance.destroy();
-                var el = document.getElementById('typed-output');
-                if(el) el.innerHTML = '';
-            }
-        });
-    </script>
+<!-- 7 Vacío estructural -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:1424px"><p class="rot">Evidencia que se explica sola</p><h2 style="font-size:50px;margin-top:6px">Algunos vacíos no son pérdidas: la pregunta no aplicaba</h2></div>
+  <div style="position:absolute;left:88px;top:220px;width:1424px;display:grid;grid-template-columns:1fr 1fr;gap:26px">
+    <div class="hoja paso"><i class="ico" data-i="link" style="font-size:54px;color:var(--cinta)"></i><h3 style="font-size:36px;margin:10px 0">Vienen juntos</h3><p style="font-size:28px">Las <b id="v1"></b> personas sin tipo de empleo tampoco tienen ocupación: es un solo hueco, no dos.</p></div>
+    <div class="hoja paso"><i class="ico" data-i="user-minus" style="font-size:54px;color:var(--cinta)"></i><h3 style="font-size:36px;margin:10px 0">No aplica</h3><p style="font-size:28px"><b id="v2"></b> personas "Never-worked" no tienen ocupación porque nunca trabajaron. Imputarles una sería inventar.</p></div>
+  </div>
+  <p class="paso sec" style="position:absolute;left:88px;top:640px;width:1424px;font-size:28px">Total con ocupación vacía: <b id="v3"></b> = <span id="v4"></span> + 7. La aritmética del vacío también se verifica.</p>
+  <aside class="notas">pd.crosstab(df.workclass == "?", df.occupation == "?") muestra el patrón. Un vacío estructural se codifica como categoría propia ("No aplica"), no se imputa.</aside>
+</section>
+
+<!-- 8 Borrar sesga -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Decisión 1 · borrar filas</p><h2 style="font-size:50px;margin-top:6px">Borrar el 7,4 % de las filas sube la tasa de ingreso alto</h2></div>
+  <svg id="borrar" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:200px;width:1424px;height:560px" role="img" aria-label="Filas y tasa de ingreso alto antes y después de borrar las filas con vacíos"></svg>
+  <aside class="notas">dropna() o df[~(df == "?").any(axis=1)]: de 32.561 a 30.162 filas. La tasa sube 0,8 puntos porque las personas borradas tenían menos ingresos altos (13,9 %). En un modelo, eso sesga la predicción para jóvenes y jubilados.</aside>
+</section>
+
+<!-- 9 Imputar con la moda -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:660px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Decisión 2 · imputar con la moda</p>
+    <h2 style="font-size:50px;line-height:1.08">Llenar con lo más común contamina ese grupo</h2>
+    <p class="paso" style="font-size:29px">Ocupación más común: <b id="m1"></b>. Ingresos altos en ese grupo: <b class="acento" id="m2"></b>.</p>
+    <p class="paso" style="font-size:29px">Imputados los vacíos con esa ocupación, el grupo baja a <b class="acento" id="m3"></b>.</p>
+    <p class="paso" style="font-size:29px">"Private" pasa de <b id="m4"></b> a <b id="m5"></b> del tipo de empleo: se infla la categoría dominante.</p>
+    <p class="paso sec" style="font-size:26px">La moda no es neutral: les asigna a estudiantes y jubilados el perfil de un profesional.</p>
+  </div>
+  <svg id="moda" class="diagrama" viewBox="0 0 760 740" style="position:absolute;left:800px;top:70px;width:760px;height:740px" role="img" aria-label="Tasa de ingreso alto del grupo Prof-specialty antes y después de imputar"></svg>
+  <aside class="notas">Prof-specialty: especialistas profesionales. Imputar con la moda es rápido pero cambia las relaciones entre variables. Alternativa honesta: una categoría "Desconocido" y una columna que marque qué fila tenía vacío. La imputación múltiple (Sterne y otros, 2009; van Buuren, 2011) estima la incertidumbre de lo imputado.</aside>
+</section>
+
+<!-- 10 Decisión 3 -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:120px;top:70px;width:1360px">
+    <p class="rot">Decisión 3 · marcar y conservar</p>
+    <h2 style="font-size:48px;margin:12px 0 24px">Tres opciones honestas, de la más simple a la más rigurosa</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:22px 18px;align-items:center">
+      <i class="ico paso" data-i="tag" style="font-size:56px;color:var(--cinta)"></i><p class="paso" style="font-size:30px"><b>Categoría propia:</b> "Desconocido" o "No aplica". Conserva las filas y no inventa.</p>
+      <i class="ico paso" data-i="flag" style="font-size:56px;color:var(--cinta)"></i><p class="paso" style="font-size:30px"><b>Indicador de vacío:</b> una columna 0 o 1. El modelo aprende si faltar predice algo.</p>
+      <i class="ico paso" data-i="layers" style="font-size:56px;color:var(--cinta)"></i><p class="paso" style="font-size:30px"><b>Imputación múltiple:</b> varias versiones plausibles del dato y resultados combinados.</p>
+      <i class="ico paso" data-i="clipboard-list" style="font-size:56px;color:var(--acento-texto)"></i><p class="paso" style="font-size:30px"><b>Siempre:</b> anotar la decisión, el motivo y el efecto en la bitácora.</p>
+    </div>
+  </div>
+  <aside class="notas">Sterne y otros (2009), BMJ, describen el uso y la forma de reportar la imputación múltiple; van Buuren y Groothuis-Oudshoorn (2011) documentan el paquete mice. En Python, scikit-learn tiene IterativeImputer (experimental).</aside>
+</section>
+
+<!-- 11 Atípicos: tres reglas -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Atípicos · horas trabajadas por semana</p><h2 style="font-size:48px;margin-top:6px">Tres reglas, tres respuestas: depende de la forma</h2></div>
+  <svg id="horas" class="diagrama" viewBox="0 0 900 640" style="position:absolute;left:60px;top:180px;width:900px;height:640px" role="img" aria-label="Histograma de horas trabajadas por semana con un pico enorme en 40"></svg>
+  <div style="position:absolute;left:1000px;top:200px;width:520px;display:flex;flex-direction:column;gap:20px">
+    <p class="paso" style="font-size:28px">El <b class="acento" id="h40"></b> trabaja exactamente 40 horas.</p>
+    <p class="paso" style="font-size:28px">Media ± 3 desviaciones: <b id="hz"></b> atípicos.</p>
+    <p class="paso" style="font-size:28px">Rango intercuartílico: <b class="acento" id="hiqr"></b>, el <span id="hiqrp"></span>. Q1 = Q3 − 5.</p>
+    <p class="paso" style="font-size:28px">Mediana ± 3 MAD: <b id="hmad"></b>.</p>
+    <p class="paso sec" style="font-size:25px">Con un pico tan alto, la caja es angosta y las reglas marcan a quien trabaja 30 horas. Un atípico no se decide con una fórmula.</p>
+  </div>
+  <aside class="notas">Q1 = 40, Q3 = 45, RIC = 5: límites 32,5 y 52,5. Leys y otros (2013) recomiendan la mediana y la MAD frente a la media y la desviación estándar, pero aquí también fallan: la MAD es 3. Rousseeuw y Hubert (2011) explican por qué los métodos robustos buscan el modelo de la mayoría.</aside>
+</section>
+
+<!-- 12 Topes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Valores imposibles · topes de registro</p><h2 style="font-size:50px;margin-top:6px">99.999 y 90 no son medidas: son techos</h2></div>
+  <svg id="topes" class="diagrama" viewBox="0 0 1424 600" style="position:absolute;left:88px;top:190px;width:1424px;height:600px" role="img" aria-label="Final de la distribución de edad con un salto en 90 y ganancias de capital con un salto en 99.999"></svg>
+  <aside class="notas">Ganancias: 91,7 % son cero; el máximo distinto del tope es 41.310 y luego 159 personas en 99.999. Media con tope 1.078; sin él, 592. Edad: 43 personas en 90, ninguna en 89 y 3 en 88: el censo agrupa a todos los de 90 o más. Se documenta, no se borra: son personas reales con un valor truncado.</aside>
+</section>
+
+<!-- 13 Duplicados -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:760px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Evidencia ambigua · duplicados</p>
+    <h2 style="font-size:52px;line-height:1.08">24 filas idénticas: ¿error o dos personas iguales?</h2>
+    <p class="paso" style="font-size:30px">Las 15 columnas coinciden, incluido el peso muestral <code>fnlwgt</code>, que casi nunca se repite.</p>
+    <p class="paso" style="font-size:30px">Es más probable un registro duplicado que dos personas idénticas en todo.</p>
+    <p class="paso sec" style="font-size:26px">Decisión del curso: se conservan para análisis descriptivo y se eliminan antes de entrenar modelos (semana 12). Las dos cosas se anotan.</p>
+  </div>
+  <div class="codigo paso" style="position:absolute;left:900px;top:180px;width:620px;font-size:23px">df.duplicated().sum()
+<b id="d1"></b>
+df[df.duplicated(keep=False)]
+<i># las 48 filas: originales y copias</i></div>
+  <aside class="notas">En la semana 12, el conjunto de churn tenía 300 filas repetidas que inflaban la validación cruzada. Aquí son 24 de 32.561: poco peso, pero el procedimiento es el mismo.</aside>
+</section>
+
+<!-- 14 Reto -->
+<section class="esc">
+  <svg id="reto" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco pasos del Dirty Data Challenge"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana4.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del reto</a>
+  <aside class="notas">Equipos de tres: forense (diagnostica), juez (decide y justifica) y cronista (escribe la bitácora). NotebookLM puede proponer opciones a partir de los artículos de la guía; el equipo justifica la elección con datos. Gana la bitácora mejor argumentada, no la tabla más "limpia".</aside>
+</section>
+
+<!-- 15 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="hoja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · reading a classic</p>
+    <p class="cita" style="margin:22px 0 18px">“It is appropriate to ignore the process that causes missing data if the missing data are <span class="acento">‘missing at random’</span>…”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Rubin (1976), Inference and missing data, Biometrika 63(3), 581-592</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--cinta)"></i><p class="paso" style="font-size:31px">Are the missing workclass values missing at random? What is your evidence?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--cinta)"></i><p class="paso" style="font-size:31px">Explain in English why dropping 7.4 % of the rows changed the income rate.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--cinta)"></i><p class="paso" style="font-size:31px">Write one line of your cleaning log: “We decided to… because…”.</p>
+    </div>
+    <p class="paso" style="font-size:25px;margin-top:22px;color:var(--tinta-2)"><b>Words:</b> missing value · to impute · outlier · duplicate · top-coded · bias · cleaning log</p>
+  </div>
+  <aside class="notas">Cita textual del resumen de Rubin (1976). Es el artículo que definió el vocabulario de los datos faltantes.</aside>
+</section>
+
+<!-- 16 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Manual del laboratorio</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="eye-off"></i><b>Vacío disfrazado</b><span>Un "?", un 0 o un 99 que significa "no sé".</span></div>
+      <div><i class="ico" data-i="shuffle"></i><b>MCAR</b><span>Falta completamente al azar.</span></div>
+      <div><i class="ico" data-i="git-branch"></i><b>MAR</b><span>Falta según otras variables observadas.</span></div>
+      <div><i class="ico" data-i="eye-closed"></i><b>MNAR</b><span>Falta según el valor que no se ve.</span></div>
+      <div><i class="ico" data-i="user-minus"></i><b>Estructural</b><span>Falta porque la pregunta no aplicaba.</span></div>
+      <div><i class="ico" data-i="replace"></i><b>Imputar</b><span>Llenar un vacío con un valor estimado.</span></div>
+      <div><i class="ico" data-i="flag"></i><b>Indicador</b><span>Columna que marca qué fila tenía vacío.</span></div>
+      <div><i class="ico" data-i="crosshair"></i><b>Atípico</b><span>Raro respecto a su grupo; se explica antes de decidir.</span></div>
+      <div><i class="ico" data-i="arrow-right-to-line"></i><b>Tope</b><span>Valor máximo de registro: 99.999, 90 años.</span></div>
+      <div><i class="ico" data-i="clipboard-list"></i><b>Bitácora</b><span>Qué se cambió, por qué y con qué efecto.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Estos términos entran en la Evaluación auténtica de la semana 8.</aside>
+</section>
+
+<!-- 17 Cierre -->
+<section class="esc">
+  <div class="hoja naranja" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot" style="color:var(--acento-texto)">Conclusiones</p>
+    <h2 style="font-size:54px;margin:12px 0 30px">Tres reglas del laboratorio</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="scan-search" style="font-size:60px;color:var(--cinta)"></i><p class="paso" style="font-size:34px"><b>Inventariar antes de tocar:</b> isna() no ve los vacíos disfrazados.</p>
+      <i class="ico paso" data-i="scale" style="font-size:60px;color:var(--cinta)"></i><p class="paso" style="font-size:34px"><b>Toda limpieza cambia el resultado:</b> mida cuánto.</p>
+      <i class="ico paso" data-i="clipboard-list" style="font-size:60px;color:var(--cinta)"></i><p class="paso" style="font-size:34px"><b>Documentar cada decisión</b> para que otro la pueda repetir o discutir.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 5: estadística descriptiva con datos de clientes de una empresa de telecomunicaciones.</p>
+  </div>
+  <aside class="notas">Pregunta de salida: ¿qué decisión de limpieza de su equipo cambiaría si el objetivo fuera predecir el ingreso de jóvenes?</aside>
+</section>
+
+<!-- 18 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px" class="bib">
+    <p class="rot">Fuentes del laboratorio</p>
+    <h2 style="font-size:48px;margin:6px 0 16px">Bibliografía y datos</h2>
+    <p>Becker, B. y Kohavi, R. (1996). <em>Adult</em> [conjunto de datos]. UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5XW20" target="_blank" rel="noopener">doi:10.24432/C5XW20</a></p>
+    <p>Rubin, D. B. (1976). Inference and missing data. <em>Biometrika</em>, 63(3), 581-592. <a href="https://doi.org/10.1093/biomet/63.3.581" target="_blank" rel="noopener">doi:10.1093/biomet/63.3.581</a></p>
+    <p>Sterne, J. A. C. y otros (2009). Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls. <em>BMJ</em>, 338, b2393. <a href="https://doi.org/10.1136/bmj.b2393" target="_blank" rel="noopener">doi:10.1136/bmj.b2393</a></p>
+    <p>van Buuren, S. y Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by chained equations in R. <em>Journal of Statistical Software</em>, 45(3). <a href="https://doi.org/10.18637/jss.v045.i03" target="_blank" rel="noopener">doi:10.18637/jss.v045.i03</a></p>
+    <p>Rousseeuw, P. J. y Hubert, M. (2011). Robust statistics for outlier detection. <em>WIREs Data Mining and Knowledge Discovery</em>, 1(1), 73-79. <a href="https://doi.org/10.1002/widm.2" target="_blank" rel="noopener">doi:10.1002/widm.2</a></p>
+    <p>Leys, C., Ley, C., Klein, O., Bernard, P. y Licata, L. (2013). Detecting outliers: Do not use standard deviation around the mean, use absolute deviation around the median. <em>Journal of Experimental Social Psychology</em>, 49(4), 764-766. <a href="https://doi.org/10.1016/j.jesp.2013.03.013" target="_blank" rel="noopener">doi:10.1016/j.jesp.2013.03.013</a> · Iconos: Lucide, ISC. Cifras: <span class="mono">cifras_1a6.py</span>. Uso de IA: Claude ayudó a programar y redactar; el docente revisó cada cifra y cita.</p>
+  </div>
+  <aside class="notas">Cifras: Material_Privado/Cifras/cifras_s04.json.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, num = DS.num, txt = DS.txt, P = S.signo_pregunta, T = S.tasa_alto_ingreso, H = S.horas, G = S.capital_gain;
+  function pon(id, v) { document.getElementById(id).textContent = v; }
+  function pct(x) { return num(x, 1) + ' %'; }
+  var tot = P.workclass + P.occupation + P.native_country;
+  pon('pIsna', S.isna_pandas); pon('pSignos', num(tot));
+  pon('pPerd', pct(S.filas_con_alguno_pct)); pon('pT0', pct(T.todos)); pon('pT1', pct(S.tras_borrar.tasa_alto_ingreso)); pon('pT2', pct(T.con_signo));
+  pon('e1', num(P.workclass)); pon('e2', num(P.occupation)); pon('e3', num(P.native_country)); pon('e4', S.duplicadas); pon('e5', G.n_99999); pon('e6', S.edad_90);
+  pon('v1', num(S.workclass_y_ocupacion_juntos)); pon('v2', S.ocupacion_sin_dato_y_nunca_trabajo); pon('v3', num(P.occupation)); pon('v4', num(S.workclass_y_ocupacion_juntos));
+  pon('m1', S.ocupacion.moda); pon('m2', pct(S.ocupacion.tasa_alto_ingreso_moda_antes)); pon('m3', pct(S.ocupacion.tasa_alto_ingreso_moda_despues)); pon('m4', pct(S.imputar_moda.pct_antes)); pon('m5', pct(S.imputar_moda.pct_despues));
+  pon('h40', pct(H.exactamente_40_pct)); pon('hz', num(H.z3_fuera)); pon('hiqr', num(H.iqr_fuera)); pon('hiqrp', pct(H.iqr_fuera_pct)); pon('hmad', num(H.mad_3_fuera)); pon('d1', S.duplicadas);
+
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apuesta', 'dice-5'], ['7:10', 'Inventario', 'scan-search'], ['7:30', 'Por qué faltan', 'circle-help'], ['7:55', 'Decisiones', 'scale'], ['8:20', 'Pausa', 'coffee'], ['8:35', 'English', 'languages'], ['8:45', 'Dirty Data', 'eraser'], ['9:55', 'Cierre', 'flag']], 6, { color: 'var(--cinta)' }));
+
+  /* Apuesta: tres barras de tasa */
+  var a = '', F = [['Todas', T.todos, 'var(--punto)'], ['Filas completas', S.tras_borrar.tasa_alto_ingreso, 'var(--cinta)'], ['Filas con algún "?"', T.con_signo, 'var(--compra)']];
+  F.forEach(function (f, i) {
+    var h = f[1] / 30 * 520, x = 70 + i * 220;
+    a += '<g' + (i ? ' class="paso-capa"' : '') + '><rect x="' + x + '" y="' + (620 - h) + '" width="160" height="' + h + '" fill="' + f[2] + '"/>' + txt(x + 80, 600 - h, pct(f[1]), 't-n', ' text-anchor="middle" font-size="34"') + txt(x + 80, 662, f[0], 't-s', ' text-anchor="middle" font-size="22"') + '</g>';
+  });
+  a += txt(70, 60, 'Personas con ingreso mayor a 50.000 dólares', 't-s', ' font-size="24"');
+  CUR.poner('apuesta', a);
+
+  /* Edades: menores de 25 y mayores de 60 */
+  var e = '', W = S.edad_sin_workclass, R = S.edad_con_workclass;
+  [['Menores de 25', W.menores_25_pct, R.menores_25_pct], ['60 años o más', W.mayores_60_pct, R.mayores_60_pct]].forEach(function (g, i) {
+    var y0 = 90 + i * 300;
+    e += txt(20, y0, g[0], 't-n', ' font-size="30"');
+    [['Sin tipo de empleo', g[1], 'var(--compra)'], ['Con tipo de empleo', g[2], 'var(--punto)']].forEach(function (b, j) {
+      var w = b[1] / 40 * 560, y = y0 + 30 + j * 96;
+      e += '<rect x="20" y="' + y + '" width="' + w + '" height="64" fill="' + b[2] + '"/>' + txt(32 + w, y + 44, pct(b[1]), j ? 't-n' : 't-o', ' font-size="30"') + txt(20, y + 88, b[0], 't-s', ' font-size="21"');
+    });
+  });
+  CUR.poner('edades', e);
+
+  /* Borrar: filas y tasa */
+  var b = '', X = DS.esc(0, 0, 32561, 300, 1300);
+  b += txt(0, 60, 'Filas', 't-c', ' font-size="30"');
+  b += '<rect x="300" y="30" width="' + (X(S.filas) - 300) + '" height="56" fill="var(--punto)"/>' + txt(310 + X(S.filas) - 300, 70, num(S.filas), 't-n', ' font-size="28"');
+  b += '<g class="paso-capa"><rect x="300" y="100" width="' + (X(S.tras_borrar.filas) - 300) + '" height="56" fill="var(--cinta)"/>' + txt(310 + X(S.tras_borrar.filas) - 300, 140, num(S.tras_borrar.filas) + ' tras borrar', 't-n', ' font-size="28"') + '</g>';
+  b += txt(0, 300, 'Ingreso alto', 't-c', ' font-size="30"');
+  var Y2 = function (v) { return 300 + v / 30 * 1000; };
+  b += '<rect x="300" y="270" width="' + (Y2(T.todos) - 300) + '" height="56" fill="var(--punto)"/>' + txt(310 + Y2(T.todos) - 300, 310, pct(T.todos) + ' antes', 't-n', ' font-size="28"');
+  b += '<g class="paso-capa"><rect x="300" y="340" width="' + (Y2(S.tras_borrar.tasa_alto_ingreso) - 300) + '" height="56" fill="var(--cinta)"/>' + txt(310 + Y2(S.tras_borrar.tasa_alto_ingreso) - 300, 380, pct(S.tras_borrar.tasa_alto_ingreso) + ' después', 't-o', ' font-size="28"') + '</g>';
+  b += '<g class="paso">' + txt(300, 480, 'Las filas borradas tenían ' + pct(T.con_signo) + ' de ingreso alto: no eran una muestra al azar.', 't-s', ' font-size="27"') + '</g>';
+  CUR.poner('borrar', b);
+
+  /* Moda */
+  var m = '', O = S.ocupacion;
+  [['Antes', O.tasa_alto_ingreso_moda_antes, 'var(--punto)'], ['Después de imputar', O.tasa_alto_ingreso_moda_despues, 'var(--compra)']].forEach(function (f, i) {
+    var h = f[1] / 50 * 520, x = 120 + i * 300;
+    m += '<g' + (i ? ' class="paso-capa"' : '') + '><rect x="' + x + '" y="' + (620 - h) + '" width="200" height="' + h + '" fill="' + f[2] + '"/>' + txt(x + 100, 600 - h, pct(f[1]), 't-n', ' text-anchor="middle" font-size="38"') + txt(x + 100, 664, f[0], 't-s', ' text-anchor="middle" font-size="24"') + '</g>';
+  });
+  m += txt(120, 60, 'Ingreso alto en ' + O.moda, 't-s', ' font-size="24"');
+  CUR.poner('moda', m);
+
+  /* Horas: histograma */
+  var hh = DS.histo({ x: 90, y: 40, w: 780, h: 480, vals: C.horas, bins: [0, 100, 2], yt: [0, 5000, 10000, 15000], xt: [0, 20, 40, 60, 80, 99], xl: 'Horas por semana', color: function (v) { return v === 40 ? 'var(--cinta)' : (v < H.iqr_limites[0] || v >= H.iqr_limites[1] ? 'var(--compra)' : 'var(--punto)'); } });
+  var hs = hh.s + '<g class="paso">' + '<line x1="' + hh.X(H.iqr_limites[0]) + '" x2="' + hh.X(H.iqr_limites[0]) + '" y1="40" y2="520" stroke="var(--compra)" stroke-width="3" stroke-dasharray="9 7"/>' + '<line x1="' + hh.X(H.iqr_limites[1]) + '" x2="' + hh.X(H.iqr_limites[1]) + '" y1="40" y2="520" stroke="var(--compra)" stroke-width="3" stroke-dasharray="9 7"/>' + txt(hh.X(52.5) + 10, 80, 'límites del RIC: 32,5 y 52,5', 't-o', ' font-size="22"') + '</g>';
+  hs += txt(hh.X(40) + 22, 120, '40 horas', 't-c', ' font-size="24"');
+  CUR.poner('horas', hs);
+
+  /* Topes: final de la edad y ganancias */
+  var tp = '', edades = {};
+  C.edad.forEach(function (v) { if (v >= 80) edades[v] = (edades[v] || 0) + 1; });
+  var Xa = DS.esc(0, 79.5, 90.5, 40, 640), Ya = DS.esc(0, 0, 50, 520, 80);
+  tp += txt(40, 40, 'Edad: cuántas personas por año, de 80 a 90', 't-c', ' font-size="26"');
+  for (var v = 80; v <= 90; v++) { var n = edades[v] || 0; tp += '<rect x="' + (Xa(v) - 22) + '" y="' + Ya(n) + '" width="44" height="' + (Ya(0) - Ya(n)) + '" fill="' + (v === 90 ? 'var(--compra)' : 'var(--punto)') + '"/>' + txt(Xa(v), Ya(n) - 10, n, v === 90 ? 't-o' : 't-n', ' text-anchor="middle" font-size="22"') + txt(Xa(v), 556, v, 't-eje', ' text-anchor="middle" font-size="20"'); }
+  tp += '<g class="paso">' + txt(760, 40, 'Ganancias de capital distintas de cero', 't-c', ' font-size="26"');
+  var gan = C.gan.filter(function (x) { return x > 0; }), Xg = DS.esc(0, 0, 100000, 760, 1400), cajas = {};
+  gan.forEach(function (x) { var k = Math.floor(x / 5000); cajas[k] = (cajas[k] || 0) + 1; });
+  var mx = Math.max.apply(null, Object.keys(cajas).map(function (k) { return cajas[k]; })), Yg = DS.esc(0, 0, mx, 520, 80);
+  Object.keys(cajas).forEach(function (k) { var x0 = Xg(k * 5000); tp += '<rect x="' + (x0 + 1) + '" y="' + Yg(cajas[k]) + '" width="' + (Xg(5000) - Xg(0) - 2) + '" height="' + (Yg(0) - Yg(cajas[k])) + '" fill="' + (+k === 19 ? 'var(--compra)' : 'var(--punto)') + '"/>'; });
+  [0, 50000, 99999].forEach(function (t) { tp += txt(Xg(t), 556, num(t), 't-eje', ' text-anchor="middle" font-size="20"'); });
+  tp += txt(Xg(99999) - 10, Yg(cajas[19]) - 14, num(G.n_99999) + ' en 99.999', 't-o', ' text-anchor="end" font-size="24"') + txt(760, 596, 'Media con el tope ' + num(G.media) + '; sin él ' + num(G.media_sin_99999) + '. Hueco entre ' + num(G.max_sin_99999) + ' y 99.999.', 't-s', ' font-size="21"') + '</g>';
+  CUR.poner('topes', tp);
+
+  CUR.poner('reto', DS.ruta([['scan-search', 'Inventario', 'qué hay y dónde'], ['circle-help', 'Hipótesis', '¿por qué falta?'], ['scale', 'Decisión', 'borrar, imputar o marcar'], ['ruler', 'Efecto', 'antes y después'], ['clipboard-list', 'Bitácora', 'decisión y motivo']],
+    'Dirty Data Challenge: 70 minutos, una bitácora defendible', 'Equipos de tres: forense, juez y cronista · Colab · gana la mejor justificación', 'var(--cinta)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
 </body>
 </html>

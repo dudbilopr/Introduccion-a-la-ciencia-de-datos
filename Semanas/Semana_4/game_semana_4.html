@@ -65,14 +65,14 @@
             </div>
         </div>
 
-        <div class="flex gap-8">
+        <div class="flex flex-wrap justify-center gap-3 sm:gap-8">
             <div class="text-center">
                 <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Nivel</p>
                 <p class="text-2xl font-bold text-blue-400" id="level-display">1 <span class="text-sm text-gray-500">/ 10</span></p>
             </div>
             <div class="text-center">
                 <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Quality Score (R²)</p>
-                <div class="w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
+                <div class="w-36 sm:w-48 h-6 bg-gray-800 rounded-full overflow-hidden border border-gray-600 relative">
                     <div id="health-bar" class="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 transition-all duration-300" style="width: 100%;"></div>
                     <span id="health-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold drop-shadow-md">1.00</span>
                 </div>

@@ -1,191 +1,22 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Semana 4: Exploratory Data Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#003865', /* UNAB Blue */
-                        secondary: '#E85C0B' /* UNAB Orange */
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .quiz-container { max-w-3xl mx-auto my-10 bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary; }
-        .option-btn {
-            display: block; width: 100%; text-align: left; padding: 12px 20px;
-            margin-bottom: 10px; border: 2px solid #e2e8f0; border-radius: 8px;
-            transition: all 0.2s; cursor: pointer; background: white;
-            color: #334155; font-weight: 500;
-        }
-        .option-btn:hover:not(:disabled) { border-color: #003865; background-color: #f0f4f8; }
-        .option-btn.correct { border-color: #22c55e; background-color: #dcfce7; color: #166534; }
-        .option-btn.incorrect { border-color: #ef4444; background-color: #fee2e2; color: #991b1b; }
-        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
 </head>
-<body class="p-6">
-
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border-t-4 border-primary relative overflow-hidden">
-        <!-- EMI Tag -->
-        <div class="absolute top-0 right-0 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-            EMI Activity
-        </div>
-
-        <h1 class="text-3xl font-bold text-primary mb-2"><i class="fas fa-clipboard-check mr-2 text-secondary"></i> Knowledge Check</h1>
-        <p class="text-gray-600 mb-8 border-b pb-4">Test your understanding of Exploratory Data Analysis (EDA) and Visualization techniques.</p>
-
-        <div id="quiz-container">
-            <!-- Question template will be injected here -->
-        </div>
-
-        <div id="results-container" class="hidden text-center py-8">
-            <i class="fas fa-award text-6xl text-secondary mb-4"></i>
-            <h2 class="text-2xl font-bold text-primary mb-2">Quiz Completed!</h2>
-            <p class="text-lg text-gray-700 mb-6">Your Score: <span id="score" class="font-bold text-2xl text-secondary"></span> / <span id="total"></span></p>
-            <button onclick="location.reload()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition"><i class="fas fa-redo mr-2"></i>Try Again</button>
-        </div>
-    </div>
-
-    <script>
-        const questions = [
-            {
-                question: "What is the primary goal of Exploratory Data Analysis (EDA)?",
-                options: [
-                    "To train a machine learning model as fast as possible.",
-                    "To discover patterns, spot anomalies, and check assumptions with summary statistics and graphical representations.",
-                    "To deploy a dashboard to production.",
-                    "To write complex SQL queries."
-                ],
-                correct: 1,
-                feedback: "Excellent! EDA is all about understanding your data before applying any complex modeling."
-            },
-            {
-                question: "Which Pandas method is best for checking the number of non-null values and data types in a DataFrame?",
-                options: [
-                    "df.describe()",
-                    "df.head()",
-                    "df.info()",
-                    "df.shape()"
-                ],
-                correct: 2,
-                feedback: "Correct! df.info() provides a concise summary of the DataFrame including Dtypes and non-null counts."
-            },
-            {
-                question: "In the context of dealing with missing data, what does 'imputation' mean?",
-                options: [
-                    "Deleting the entire row that contains a missing value.",
-                    "Replacing missing values with a substituted value (like the mean or median).",
-                    "Creating a new dataframe without missing values.",
-                    "Ignoring the missing values during calculation."
-                ],
-                correct: 1,
-                feedback: "Exactly. Imputation allows you to keep valuable rows by estimating the missing values."
-            },
-            {
-                question: "Which library is best suited for creating interactive, web-based dashboards with hover effects?",
-                options: [
-                    "Matplotlib",
-                    "Seaborn",
-                    "Plotly",
-                    "Pandas"
-                ],
-                correct: 2,
-                feedback: "Spot on! Plotly is designed for interactivity (zoom, hover, pan) in web browsers."
-            },
-            {
-                question: "What is the main purpose of a Boxplot in statistical analysis?",
-                options: [
-                    "To show the correlation between two continuous variables.",
-                    "To display the distribution of data based on a five-number summary and identify outliers.",
-                    "To plot a time series.",
-                    "To represent categorical data as proportions of a whole."
-                ],
-                correct: 1,
-                feedback: "Perfect! Boxplots are the gold standard for visualizing distribution and spotting outliers."
-            }
-        ];
-
-        let currentQuestion = 0;
-        let score = 0;
-
-        function renderQuestion() {
-            if (currentQuestion >= questions.length) {
-                document.getElementById('quiz-container').classList.add('hidden');
-                document.getElementById('results-container').classList.remove('hidden');
-                document.getElementById('score').innerText = score;
-                document.getElementById('total').innerText = questions.length;
-                return;
-            }
-
-            const q = questions[currentQuestion];
-            let html = `
-                <div class="mb-4">
-                    <span class="text-sm font-bold text-gray-500 uppercase tracking-wide">Question ${currentQuestion + 1} of ${questions.length}</span>
-                    <h2 class="text-xl font-semibold text-gray-800 mt-2">${q.question}</h2>
-                </div>
-                <div class="space-y-3">
-            `;
-
-            q.options.forEach((opt, index) => {
-                html += `<button class="option-btn" onclick="checkAnswer(${index}, this)">${opt}</button>`;
-            });
-
-            html += `
-                </div>
-                <div id="feedback" class="mt-6 hidden p-4 rounded-lg"></div>
-                <button id="next-btn" onclick="nextQuestion()" class="mt-6 bg-secondary text-white px-6 py-2 rounded-lg font-bold hidden hover:bg-orange-700 transition">Next Question <i class="fas fa-arrow-right ml-2"></i></button>
-            `;
-
-            document.getElementById('quiz-container').innerHTML = html;
-        }
-
-        window.checkAnswer = function(selectedIndex, btn) {
-            const q = questions[currentQuestion];
-            const buttons = document.querySelectorAll('.option-btn');
-            
-            buttons.forEach((b, i) => {
-                b.disabled = true;
-                if (i === q.correct) {
-                    b.classList.add('correct');
-                    b.innerHTML += ' <i class="fas fa-check-circle float-right mt-1"></i>';
-                } else if (i === selectedIndex) {
-                    b.classList.add('incorrect');
-                    b.innerHTML += ' <i class="fas fa-times-circle float-right mt-1"></i>';
-                }
-            });
-
-            const feedbackDiv = document.getElementById('feedback');
-            feedbackDiv.classList.remove('hidden');
-            
-            if (selectedIndex === q.correct) {
-                score++;
-                feedbackDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
-                feedbackDiv.innerHTML = `<strong><i class="fas fa-thumbs-up mr-2"></i> Correct!</strong> ${q.feedback}`;
-            } else {
-                feedbackDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
-                feedbackDiv.innerHTML = `<strong><i class="fas fa-exclamation-triangle mr-2"></i> Incorrect.</strong> The correct answer was option ${q.correct + 1}.`;
-            }
-
-            document.getElementById('next-btn').classList.remove('hidden');
-        }
-
-        window.nextQuestion = function() {
-            currentQuestion++;
-            renderQuestion();
-        }
-
-        // Initialize
-        renderQuestion();
-    </script>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 4, "tema": "Cleaning dirty data", "cierre": "Inventory before you touch, measure the effect of every cleaning decision, and write it in your log.", "preguntas": [
+{"q": "df.isna().sum().sum() returns 0 for the census data, but 1,836 workclass values are \"?\". What does this mean?", "o": ["There are no missing values", "Missing values are disguised as text, so pandas cannot see them", "The question marks are real job types", "isna() is broken"], "a": 1, "e": "Always inspect value_counts(): missing values can hide as \"?\", 0, 99 or empty strings."},
+{"q": "Among people with no workclass, 34.4 % are under 25, against 16.1 % of the rest. Are these values missing completely at random?", "o": ["Yes, they are random", "No: missingness depends on age, an observed variable", "We cannot say anything", "Only if the sample is large"], "a": 1, "e": "This rules out MCAR. It is compatible with MAR; MNAR cannot be tested with these data alone."},
+{"q": "Dropping every row with a \"?\" removes 7.4 % of the data and the high-income rate goes from 24.1 % to 24.9 %. Why?", "o": ["Rounding error", "The removed rows had fewer high incomes (13.9 %), so the remaining sample is biased", "More rows always raise the rate", "Duplicates were removed"], "a": 1, "e": "Dropping is a decision with consequences: it removes many students and retirees."},
+{"q": "After imputing missing occupations with the mode (Prof-specialty), its high-income rate drops from 44.9 % to 34.3 %. What happened?", "o": ["Professionals earn less now", "People who were not professionals were added to that group", "The mode was miscalculated", "Nothing important"], "a": 1, "e": "Mode imputation changes relationships between variables. A separate \"Unknown\" category is more honest."},
+{"q": "With Q1 = 40 and Q3 = 45, the IQR rule flags 9,008 rows (27.7 %) as outliers in hours per week. What is the best reading?", "o": ["A quarter of the census is wrong", "The rule fails because 46.7 % of people work exactly 40 hours and the box is very narrow", "Those rows must be deleted", "The data are fake"], "a": 1, "e": "Outlier rules assume a shape. Look at the histogram before applying any formula."},
+{"q": "There are 43 people aged 90 and none aged 89. What is the most likely explanation?", "o": ["A baby boom in 1904", "Ages were top-coded: 90 means \"90 or older\"", "People aged 89 refused to answer", "A typing error"], "a": 1, "e": "Top-coding protects privacy and limits extreme values. Document it; do not treat 90 as an exact age."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
 </body>
 </html>

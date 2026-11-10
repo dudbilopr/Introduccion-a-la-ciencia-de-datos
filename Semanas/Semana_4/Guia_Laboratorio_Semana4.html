@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 4: Dirty Data Challenge | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Dirty Data Challenge: el censo de 1994 tiene vacíos disfrazados</h1>
+  <p>Reto de aprendizaje basado en problemas. En equipos, investigan los vacíos, duplicados, topes y atípicos reales del censo Adult, comparan tres maneras de limpiar, miden el efecto de cada una y entregan una bitácora que otro equipo pueda repetir y discutir.</p>
+  <div class="datos-clase"><span><b>Semana</b>4</span><span><b>Tiempo</b>70 minutos en clase</span><span><b>Herramientas</b>Colab y NotebookLM</span><span><b>Resultado</b>RAE 1.2</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Inventario</a></li>
+  <li><a href="#e2">2. ¿Por qué faltan?</a></li>
+  <li><a href="#e3">3. Tres decisiones</a></li>
+  <li><a href="#e4">4. Atípicos y topes</a></li>
+  <li><a href="#e5">5. Bitácora</a></li>
+  <li><a href="#ia">El asistente como guía</a></li>
+  <li><a href="#rubrica">Rúbrica</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+</ol></nav>
+<main>
+
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_4/Colab_Guiado_Semana_4.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="simulador_limpieza.html">Mesa de limpieza en el navegador</a>
+    <a class="boton sec" href="../Datos/censo_adult.csv" download>Descargar el CSV</a>
+  </div>
+  <p><code>censo_adult.csv</code>: 32.561 personas y 15 columnas del censo de Estados Unidos de 1994. Adult, Becker y Kohavi (1996), <a href="https://doi.org/10.24432/C5XW20" target="_blank" rel="noopener">UCI, doi:10.24432/C5XW20</a>, CC BY 4.0. El curso solo agregó los nombres de columna de la documentación.</p>
+  <p><strong>Roles:</strong> forense (diagnostica y escribe el código de inventario), juez (decide y justifica cada limpieza), cronista (escribe la bitácora con números). Rotan entre los ejercicios 2 y 3.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Inventario: lo que isna() no ve</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Cuente los vacíos con <code>df.isna().sum()</code>. Después cuente los <code>"?"</code> con <code>(df == "?").sum()</code>.</li>
+    <li>Cuente las filas con algún <code>"?"</code>, las filas duplicadas, las ganancias en 99.999 y las personas de 90 y de 89 años.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>pandas cuenta 0 vacíos. Hay 1.836 <code>"?"</code> en workclass, 1.843 en occupation y 583 en native_country; 2.399 filas (7,4 %) tienen al menos uno. 24 filas están duplicadas, 159 ganancias valen 99.999 y hay 43 personas de 90 años y ninguna de 89.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> ¿Por qué faltan?</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Cruce <code>workclass == "?"</code> con <code>occupation == "?"</code>. ¿Qué patrón ve?</li>
+    <li>¿Qué tienen en común las 7 personas con ocupación vacía pero tipo de empleo conocido?</li>
+    <li>Compare el porcentaje de menores de 25 y de mayores de 60 entre quienes tienen y no tienen tipo de empleo.</li>
+    <li>El juez escribe: ¿MCAR, MAR o MNAR? ¿Qué evidencia tienen? ¿Qué no pueden saber con estos datos?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Las 1.836 personas sin tipo de empleo tampoco tienen ocupación: es un solo hueco. Las otras 7 son "Never-worked": su vacío es estructural, la ocupación no aplica. Sin tipo de empleo, el 34,4 % es menor de 25 y el 28,5 % tiene 60 o más; con tipo de empleo, 16,1 % y 6,9 %. No es MCAR: la falta depende de la edad, que se observa (compatible con MAR). Si además depende del propio empleo no registrado (MNAR), los datos no lo pueden mostrar.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Tres decisiones y su efecto</h2>
+  <p class="meta">18 minutos.</p>
+  <ol class="pasos">
+    <li><strong>Borrar.</strong> Quite las filas con algún <code>"?"</code>. ¿Cuántas quedan? ¿Cómo cambia la tasa de ingreso alto (<code>income == "&gt;50K"</code>)?</li>
+    <li><strong>Imputar con la moda.</strong> Reemplace los <code>"?"</code> de workclass y occupation por su valor más frecuente. Mida la participación de "Private" y la tasa de ingreso alto de la ocupación más frecuente, antes y después.</li>
+    <li><strong>Marcar y conservar.</strong> Reemplace <code>"?"</code> por "Desconocido", agregue una columna indicadora por cada variable y ponga "No aplica" a la ocupación de quienes nunca trabajaron.</li>
+    <li>Repita las tres decisiones en la <a href="simulador_limpieza.html">mesa de limpieza</a> y compare.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Decisión</th><th>Efecto medido</th></tr>
+      <tr><td>Ninguna</td><td>32.561 filas; ingreso alto 24,1 %</td></tr>
+      <tr><td>Borrar</td><td>30.162 filas; ingreso alto 24,9 % (las filas borradas tenían 13,9 %)</td></tr>
+      <tr><td>Imputar con la moda</td><td>"Private" pasa de 73,9 % a 75,3 %; ingreso alto en Prof-specialty, de 44,9 % a 34,3 %</td></tr>
+      <tr><td>Marcar y conservar</td><td>32.561 filas; ninguna tasa cambia; el modelo puede usar el indicador</td></tr>
+    </table>
+    <p>Borrar sesga hacia las personas con empleo registrado. Imputar con la moda les da a estudiantes y jubilados el perfil de un profesional y contamina ese grupo.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Atípicos y topes</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Haga el histograma de <code>hours_per_week</code>. ¿Qué porcentaje trabaja exactamente 40 horas?</li>
+    <li>Cuente los atípicos con tres reglas: media ± 3 desviaciones, rango intercuartílico con 1,5 y mediana ± 3 MAD (escalada por 1,4826).</li>
+    <li>Explique por qué las reglas no están de acuerdo.</li>
+    <li>Compare la media de <code>capital_gain</code> con y sin los valores de 99.999. Mire el conteo de edades de 84 a 90.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>El 46,7 % trabaja exactamente 40 horas. Q1 = 40 y Q3 = 45: los límites del rango intercuartílico son 32,5 y 52,5 y marcan 9.008 filas (27,7 %). Media ± 3 desviaciones: 440. Mediana ± 3 MAD: 7.440 (la MAD es 3). Con un pico tan alto, la caja es muy angosta. Ganancias: media 1.078 con el tope y 592 sin él; el máximo sin tope es 41.310. Edades: 43 personas en 90, ninguna en 89 y 3 en 88: el censo registró "90 o más" como 90.</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> La bitácora</h2>
+  <p class="meta">15 minutos. La escribe el cronista; el equipo la revisa.</p>
+  <pre><code># Bitácora de limpieza · equipo ...
+| # | Evidencia | Decisión | Motivo | Efecto medido |
+|---|-----------|----------|--------|---------------|
+| 1 | 2.399 filas con "?" | ... | ... | ... |
+| 2 | 7 "Never-worked" sin ocupación | ... | ... | ... |
+| 3 | 24 duplicados | ... | ... | ... |
+| 4 | 159 ganancias en 99.999 | ... | ... | ... |
+| 5 | Horas atípicas | ... | ... | ... |</code></pre>
+  <p>La mesa de limpieza genera un borrador de bitácora con sus decisiones: cópielo y complete los motivos.</p>
+</section>
+
+<section id="ia">
+  <h2>El asistente como guía, no como juez</h2>
+  <ol class="pasos">
+    <li>En NotebookLM, suban como fuentes Rubin (1976), Sterne y otros (2009) y Leys y otros (2013), enlazados en la <a href="Investigacion_Semana4.html">guía de investigación</a>.</li>
+    <li>Pregunten: "¿Qué opciones hay para tratar valores faltantes que no faltan al azar?". Anoten las opciones y abran cada cita.</li>
+    <li>La decisión la toma el juez con los números del ejercicio 3, no el asistente. Declaren el uso en la bitácora.</li>
+  </ol>
+</section>
+
+<section id="rubrica">
+  <h2>Rúbrica del reto</h2>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th class="d">Puntos</th><th>Qué se espera</th></tr>
+    <tr><td>Inventario completo</td><td class="d">2</td><td>Los seis hallazgos con sus conteos.</td></tr>
+    <tr><td>Diagnóstico del mecanismo</td><td class="d">2</td><td>MCAR, MAR o MNAR con evidencia y con lo que no se puede saber.</td></tr>
+    <tr><td>Efecto medido</td><td class="d">3</td><td>Cada decisión con su número antes y después.</td></tr>
+    <tr><td>Justificación</td><td class="d">2</td><td>El motivo depende de la pregunta que se quiere responder.</td></tr>
+    <tr><td>Reproducible</td><td class="d">1</td><td>El cuaderno corre de principio a fin y la bitácora coincide con él.</td></tr>
+  </table></div>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Un banco quiere usar este censo para predecir quién gana más de 50.000 dólares y ofrecerle una tarjeta. Escriba media página: ¿qué limpieza elegiría y por qué? ¿A quién perjudicaría borrar las filas con vacíos? Use los números de su bitácora. En la semana 15 se retoma este conjunto para hablar de sesgo.</p>
+</section>
+</main>
+</div>
+<script>/* 2.399 de 32.561 filas tienen algún vacío: un punto por cada 100 personas, en naranja la proporción con "?" */ window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 326; i++) o.push(i < 24 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>
