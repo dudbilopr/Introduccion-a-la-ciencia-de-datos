@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 3: tres sobres y una búsqueda del tesoro | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Tres sobres y una búsqueda del tesoro</h1>
+  <p>Taller de adquisición de datos. Primero abren el mismo indicador del Banco Mundial en CSV, JSON y XML y comprueban que dicen lo mismo. Después, en equipos, buscan en repositorios abiertos un conjunto real que cumpla cinco pistas y lo evalúan con los principios FAIR.</p>
+  <div class="datos-clase"><span><b>Semana</b>3</span><span><b>Tiempo</b>30 + 60 minutos</span><span><b>Herramientas</b>Colab y repositorios abiertos</span><span><b>Resultado</b>RAE 1.2</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. CSV con metadatos</a></li>
+  <li><a href="#e2">2. JSON anidado</a></li>
+  <li><a href="#e3">3. XML con espacio de nombres</a></li>
+  <li><a href="#e4">4. ¿Dicen lo mismo?</a></li>
+  <li><a href="#e5">5. Tipos de atributo</a></li>
+  <li><a href="#tesoro">6. Búsqueda del tesoro</a></li>
+  <li><a href="#entrega">Qué entregan</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+</ol></nav>
+<main>
+
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_3/Colab_Guiado_Semana_3.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="simulador_tres_sobres.html">Abrir los tres sobres en el navegador</a>
+  </div>
+  <p>Archivos (Banco Mundial, Indicadores del Desarrollo Mundial, IT.NET.USER.ZS, con datos de la Unión Internacional de Telecomunicaciones, licencia CC BY 4.0, descargados de la API oficial el 2026-11-10): <a href="../Datos/banco_mundial_internet.csv" download>CSV</a>, <a href="../Datos/banco_mundial_internet.json" download>JSON</a> y <a href="../Datos/banco_mundial_internet.xml" download>XML</a>.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> CSV con metadatos</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Imprima las cinco primeras líneas del archivo como texto, sin pandas.</li>
+    <li>Léalo con <code>pd.read_csv(..., skiprows=4)</code>. ¿Qué forma tiene? ¿Cómo se llama la última columna?</li>
+    <li>Pase de formato ancho a largo con <code>melt</code>: una fila por año.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Cuatro líneas de metadatos ("Data Source", una vacía, "Last Updated Date", otra vacía). Forma ancha: 1 fila y 71 columnas; la última, <code>Unnamed: 70</code>, está vacía por la coma final de cada línea. Forma larga: 66 filas (1960 a 2025), de las cuales 32 tienen dato.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> JSON anidado</h2>
+  <p class="meta">7 minutos.</p>
+  <ol class="pasos">
+    <li>Cargue el JSON con <code>json.loads</code> e imprima <code>J[0]</code> y <code>J[1][0]</code>.</li>
+    <li>Aplánelo con <code>pd.json_normalize(J[1])</code>. ¿Qué columnas aparecen con un punto en el nombre?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p><code>J[0]</code> son metadatos: 25 registros, actualizado el 2026-10-08. Cada registro trae <code>indicator</code> y <code>country</code> como objetos; al aplanar salen <code>indicator.id</code>, <code>indicator.value</code>, <code>country.id</code> y <code>country.value</code>. El primer registro es 2024, con 79,345 %.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> XML con espacio de nombres</h2>
+  <p class="meta">7 minutos.</p>
+  <pre><code>dx = pd.read_xml(ruta, xpath=".//wb:data", namespaces={"wb": "http://www.worldbank.org"}, parser="etree")</code></pre>
+  <ol class="pasos">
+    <li>Lea el XML con la línea de arriba. ¿Qué pasa si quita el argumento <code>namespaces</code>?</li>
+    <li>Compare el tamaño en bytes de los tres archivos.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Sin el espacio de nombres, pandas no reconoce el prefijo <code>wb:</code> y da error. Tamaños: CSV 1.221 bytes (pero con 66 años), JSON 5.959 y XML 7.943 bytes (con 25 años cada uno).</p></div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> ¿Dicen lo mismo los tres sobres?</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Compare los valores de 2000 a 2024 de los tres formatos con <code>np.allclose</code>.</li>
+    <li>Grafique la serie y encuentre el primer año en que pasó del 50 %.</li>
+    <li>Busque el único año en que el valor bajó respecto del anterior. Proponga dos explicaciones.</li>
+    <li>Mida cuánto pesa la tabla de bicicletas en CSV, JSON y XML con <code>to_csv</code>, <code>to_json</code> y <code>to_xml</code>.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Los tres coinciden. 2000: 2,21 %; 2024: 79,35 %; el 50 % se cruzó en 2013 (51,70 %). Bajó en 2022 (72,80 % frente a 73,03 % en 2021): puede ser un cambio real o un cambio en la encuesta que da origen al dato; solo la fuente original (la UIT) lo aclara. Bicicletas: CSV 57.571 bytes, JSON 167.106 (2,9 veces) y XML 319.206 (5,54 veces).</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Tipos de atributo (RAE 1.2)</h2>
+  <p class="meta">Con el juego del <a href="simulador_tres_sobres.html">simulador</a>.</p>
+  <ol class="pasos">
+    <li>Clasifique las diez columnas del juego como nominales, ordinales, binarias o numéricas.</li>
+    <li>En el cuaderno, convierta <code>season</code> en categoría y <code>weathersit</code> en categoría ordenada con <code>pd.Categorical(..., ordered=True)</code>.</li>
+    <li>Calcule a mano, con la fórmula de la escena 11, la distancia ordinal entre los niveles 2 y 7 de <code>Charge Amount</code> (0 a 10).</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Con 11 niveles, el nivel 2 vale (3 − 1)/10 = 0,2 y el 7 vale (8 − 1)/10 = 0,7; la distancia es 0,5. <code>weathersit</code> solo toma los valores 1, 2 y 3 en los datos diarios: la categoría 4 existe en la documentación pero no aparece.</p></div></details>
+</section>
+
+<section id="tesoro">
+  <h2><span class="num">6.</span> Búsqueda del tesoro</h2>
+  <p class="meta">60 minutos en equipos de tres: buscador, lector de licencias y programador.</p>
+  <div class="tablon"><table>
+    <tr><th>Isla</th><th>Dónde</th><th>Qué tener en cuenta</th></tr>
+    <tr><td>UCI</td><td><a href="https://archive.ics.uci.edu/" target="_blank" rel="noopener">archive.ics.uci.edu</a></td><td>DOI y licencia en cada ficha.</td></tr>
+    <tr><td>Kaggle</td><td><a href="https://www.kaggle.com/datasets" target="_blank" rel="noopener">kaggle.com/datasets</a></td><td>La licencia la pone quien sube el conjunto: léala.</td></tr>
+    <tr><td>datos.gov.co</td><td><a href="https://www.datos.gov.co/" target="_blank" rel="noopener">datos.gov.co</a></td><td>Datos del Estado colombiano; cada conjunto tiene exportación en CSV y JSON.</td></tr>
+    <tr><td>Banco Mundial</td><td><a href="https://data.worldbank.org/" target="_blank" rel="noopener">data.worldbank.org</a></td><td>API documentada en el <a href="https://datahelpdesk.worldbank.org/knowledgebase/articles/889392" target="_blank" rel="noopener">Data Help Desk</a>.</td></tr>
+    <tr><td>Zenodo</td><td><a href="https://zenodo.org/" target="_blank" rel="noopener">zenodo.org</a></td><td>Datos de investigación con DOI.</td></tr>
+    <tr><td>OpenML</td><td><a href="https://www.openml.org/" target="_blank" rel="noopener">openml.org</a></td><td>Conjuntos ya preparados para modelos.</td></tr>
+  </table></div>
+  <h3>Las cinco pistas</h3>
+  <ol class="pasos">
+    <li>Tiene al menos 1.000 filas.</li>
+    <li>La licencia está escrita y permite usarlo en clase.</li>
+    <li>Tiene al menos un atributo nominal y uno ordinal.</li>
+    <li>Se lee con pandas sin errores (anoten los argumentos que necesitaron).</li>
+    <li>Sirve para una pregunta sobre Colombia o sobre su carrera.</li>
+  </ol>
+  <h3>Ficha FAIR del tesoro</h3>
+  <pre><code>Nombre y enlace:
+Encontrable (DOI o identificador, metadatos):
+Accesible (cómo se descarga, si pide cuenta):
+Interoperable (formato, documentación de las columnas):
+Reutilizable (licencia exacta y fuente original):
+Filas y columnas:
+Un atributo nominal y uno ordinal:
+Pregunta que podríamos responder:</code></pre>
+  <div class="tablon"><table>
+    <tr><th>Puntaje</th><th class="d">Puntos</th></tr>
+    <tr><td>Cada pista cumplida</td><td class="d">1 (máximo 5)</td></tr>
+    <tr><td>Cada letra FAIR verificada con evidencia</td><td class="d">1 (máximo 4)</td></tr>
+    <tr><td>Bonificación: el conjunto viene en JSON o XML y lo leen</td><td class="d">2</td></tr>
+  </table></div>
+</section>
+
+<section id="entrega">
+  <h2>Qué entregan</h2>
+  <p>El cuaderno ejecutado en GitHub, con una sección final que lea el tesoro del equipo, y la ficha FAIR en el README. Presenten su tesoro en un minuto al grupo.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Cambie en la URL de la API el país (<code>COL</code>) por otros dos países de América Latina y el indicador por <code>SP.POP.TOTL</code> (población). Grafique en una sola figura el porcentaje de personas conectadas de los tres países. ¿Cuál pasó primero el 50 %? Guarde las respuestas de la API en un archivo y súbalo con el cuaderno, para que su análisis no dependa de que la API cambie.</p>
+  <p>Más lecturas, videos y cursos en la <a href="Investigacion_Semana3.html">guía de investigación</a>.</p>
+</section>
+</main>
+</div>
+<script>/* 66 años de la serie (1960 a 2025); el punto naranja es 2013, cuando Colombia pasó el 50 % */ window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 66; i++) o.push(i === 53 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

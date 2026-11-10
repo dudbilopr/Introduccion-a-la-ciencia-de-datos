@@ -131,7 +131,7 @@ pd.json_normalize(J[1])</div>
     <p class="paso" style="font-size:29px">Cada dato va entre una etiqueta que abre y otra que cierra.</p>
     <p class="paso" style="font-size:29px"><code>wb:</code> es un espacio de nombres: evita choques entre vocabularios.</p>
     <p class="paso" style="font-size:29px"><b class="acento" id="xReg"></b> registros; <b id="xBytes"></b> bytes, frente a <b id="jBytes"></b> del JSON.</p>
-    <div class="sobre paso" style="font-size:19px;border-top-color:var(--compra)">pd.read_xml(ruta, xpath="//wb:data",
+    <div class="sobre paso" style="font-size:19px;border-top-color:var(--compra)">pd.read_xml(ruta, xpath=".//wb:data",
   namespaces={"wb": "http://www.worldbank.org"})</div>
   </div>
   <aside class="notas">XML 1.0 es una recomendación del W3C. Sigue vivo en facturación electrónica, datos del sector público y documentos de oficina (.docx es XML comprimido). La prueba de la escena siguiente: ¿dicen lo mismo los tres archivos?</aside>

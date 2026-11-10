@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abrir los tres sobres | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="../assets/puntos/simulador.css">
+<style>
+  :root { --l-fondo: #15111d; --l-panel: #231c30; --l-hondo: #0e0b14; --l-tinta: #f1edf7; --l-tinta2: #ada3bf; --l-regla: rgba(173,163,191,.24); --l-acento: #c7a6ff; --l-naranja: #ff7a1f; }
+  .pestanas { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pestanas button { background: var(--l-hondo); color: var(--l-tinta); border: 1px solid var(--l-regla); padding: 8px 14px; font: 700 15px 'Schibsted Grotesk', sans-serif; cursor: pointer; min-height: 40px; }
+  .pestanas button[aria-selected="true"] { border-color: var(--l-acento); color: var(--l-acento); }
+  pre.crudo { margin: 0; height: 340px; overflow: auto; background: var(--l-hondo); color: #e3dcef; border: 1px solid var(--l-regla); padding: 12px; font: 13.5px/1.45 Consolas, monospace; white-space: pre-wrap; word-break: break-all; }
+  .tablilla { max-height: 300px; overflow: auto; margin-top: 12px; }
+  .tablilla table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--l-tinta); }
+  .tablilla th, .tablilla td { border-bottom: 1px solid var(--l-regla); padding: 4px 8px; text-align: right; }
+  .tablilla th { color: var(--l-acento); position: sticky; top: 0; background: var(--l-panel); }
+  .tablilla td.dif { color: var(--l-naranja); font-weight: 700; }
+  .tipos-juego { display: grid; gap: 10px; }
+  .tipos-juego .item { background: var(--l-hondo); padding: 10px 12px; }
+  .tipos-juego .item b { display: block; font-family: Consolas, monospace; color: var(--l-acento); }
+  .tipos-juego .item span { font-size: 14px; color: var(--l-tinta2); }
+  .tipos-juego .ops { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tipos-juego .ops button { background: none; border: 1px solid var(--l-regla); color: var(--l-tinta); padding: 6px 10px; font: 14px 'Schibsted Grotesk', sans-serif; cursor: pointer; min-height: 36px; }
+  .tipos-juego .ops button.si { border-color: var(--l-acento); background: var(--l-acento); color: var(--l-fondo); }
+  .tipos-juego .ops button.no { border-color: var(--l-naranja); color: var(--l-naranja); }
+  .tipos-juego .por { font-size: 14px; color: var(--l-tinta2); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Abrir los tres sobres: el mismo dato en CSV, JSON y XML</h1>
+  <p class="bajada">La página descarga los tres archivos reales que entregó la API del Banco Mundial: el porcentaje de la población de Colombia que usa internet. Los abre en su navegador con tres lectores distintos y comprueba si dicen lo mismo. Fuente: Indicadores del Desarrollo Mundial (IT.NET.USER.ZS, datos de la UIT), CC BY 4.0.</p>
+  <div class="rejilla">
+    <div>
+      <div class="pestanas" role="tablist" aria-label="Formato">
+        <button type="button" role="tab" data-f="csv" aria-selected="true">CSV</button>
+        <button type="button" role="tab" data-f="json" aria-selected="false">JSON</button>
+        <button type="button" role="tab" data-f="xml" aria-selected="false">XML</button>
+      </div>
+      <pre class="crudo" id="crudo" aria-label="Contenido del archivo tal como llega">Descargando…</pre>
+      <p class="nota" id="como"></p>
+      <div class="tablilla"><table id="tabla"></table></div>
+    </div>
+    <div class="panel">
+      <h2>Lo que pesa cada sobre</h2>
+      <div class="metricas">
+        <div><b id="bC">–</b><span>bytes CSV</span></div>
+        <div><b id="bJ">–</b><span>bytes JSON</span></div>
+        <div><b id="bX">–</b><span>bytes XML</span></div>
+        <div><b id="nAn">–</b><span>años con dato en los tres</span></div>
+      </div>
+      <p class="estado" id="veredicto" aria-live="polite"></p>
+      <h2>Su sobre a la medida</h2>
+      <label for="desde">Desde el año <b id="dv">2019</b></label>
+      <input id="desde" type="range" min="2000" max="2024" value="2019">
+      <label for="formato">Empaquetar en</label>
+      <select id="formato"><option value="csv">CSV</option><option value="json">JSON</option><option value="xml">XML</option></select>
+      <pre class="crudo" id="propio" style="height:170px;margin-top:10px"></pre>
+      <p class="estado" id="pesoPropio"></p>
+    </div>
+  </div>
+  <div class="retos">
+    <h2>¿Qué clase de dato es? (RAE 1.2)</h2>
+    <p class="nota" style="margin-top:0">Columnas reales de los conjuntos del curso. Elija el tipo de cada una y lea la explicación.</p>
+    <div class="tipos-juego" id="juego"></div>
+    <p class="estado" id="marcador"></p>
+  </div>
+  <div class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>En la pestaña CSV, ¿cuántas líneas hay antes del encabezado? ¿Qué pasa con la última columna?</li>
+      <li>En JSON, ¿dónde está el valor de 2024 y cuántos niveles de anidación hay que bajar para llegar a él?</li>
+      <li>¿En qué año el valor bajó respecto del anterior? Proponga dos explicaciones y diga cómo las comprobaría.</li>
+      <li>Arme su sobre desde 2019 en los tres formatos. ¿Cuántas veces pesa el XML lo que pesa el CSV? ¿Crece la proporción si incluye más años?</li>
+    </ol>
+  </div>
+</div>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var S = window.CIFRAS.resumen, R = {}, T = {}, act = 'csv';
+  function fmt(x) { return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function dec(x, d) { return x.toFixed(d).replace('.', ','); }
+  /* Lector CSV con comillas (RFC 4180), saltando las 4 líneas de metadatos */
+  function filaCSV(l) { var o = [], c = '', q = false; for (var i = 0; i < l.length; i++) { var ch = l[i]; if (q) { if (ch === '"' && l[i + 1] === '"') { c += '"'; i++; } else if (ch === '"') q = false; else c += ch; } else if (ch === '"') q = true; else if (ch === ',') { o.push(c); c = ''; } else c += ch; } o.push(c); return o; }
+  function leerCSV(t) {
+    var L = t.replace(/^﻿/, '').split(/\r?\n/), enc = filaCSV(L[4]), fila = filaCSV(L[5]), out = {};
+    enc.forEach(function (h, j) { if (/^\d{4}$/.test(h) && fila[j] !== '') out[+h] = parseFloat(fila[j]); });
+    return { datos: out, nota: 'Lector CSV: se saltan ' + 4 + ' líneas de metadatos; encabezado con ' + enc.length + ' columnas (la última, vacía, por la coma final); formato ancho, un año por columna.' };
+  }
+  function leerJSON(t) { var J = JSON.parse(t), out = {}; J[1].forEach(function (r) { if (r.value !== null) out[+r.date] = r.value; }); return { datos: out, nota: 'Lector JSON: lista de dos elementos; J[0] son metadatos (total ' + J[0].total + ', actualizado ' + J[0].lastupdated + ') y J[1] los registros, con indicator y country anidados.' }; }
+  function leerXML(t) {
+    var d = new DOMParser().parseFromString(t, 'application/xml'), ns = 'http://www.worldbank.org', out = {};
+    var regs = d.getElementsByTagNameNS(ns, 'data');
+    for (var i = 0; i < regs.length; i++) { var a = regs[i].getElementsByTagNameNS(ns, 'date')[0], v = regs[i].getElementsByTagNameNS(ns, 'value')[0]; if (a && v && v.textContent) out[+a.textContent] = parseFloat(v.textContent); }
+    return { datos: out, nota: 'Lector XML: cada registro es un elemento wb:data del espacio de nombres http://www.worldbank.org; se leen wb:date y wb:value.' };
+  }
+  function pinta() {
+    document.querySelectorAll('.pestanas button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-f') === act); });
+    document.getElementById('crudo').textContent = R[act];
+    document.getElementById('como').textContent = T[act].nota;
+  }
+  function tabla() {
+    var anios = [], ok = true;
+    for (var a = 2000; a <= 2024; a++) anios.push(a);
+    var h = '<tr><th style="text-align:left">Año</th><th>CSV</th><th>JSON</th><th>XML</th><th>Cambio</th></tr>';
+    anios.slice().reverse().forEach(function (a) {
+      var c = T.csv.datos[a], j = T.json.datos[a], x = T.xml.datos[a], igual = Math.abs(c - j) < 1e-9 && Math.abs(c - x) < 1e-9, prev = T.json.datos[a - 1];
+      if (!igual) ok = false;
+      var cambio = prev != null ? j - prev : null;
+      h += '<tr><td style="text-align:left">' + a + '</td><td' + (igual ? '' : ' class="dif"') + '>' + dec(c, 2) + '</td><td>' + dec(j, 2) + '</td><td>' + dec(x, 2) + '</td><td' + (cambio != null && cambio < 0 ? ' class="dif"' : '') + '>' + (cambio == null ? '' : (cambio > 0 ? '+' : '') + dec(cambio, 2)) + '</td></tr>';
+    });
+    document.getElementById('tabla').innerHTML = h;
+    document.getElementById('nAn').textContent = anios.length;
+    var py = S.tres_formatos_coinciden_2000_2024, bytesOk = R.bytes.csv === S.csv.bytes && R.bytes.json === S.json.bytes && R.bytes.xml === S.xml.bytes;
+    document.getElementById('veredicto').innerHTML = (ok ? '<b>Los tres sobres dicen lo mismo</b> de 2000 a 2024.' : '<b>Hay diferencias</b> entre formatos.') + ' Python llegó a la misma conclusión (' + (py ? 'coinciden' : 'no coinciden') + ') y los tamaños ' + (bytesOk ? 'son idénticos a los que midió Python.' : 'difieren de los que midió Python: revise la descarga.');
+    window.SOBRES_OK = ok && py && bytesOk;
+  }
+  function propio() {
+    var d = +document.getElementById('desde').value, f = document.getElementById('formato').value, filas = [];
+    document.getElementById('dv').textContent = d;
+    for (var a = d; a <= 2024; a++) filas.push([a, T.json.datos[a]]);
+    function emp(f) {
+      if (f === 'csv') return 'pais,anio,pct\n' + filas.map(function (r) { return 'COL,' + r[0] + ',' + r[1]; }).join('\n') + '\n';
+      if (f === 'json') return JSON.stringify(filas.map(function (r) { return { pais: 'COL', anio: r[0], pct: r[1] }; }), null, 1);
+      return '<?xml version="1.0" encoding="utf-8"?>\n<datos>\n' + filas.map(function (r) { return ' <registro><pais>COL</pais><anio>' + r[0] + '</anio><pct>' + r[1] + '</pct></registro>'; }).join('\n') + '\n</datos>\n';
+    }
+    var t = emp(f), n = function (s) { return new TextEncoder().encode(s).length; };
+    document.getElementById('propio').textContent = t;
+    document.getElementById('pesoPropio').innerHTML = filas.length + ' años: CSV ' + fmt(n(emp('csv'))) + ' bytes, JSON ' + fmt(n(emp('json'))) + ', XML ' + fmt(n(emp('xml'))) + '. El XML pesa <b>' + dec(n(emp('xml')) / n(emp('csv')), 1) + '</b> veces el CSV.';
+  }
+  var J = [
+    ['season', 'Bicicletas: 1 a 4', 'nominal', 'Es una categoría cíclica: invierno, primavera, verano, otoño. El 4 no es "el doble" del 2. Algunos la tratarían como ordinal dentro del año, pero no tiene un orden que empiece y termine.'],
+    ['weathersit', 'Bicicletas: 1 despejado a 4 lluvia fuerte', 'ordinal', 'Tiene orden de severidad, pero la distancia entre 1 y 2 no tiene por qué ser la misma que entre 3 y 4.'],
+    ['holiday', 'Bicicletas: 0 o 1', 'binario', 'Dos valores. Es asimétrico: que dos días sean festivos dice más que que dos días no lo sean.'],
+    ['cnt', 'Bicicletas: alquileres por día', 'numerico', 'Una cantidad: restar y promediar tiene sentido.'],
+    ['workclass', 'Censo Adult: Private, Self-emp-inc, …', 'nominal', 'Categorías sin orden. Además trae vacíos escritos como "?": semana 4.'],
+    ['education_num', 'Censo Adult: 1 a 16', 'ordinal', 'Es el nivel educativo codificado en orden. Pasar de 9 a 10 no equivale a pasar de 15 a 16.'],
+    ['Charge  Amount', 'Telecomunicaciones: 0 a 10', 'ordinal', 'Según la documentación es un nivel ordenado de cargos, no un monto en dinero.'],
+    ['Age', 'Telecomunicaciones: solo 15, 25, 30, 45 o 55', 'ordinal', 'Parece una edad, pero solo toma cinco valores: son marcas de grupos de edad. Se lo pregunta la semana 5.'],
+    ['Complains', 'Telecomunicaciones: 0 o 1', 'binario', 'Se quejó o no. Asimétrico: una queja es el evento importante.'],
+    ['pct', 'Banco Mundial: % de la población que usa internet', 'numerico', 'Un porcentaje continuo entre 0 y 100.']
+  ], resp = {};
+  function juego() {
+    var nombres = { nominal: 'Nominal', ordinal: 'Ordinal', binario: 'Binario', numerico: 'Numérico' };
+    document.getElementById('juego').innerHTML = J.map(function (j, i) {
+      var r = resp[i];
+      return '<div class="item"><b>' + j[0] + '</b><span>' + j[1] + '</span><div class="ops">' + Object.keys(nombres).map(function (k) { var cl = r == null ? '' : (k === j[2] ? 'si' : (k === r ? 'no' : '')); return '<button type="button" data-i="' + i + '" data-k="' + k + '" class="' + cl + '"' + (r != null ? ' disabled' : '') + '>' + nombres[k] + '</button>'; }).join('') + '</div>' + (r != null ? '<p class="por">' + (r === j[2] ? 'Correcto. ' : 'No: es ' + nombres[j[2]].toLowerCase() + '. ') + j[3] + '</p>' : '') + '</div>';
+    }).join('');
+    document.querySelectorAll('#juego .ops button').forEach(function (b) { b.addEventListener('click', function () { resp[+b.getAttribute('data-i')] = b.getAttribute('data-k'); juego(); }); });
+    var n = Object.keys(resp).length, ok = Object.keys(resp).filter(function (i) { return resp[i] === J[i][2]; }).length;
+    document.getElementById('marcador').textContent = n ? ok + ' de ' + n + ' correctas.' + (n === J.length ? ' Discuta con su pareja los que fallaron: varios tienen argumentos para más de un tipo.' : '') : '';
+  }
+  document.querySelectorAll('.pestanas button').forEach(function (b) { b.addEventListener('click', function () { act = b.getAttribute('data-f'); pinta(); }); });
+  document.getElementById('desde').addEventListener('input', propio);
+  document.getElementById('formato').addEventListener('change', propio);
+  juego();
+  Promise.all(['csv', 'json', 'xml'].map(function (f) { return fetch('../Datos/banco_mundial_internet.' + f).then(function (r) { return r.arrayBuffer(); }); })).then(function (bufs) {
+    var dec8 = new TextDecoder('utf-8');
+    R.bytes = { csv: bufs[0].byteLength, json: bufs[1].byteLength, xml: bufs[2].byteLength };
+    R.csv = dec8.decode(bufs[0]); R.json = dec8.decode(bufs[1]); R.xml = dec8.decode(bufs[2]);
+    T.csv = leerCSV(R.csv); T.json = leerJSON(R.json); T.xml = leerXML(R.xml);
+    document.getElementById('bC').textContent = fmt(R.bytes.csv); document.getElementById('bJ').textContent = fmt(R.bytes.json); document.getElementById('bX').textContent = fmt(R.bytes.xml);
+    pinta(); tabla(); propio();
+  }).catch(function (e) { document.getElementById('crudo').textContent = 'No se pudieron descargar los archivos (' + e + ').'; });
+})();
+</script>
+</body>
+</html>
