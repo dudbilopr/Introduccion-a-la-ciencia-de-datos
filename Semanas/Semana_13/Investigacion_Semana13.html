@@ -22,7 +22,7 @@
   <canvas class="puntitos" aria-hidden="true"></canvas>
   <h1>Semana 13: lo que la investigación dice sobre agrupar</h1>
   <p>Guía de estudio independiente. Reúne la búsqueda bibliográfica de la semana, una lectura guiada de un artículo de investigación, ocho videos verificados, el simulador propio y los recursos del mundo para seguir profundizando.</p>
-  <div class="datos-clase"><span><b>Semana</b>13</span><span><b>Tiempo</b>4 a 6 horas de trabajo independiente</span><span><b>Artículos</b>20 con DOI verificado</span><span><b>Videos</b>8</span></div>
+  <div class="datos-clase"><span><b>Semana</b>13</span><span><b>Tiempo</b>4 a 6 horas de trabajo independiente</span><span><b>Artículos</b>20 con DOI verificado</span><span><b>Videos</b>10</span></div>
 </header>
 <div class="marco">
 <nav class="indice" aria-label="Contenido"><ol>
@@ -30,6 +30,7 @@
   <li><a href="#lectura">Lectura guiada</a></li>
   <li><a href="#videos">Videos</a></li>
   <li><a href="#simulador">Simulador</a></li>
+  <li><a href="#orange">Sin código: Orange</a></li>
   <li><a href="#biblio">Bibliografía comentada</a></li>
   <li><a href="#profundizar">Para profundizar</a></li>
   <li><a href="#metodo">Método de la búsqueda</a></li>
@@ -69,6 +70,24 @@
   <h2>Simulador propio</h2>
   <p>El <a href="simulador_agrupamiento.html">simulador de agrupamiento</a> corre K-means paso a paso y DBSCAN sobre los 440 clientes reales, con tres preparaciones de los datos, silueta e índice de Rand ajustado calculados en vivo. Se comprobó que su silueta y su Rand ajustado coinciden con scikit-learn (0,290 y 0,514).</p>
   <p>Simuladores externos: <a href="https://www.naftaliharris.com/blog/visualizing-k-means-clustering/" target="_blank" rel="noopener">Visualizing K-Means Clustering</a> y <a href="https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/" target="_blank" rel="noopener">Visualizing DBSCAN Clustering</a>, de Naftali Harris.</p>
+</section>
+
+<section id="orange">
+  <h2>Hazlo sin código con Orange</h2>
+  <p><a href="https://orangedatamining.com/" target="_blank" rel="noopener">Orange Data Mining</a> es software libre (GPL 3) de la Universidad de Liubliana: el análisis se arma conectando widgets. Sirve para ver todo el flujo de la clase antes de programarlo, o para quien todavía no se siente cómodo con Python.</p>
+  <div class="descargas"><a class="boton" href="https://orangedatamining.com/download/" target="_blank" rel="noopener">Descargar Orange</a><a class="boton sec" href="../Datos/clientes_mayoristas_log.csv" download>Datos en logaritmo (CSV)</a></div>
+  <div class="aviso">El archivo trae los 440 clientes con el canal y la región como texto y el logaritmo natural de cada gasto, calculado por el script de cifras del curso. Se preparó así porque la documentación de Orange no confirma que su widget Formula acepte <code>log()</code>.</div>
+  <ol class="pasos">
+    <li><strong>File</strong> (Data): abra <code>clientes_mayoristas_log.csv</code>. Marque <code>Channel</code> y <code>Region</code> como <em>meta</em>: son etiquetas, no deben entrar al agrupamiento.</li>
+    <li><strong>k-Means</strong> (Unsupervised): conéctelo a File. Elija "From 2 to 8": el widget muestra la silueta de cada k. Deje k-Means++ y active <em>Preprocessing</em>, que normaliza las columnas a media 0 y desviación 1.</li>
+    <li><strong>Silhouette Plot</strong> (Visualize): conéctelo a k-Means con k = 2. Busque los clientes con silueta negativa.</li>
+    <li><strong>Scatter Plot</strong> (Visualize): coloree por grupo y por <code>Channel</code>. ¿Coinciden?</li>
+    <li><strong>Distances</strong> y <strong>Hierarchical Clustering</strong> (Unsupervised): use el enlace de Ward y corte en dos grupos. Compare con K-means.</li>
+    <li><strong>DBSCAN</strong> (Unsupervised): pruebe distintos radios y vea cuántos clientes quedan como ruido.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>La silueta de k = 2 debe ser la más alta del rango, cerca de 0,29 (el cuaderno da 0,290; Orange puede diferir un poco por el inicio al azar). El widget Silhouette Plot ofrece las distancias euclidiana, Manhattan y coseno: pruebe las tres y relaciónelo con el RAE 1.1.</p></div></details>
+  <div class="vids" id="listaOrange"></div>
+  <p>Otras plataformas sin código para comparar: <a href="https://www.knime.com/knime-analytics-platform" target="_blank" rel="noopener">KNIME</a> y <a href="https://ml.cms.waikato.ac.nz/weka/" target="_blank" rel="noopener">Weka</a>. Todas están en el <a href="../recursos/recursos_globales.html#plataformas_sin_codigo">centro de recursos</a>.</p>
 </section>
 
 <section id="biblio">
@@ -119,6 +138,9 @@
 (function () {
   var R = window.RECURSOS13;
   document.getElementById('listaVideos').innerHTML = R.videos.map(function (v) {
+    return '<article><a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="Miniatura del video ' + v.titulo + '" loading="lazy"></a><h3><a href="' + v.url + '" target="_blank" rel="noopener">' + v.titulo + '</a></h3><p><span class="etq">' + v.nivel + '</span><span class="etq">' + v.idioma + '</span> ' + v.canal + ' · ' + v.duracion + '</p><p><strong>Qué mirar:</strong> ' + v.mirar + '</p><p><strong>Pregunta:</strong> ' + v.pregunta + '</p></article>';
+  }).join('');
+  document.getElementById('listaOrange').innerHTML = R.orange.map(function (v) {
     return '<article><a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="Miniatura del video ' + v.titulo + '" loading="lazy"></a><h3><a href="' + v.url + '" target="_blank" rel="noopener">' + v.titulo + '</a></h3><p><span class="etq">' + v.nivel + '</span><span class="etq">' + v.idioma + '</span> ' + v.canal + ' · ' + v.duracion + '</p><p><strong>Qué mirar:</strong> ' + v.mirar + '</p><p><strong>Pregunta:</strong> ' + v.pregunta + '</p></article>';
   }).join('');
   var temas = [];

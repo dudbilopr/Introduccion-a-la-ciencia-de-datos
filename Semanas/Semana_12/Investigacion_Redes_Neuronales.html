@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redes neuronales: guía de investigación | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<style>
+  .vids { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin: 14px 0; }
+  .vids article { background: var(--papel-2, #ece9df); padding: 0 0 12px; }
+  .vids img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .vids h3 { font-size: 16px; margin: 10px 12px 4px; line-height: 1.25; }
+  .vids p { font-size: 14.5px; margin: 4px 12px; line-height: 1.35; }
+  .etq { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #00213d; color: #fff; margin-right: 4px; }
+  .metodo { background: #00213d; color: #eaf1f7; padding: 18px 22px; border-radius: 4px; }
+  .metodo b { color: #ff9a63; }
+  .metodo table td, .metodo table th { color: #eaf1f7; border-color: rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Redes neuronales: lo que dice la investigación</h1>
+  <p>Guía de estudio independiente de la clase de la semana 12. Reúne los trabajos que fundaron y explican lo que hicimos a mano en Excel, una lectura guiada, diez videos verificados, el simulador propio y libros abiertos para seguir.</p>
+  <div class="datos-clase"><span><b>Semana</b>12</span><span><b>Tiempo</b>4 a 6 horas de trabajo independiente</span><span><b>Artículos</b><span id="nArt"></span> con DOI verificado</span><span><b>Videos</b>10</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#ruta">Ruta de estudio</a></li>
+  <li><a href="#lectura">Lectura guiada</a></li>
+  <li><a href="#videos">Videos</a></li>
+  <li><a href="#simulador">Simulador y Excel</a></li>
+  <li><a href="#biblio">Bibliografía comentada</a></li>
+  <li><a href="#libros">Libros abiertos</a></li>
+  <li><a href="#metodo">Método de la búsqueda</a></li>
+</ol></nav>
+<main>
+<section id="ruta">
+  <h2>Ruta de estudio</h2>
+  <ol class="pasos">
+    <li><strong>Intuición (1 hora).</strong> Capítulos 1 y 2 de 3Blue1Brown (hay versión en español) o la serie de DotCSV.</li>
+    <li><strong>Cálculo (1 hora).</strong> La época 1 en la <a href="Datos/Red_Neuronal_Epoca1_Estudiante.xlsx" download>plantilla de Excel</a>, comprobada en el <a href="simulador_red_neuronal.html">simulador</a>.</li>
+    <li><strong>Rigor (1 hora).</strong> Capítulo 4 de 3Blue1Brown sobre el cálculo de la retropropagación y el capítulo 2 del libro de Nielsen.</li>
+    <li><strong>Investigación (1 a 2 horas).</strong> Lectura guiada de Bottou, Curtis y Nocedal (2018), secciones introductorias.</li>
+  </ol>
+</section>
+
+<section id="lectura">
+  <h2>Lectura guiada: "Optimization Methods for Large-Scale Machine Learning"</h2>
+  <p>Bottou, L., Curtis, F. E. y Nocedal, J. (2018). <em>SIAM Review</em>, 60(2), 223-311. <a href="https://doi.org/10.1137/16M1080173" target="_blank" rel="noopener">doi:10.1137/16M1080173</a>. Es largo (89 páginas): lea el resumen y la introducción.</p>
+  <ol class="pasos">
+    <li>Según el resumen, ¿por qué el gradiente estocástico ocupa un lugar central en el aprendizaje automático a gran escala?</li>
+    <li>Relacione esa idea con nuestro resultado: en línea clasificó bien AND en la época 40 y por lotes en la 199, con el mismo η.</li>
+    <li>El resumen habla de técnicas que "diminish noise in the stochastic directions". ¿De qué ruido se trata en nuestra red de cuatro muestras?</li>
+    <li>Escriba un párrafo: ¿cuándo preferiría usted actualizar por lotes?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>El resumen sostiene que el aprendizaje a gran escala es un escenario en el que el gradiente estocástico ha tenido un papel central mientras los métodos de optimización clásicos "typically falter". En nuestra red, el ruido viene de que cada muestra empuja los pesos en una dirección distinta: la muestra 4 empuja al revés que las otras tres. Por lotes se promedia ese ruido a cambio de una sola actualización por época.</p></div></details>
+</section>
+
+<section id="videos">
+  <h2>Videos verificados</h2>
+  <p>Confirmados con la ficha oficial de YouTube el 2026-11-10; los minutos citados vienen de los capítulos que publicó cada autor.</p>
+  <div class="vids" id="listaVideos"></div>
+</section>
+
+<section id="simulador">
+  <h2>Simulador y Excel</h2>
+  <p>El <a href="simulador_red_neuronal.html">simulador de la red 2-2-1</a> usa los pesos iniciales de la clase y reproduce exactamente la tabla de Excel: P4 de la época 1, la época 40 en línea y la 199 por lotes. Permite cambiar a OR y XOR, ajustar η y ver la región de decisión.</p>
+  <p>Externo: <a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a>, para jugar con capas y funciones de activación.</p>
+</section>
+
+<section id="biblio">
+  <h2>Bibliografía comentada</h2>
+  <p>Cada trabajo con DOI comprobado en Crossref. "Qué encontró" resume solo su resumen; si Crossref no lo trae, se indica que la descripción sale del título.</p>
+  <div id="tablaBib"></div>
+</section>
+
+<section id="libros">
+  <h2>Libros abiertos</h2>
+  <ul id="listaLibros"></ul>
+  <p>Más cursos, plataformas y congresos en el <a href="../recursos/recursos_globales.html">centro de recursos del curso</a>.</p>
+</section>
+
+<section id="metodo">
+  <h2>Método de la búsqueda</h2>
+  <div class="metodo" id="metodoTxt"></div>
+</section>
+</main>
+</div>
+<script src="recursos_redes_neuronales.js"></script>
+<script>
+(function () {
+  var R = window.RECURSOS_RN;
+  document.getElementById('nArt').textContent = R.articulos.filter(function (a) { return a.doi; }).length;
+  document.getElementById('listaVideos').innerHTML = R.videos.map(function (v) {
+    return '<article><a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="Miniatura del video ' + v.titulo + '" loading="lazy"></a><h3><a href="' + v.url + '" target="_blank" rel="noopener">' + v.titulo + '</a></h3><p><span class="etq">' + v.nivel + '</span><span class="etq">' + v.idioma + '</span> ' + v.canal + ' · ' + v.duracion + '</p><p><strong>Qué mirar:</strong> ' + v.mirar + '</p><p><strong>Pregunta:</strong> ' + v.pregunta + '</p></article>';
+  }).join('');
+  var temas = [];
+  R.articulos.forEach(function (a) { if (temas.indexOf(a.tema) < 0) temas.push(a.tema); });
+  document.getElementById('tablaBib').innerHTML = temas.map(function (t) {
+    return '<h3>' + t + '</h3><div class="tablon"><table><tr><th>Trabajo</th><th>Qué encontró</th><th>Uso en el curso</th></tr>' + R.articulos.filter(function (a) { return a.tema === t; }).map(function (a) {
+      return '<tr><td>' + a.cita + (a.doi ? ' <a href="https://doi.org/' + a.doi + '" target="_blank" rel="noopener">DOI</a>' : '') + (a.abierto_url ? ' · <a href="' + a.abierto_url + '" target="_blank" rel="noopener">versión abierta</a>' : '') + '</td><td>' + a.encontro + '</td><td>' + a.uso + '</td></tr>';
+    }).join('') + '</table></div>';
+  }).join('');
+  document.getElementById('listaLibros').innerHTML = R.libros.map(function (l) { return '<li><a href="' + l.url + '" target="_blank" rel="noopener">' + l.titulo + '</a>. ' + l.autores + '. ' + l.nota + '</li>'; }).join('');
+  var M = R.metodo || {};
+  document.getElementById('metodoTxt').innerHTML = M.html || '<p>Método en preparación.</p>';
+  window.GUIA_PUNTOS = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1];
+})();
+</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

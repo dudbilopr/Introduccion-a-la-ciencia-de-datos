@@ -56,12 +56,18 @@ En las presentaciones: flechas para avanzar, **F** pantalla completa, **L** tema
 - **[Semana 11: Clasificación](Semanas/Semana_11/)**: [presentación](Semanas/Semana_11/diapositivas_semana_11.html) · [guía](Semanas/Semana_11/Guia_Laboratorio_Semana11.html) · [cuaderno](Semanas/Semana_11/Colab_Guiado_Semana_11.ipynb) · [frontera logística](Semanas/Semana_11/game_regresion_logistica.html) · [árbol de decisión](Semanas/Semana_11/game_arbol_decision.html) · [actividad EMI](Semanas/Semana_11/quiz_semana_11.html)
 - **[Semana 12: Evaluación de modelos](Semanas/Semana_12/)**: [presentación](Semanas/Semana_12/diapositivas_semana_12.html) · [guía](Semanas/Semana_12/Guia_Laboratorio_Semana12.html) · [cuaderno](Semanas/Semana_12/Colab_Guiado_Semana_12.ipynb) · [actividad EMI](Semanas/Semana_12/quiz_semana_12.html)
 
+- **[Semana 12: Redes neuronales, la red 2-2-1 paso a paso](Semanas/Semana_12/)** (clase dictada esa semana): [presentación](Semanas/Semana_12/diapositivas_redes_neuronales.html) · [guía del taller](Semanas/Semana_12/Guia_Laboratorio_RedNeuronal.html) · [simulador](Semanas/Semana_12/simulador_red_neuronal.html) · [plantilla de Excel](Semanas/Semana_12/Datos/Red_Neuronal_Epoca1_Estudiante.xlsx) · [cuaderno](Semanas/Semana_12/Colab_Redes_Neuronales.ipynb) · [guía de investigación](Semanas/Semana_12/Investigacion_Redes_Neuronales.html) · [actividad EMI](Semanas/Semana_12/quiz_redes_neuronales.html)
+
 ### Bloque 4: Temas especiales
 
-- **[Semana 13: Aprendizaje no supervisado](Semanas/Semana_13/)**: [presentación](Semanas/Semana_13/diapositivas_semana_13.html) · [guía](Semanas/Semana_13/Guia_Laboratorio_Semana13.html) · [cuaderno](Semanas/Semana_13/Colab_Guiado_Semana_13.ipynb) · [cazador de centroides](Semanas/Semana_13/game_kmeans.html) · [actividad EMI](Semanas/Semana_13/quiz_semana_13.html)
+- **[Semana 13: Aprendizaje no supervisado](Semanas/Semana_13/)**: [presentación](Semanas/Semana_13/diapositivas_semana_13.html) · [guía de investigación](Semanas/Semana_13/Investigacion_Semana13.html) · [simulador](Semanas/Semana_13/simulador_agrupamiento.html) · [guía](Semanas/Semana_13/Guia_Laboratorio_Semana13.html) · [cuaderno](Semanas/Semana_13/Colab_Guiado_Semana_13.ipynb) · [cazador de centroides](Semanas/Semana_13/game_kmeans.html) · [actividad EMI](Semanas/Semana_13/quiz_semana_13.html)
 - **[Semana 14: Aplicaciones especializadas](Semanas/Semana_14/)**: [presentación](Semanas/Semana_14/diapositivas_semana_14.html) · [guía de las cápsulas](Semanas/Semana_14/Guia_Laboratorio_Semana14.html) · [cuaderno](Semanas/Semana_14/Colab_Guiado_Semana_14.ipynb) · [actividad EMI](Semanas/Semana_14/quiz_semana_14.html)
 - **[Semana 15: Ética y ciencia de datos responsable](Semanas/Semana_15/)**: [presentación](Semanas/Semana_15/diapositivas_semana_15.html) · [guía de la auditoría](Semanas/Semana_15/Guia_Laboratorio_Semana15.html) · [cuaderno](Semanas/Semana_15/Colab_Guiado_Semana_15.ipynb) · [actividad EMI](Semanas/Semana_15/quiz_semana_15.html)
 - **[Semana 16: Demo Day](Semanas/Semana_16/)**: [requisitos y rúbrica](Semanas/Semana_16/Guia_Laboratorio_Semana16.html)
+
+## Recursos globales
+
+[Centro de recursos](Semanas/recursos/recursos_globales.html): repositorios de publicaciones y de datos, simuladores, plataformas sin código (Orange, KNIME, Weka, JASP, jamovi), entornos en la nube, herramientas de visualización, libros abiertos, cursos del mundo, congresos, competencias y certificaciones. Cada enlace verificado.
 
 ## Datos
 

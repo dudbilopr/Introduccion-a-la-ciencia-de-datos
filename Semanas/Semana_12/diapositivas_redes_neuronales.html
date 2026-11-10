@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 12 · Cómo aprende una red neuronal | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: plano de un circuito. La señal viaja hacia adelante en naranja; el error regresa en magenta. */
+  :root { --fondo: #071826; --fondo-2: #0e2740; --tinta: #e8f3fb; --tinta-2: #9bb6cc; --regla: rgba(155,182,204,.22); --punto: #3f6f93; --compra: #ff7a1f; --acento-texto: #ffa263; --cian: #5fd4ff; --magenta: #ff5fa2; }
+  :root[data-tema="claro"] { --fondo: #f3f7fb; --fondo-2: #e1ebf4; --tinta: #0b2236; --tinta-2: #4b6378; --regla: rgba(11,34,54,.2); --punto: #8aa6bd; --compra: #e85c0b; --acento-texto: #b94504; --cian: #0b74a8; --magenta: #c0247a; }
+  #escenario { background-image: linear-gradient(var(--regla) 1px, transparent 1px), linear-gradient(90deg, var(--regla) 1px, transparent 1px); background-size: 40px 40px; }
+  .rot { font: 700 22px Consolas, monospace; letter-spacing: .12em; color: var(--cian); text-transform: uppercase; }
+  svg text { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; } .t-n { fill: var(--tinta); font-weight: 700; } .t-s { fill: var(--tinta-2); } .t-o { fill: var(--acento-texto); font-weight: 800; } .t-c { fill: var(--cian); font-weight: 800; } .t-m { fill: var(--magenta); font-weight: 800; }
+  .plano { background: var(--fondo-2); padding: 30px 38px; border: 2px solid var(--cian); }
+  .ecu { font-size: 36px; background: var(--fondo-2); padding: 14px 28px; border-left: 8px solid var(--compra); }
+  .ecu.m { border-left-color: var(--magenta); }
+  .mano { border-collapse: collapse; }
+  .mano th, .mano td { color: var(--tinta); font-style: normal; font-family: 'Schibsted Grotesk', sans-serif; font-size: 25px !important; padding: 8px 18px !important; border-bottom: 1px solid var(--regla); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.15 !important; }
+  .mano th { color: var(--tinta-2); font-weight: 600; } .mano td:first-child, .mano th:first-child { text-align: left; }
+  .mano .f { color: var(--acento-texto); font-weight: 800; } .mano .b { color: var(--magenta); font-weight: 800; }
+  .voto { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .voto div { background: var(--fondo-2); padding: 24px; font-size: 30px; border-top: 6px solid var(--cian); }
+  .voto b { display: block; font-size: 48px; color: var(--cian); }
+  .videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .videos a { display: block; background: var(--fondo-2); text-decoration: none; color: var(--tinta); }
+  .videos img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .videos div { padding: 10px 12px 14px; } .videos b { display: block; font-size: 19px; line-height: 1.15; } .videos span { font-size: 16px; color: var(--tinta-2); }
+  .katex { font-size: 1em; }
+</style>
+</head>
+<body data-cine="dolly">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
+
+<!-- 1 Portada -->
+<section class="esc">
+  <svg id="portada" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" aria-hidden="true"></svg>
+  <div style="position:absolute;left:88px;top:90px;width:760px">
+    <p class="rot">Plano de una red · Semana 12</p>
+    <h1 style="font-size:92px;margin-top:16px;line-height:1.03">Una red aprende <span class="acento">con la regla de la cadena.</span></h1>
+    <p class="sec" style="font-size:27px;margin-top:22px">Propagación hacia adelante, retropropagación y descenso de gradiente estocástico, paso a paso, en la red 2-2-1 que resolvimos en Excel.</p>
+    <p class="sec" style="font-size:23px;margin-top:16px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <aside class="notas">Clase dictada en la semana 12. La red de la derecha es la de la clase: dos entradas, dos neuronas ocultas y una salida, con los pesos iniciales P0. La luz naranja es la señal que viaja hacia adelante; la magenta, el error que regresa. Todo número de esta presentación se recalculó con el script del curso y coincide con la tabla de la clase.</aside>
+</section>
+
+<!-- 2 Ruta -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:56px">Ruta: de una neurona a datos reales</p>
+  <svg id="ruta" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:110px;width:1600px;height:760px" role="img" aria-label="Ruta: neurona, sigmoide, red, adelante, pérdida, atrás, actualizar, entrenar, datos reales"></svg>
+  <aside class="notas">Conecta con la semana 11: una neurona con sigmoide es exactamente una regresión logística. La red 2-2-1 son tres regresiones logísticas encadenadas.</aside>
+</section>
+
+<!-- 3 Resultados de la clase -->
+<section class="esc">
+  <div class="plano" style="position:absolute;left:150px;top:90px;width:1300px">
+    <p class="rot">Resultados de aprendizaje de la clase</p>
+    <div style="display:grid;grid-template-columns:90px 1fr;gap:24px 18px;align-items:center;margin-top:22px">
+      <i class="ico" data-i="sigma" style="font-size:60px;color:var(--cian)"></i><p style="font-size:30px">Deduce las ecuaciones hacia adelante y la retropropagación con la regla de la cadena.</p>
+      <i class="ico" data-i="calculator" style="font-size:60px;color:var(--cian)"></i><p style="font-size:30px">Calcula a mano y en hoja de cálculo cada valor intermedio: z, a, δ y gradientes.</p>
+      <i class="ico" data-i="git-compare" style="font-size:60px;color:var(--cian)"></i><p style="font-size:30px">Compara el descenso de gradiente en línea con el de lotes, y explica el papel de la sigmoide y de la pérdida.</p>
+    </div>
+  </div>
+  <aside class="notas">Resultados de la guía pedagógica de la clase (Red_Neuronal/Guia_Clase_Red_Neuronal_General.md). El syllabus no nombra las redes neuronales; se relacionan con el modelado predictivo del bloque 3 y con la validación de la semana 12.</aside>
+</section>
+
+<!-- 4 Apuesta: una neurona y XOR -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:960px">
+    <p class="rot">Apuesta</p>
+    <h2 style="font-size:50px;margin:10px 0 30px">Una sola neurona aprende AND. ¿Puede aprender XOR, "uno u otro, pero no ambos"?</h2>
+    <div class="voto">
+      <div class="paso"><b>Sí</b>Con suficientes iteraciones.</div>
+      <div class="paso"><b>No</b>Ninguna recta separa los casos.</div>
+    </div>
+    <p class="paso" style="font-size:31px;margin-top:30px">No. Una regresión logística sobre XOR acierta el <b class="acento">50 %</b> y da probabilidad <b class="acento">0,5</b> a los cuatro casos.</p>
+    <p class="paso sec" style="font-size:25px;margin-top:8px">Hace falta una capa oculta que doble la frontera. Lo verá en la región de decisión del simulador.</p>
+  </div>
+  <svg id="xor" class="diagrama" viewBox="0 0 520 300" style="position:absolute;right:60px;top:300px;width:480px;height:277px" aria-hidden="true"></svg>
+  <aside class="notas">Resultado del script del curso con LogisticRegression sin regularización práctica (C = 10⁶). La limitación de una capa ante funciones como XOR es histórica: motivó, décadas después, el entrenamiento de redes con capas ocultas por retropropagación (Rumelhart, Hinton y Williams, 1986).</aside>
+</section>
+
+<!-- 5 La neurona -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:780px;display:flex;flex-direction:column;gap:18px">
+    <p class="rot">Una neurona = una regresión logística</p>
+    <h2 style="font-size:48px;line-height:1.06">Suma ponderada, luego sigmoide</h2>
+    <div class="ecu">$$z=w_1x_1+w_2x_2+b \qquad a=\sigma(z)=\frac{1}{1+e^{-z}}$$</div>
+    <div class="ecu paso">$$\sigma'(z)=\sigma(z)\,\big(1-\sigma(z)\big)=a(1-a)$$</div>
+    <p class="paso sec" style="font-size:24px">La derivada se escribe con la propia salida: por eso el cálculo en Excel solo necesita la columna de a.</p>
+  </div>
+  <svg id="sigmoide" class="diagrama" viewBox="0 0 660 620" style="position:absolute;left:900px;top:120px;width:660px;height:620px" role="img" aria-label="Curva sigmoide y su derivada, con máximo 0,25 en z igual a 0"></svg>
+  <aside class="notas">La deducción completa de σ' está en la guía de la clase, sección 4.2. La derivada vale como máximo 0,25 (en z = 0): cada capa sigmoide multiplica el gradiente por un número pequeño. Es el origen del "gradiente que se desvanece" en redes profundas.</aside>
+</section>
+
+<!-- 6 La red y P0 -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">La red de la clase · pesos iniciales P0</p><h2 style="font-size:46px;margin-top:6px">Nueve parámetros: seis pesos y tres sesgos. η = 0,5</h2></div>
+  <svg id="red" class="diagrama" viewBox="0 0 1500 680" style="position:absolute;left:50px;top:170px;width:1500px;height:680px" role="img" aria-label="Red 2-2-1 con los pesos iniciales de la clase"></svg>
+  <aside class="notas">P0: w11 = 0,2; w12 = −0,3; b1 = −0,4; w21 = 0,3; w22 = 0,2; b2 = −0,1; w31 = 0,4; w32 = 0,5; bs = −0,3. Las mismas de la hoja de Excel de la clase. Datos: compuerta AND, cuatro muestras; es un ejemplo para calcular a mano, no un caso real.</aside>
+</section>
+
+<!-- 7 Adelante, muestra 1 -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">1. Hacia adelante · muestra 1 (0, 0 → 0)</p><h2 style="font-size:46px;margin-top:6px">La señal entra, se suma, se aplasta y sale: ŷ = 0,5245</h2></div>
+  <div style="position:absolute;left:88px;top:180px;width:900px"><table class="mano" id="tAdelante"></table></div>
+  <div style="position:absolute;left:1030px;top:200px;width:480px;display:flex;flex-direction:column;gap:18px">
+    <p class="paso" style="font-size:28px">Con entradas 0, cada neurona oculta solo ve su sesgo: z₁ = b₁ = −0,4.</p>
+    <p class="paso" style="font-size:28px">La red dice 52,45 % de que sea 1, cuando la respuesta es 0. Hay que corregir.</p>
+  </div>
+  <aside class="notas">Valores del script, con 4 decimales: z1 = −0,4000; a1 = 0,4013; z2 = −0,1000; a2 = 0,4750; zs = 0,0980; ŷ = 0,5245; pérdida BCE = 0,7434. Pida que lo calculen con la calculadora antes de mostrar la tabla.</aside>
+</section>
+
+<!-- 8 Pérdida BCE y la cancelación -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px">
+    <p class="rot">2. Medir el error</p>
+    <h2 style="font-size:48px;margin:8px 0 22px">Con entropía cruzada, el error de salida queda en una resta</h2>
+    <div class="ecu" style="max-width:1150px">$$L=-\big[\,y\ln\hat y+(1-y)\ln(1-\hat y)\,\big]$$</div>
+    <div class="ecu m paso" style="max-width:1300px;margin-top:20px">$$\delta_s=\frac{\partial L}{\partial z_s}=\frac{\hat y-y}{\hat y(1-\hat y)}\cdot \hat y(1-\hat y)=\hat y-y$$</div>
+    <p class="paso" style="font-size:28px;margin-top:22px">El factor <b>ŷ(1 − ŷ)</b> de la sigmoide se cancela con el denominador de la pérdida. Muestra 1: δs = 0,5245 − 0 = <b class="acento">0,5245</b>.</p>
+    <p class="paso sec" style="font-size:24px">La pérdida sale de la máxima verosimilitud de una variable de Bernoulli, como en la regresión logística de la semana 11.</p>
+  </div>
+  <aside class="notas">Deducción completa en la guía de la clase (secciones 4.3 y 5.1). Contraste con StatQuest: su video de retropropagación usa la suma de residuos al cuadrado; con esa pérdida la cancelación no ocurre y el gradiente se debilita cuando la sigmoide se satura.</aside>
+</section>
+
+<!-- 9 Atrás -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">3. Hacia atrás</p><h2 style="font-size:46px;margin-top:6px">El error regresa por los mismos cables, multiplicado por cada peso</h2></div>
+  <div style="position:absolute;left:88px;top:170px;width:760px;display:flex;flex-direction:column;gap:20px">
+    <div class="ecu m">$$\delta_1=\delta_s\,w_{31}\,a_1(1-a_1)$$</div>
+    <div class="ecu m">$$\delta_2=\delta_s\,w_{32}\,a_2(1-a_2)$$</div>
+    <p class="paso" style="font-size:27px">Muestra 1: δ₁ = 0,5245 · 0,4 · 0,4013 · 0,5987 = <b class="acento">0,0504</b></p>
+    <p class="paso" style="font-size:27px">δ₂ = 0,5245 · 0,5 · 0,4750 · 0,5250 = <b class="acento">0,0654</b></p>
+  </div>
+  <svg id="atras" class="diagrama" viewBox="0 0 680 640" style="position:absolute;left:880px;top:180px;width:680px;height:640px" role="img" aria-label="El error viaja de la salida a las neuronas ocultas"></svg>
+  <aside class="notas">Regla de la cadena por la ruta z1 → a1 → zs → L (guía de la clase, sección 4.5). Los productos con 4 decimales dan los mismos δ que la tabla. Cada δ es la sensibilidad de la pérdida a la suma de su neurona.</aside>
+</section>
+
+<!-- 10 Actualizar -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">4. Actualizar</p><h2 style="font-size:44px;margin-top:6px">θ ← θ − η · gradiente. Y una sorpresa: cuatro pesos no se mueven</h2></div>
+  <div style="position:absolute;left:88px;top:170px;width:880px"><table class="mano" id="tUpdate"></table></div>
+  <div style="position:absolute;left:1020px;top:190px;width:500px;display:flex;flex-direction:column;gap:20px">
+    <div class="ecu" style="font-size:30px">$$\frac{\partial L}{\partial w_{ji}}=\delta_j\,x_i$$</div>
+    <p class="paso" style="font-size:28px">En la muestra 1, x₁ = x₂ = 0: los gradientes de w11, w12, w21 y w22 valen <b class="acento">0</b>.</p>
+    <p class="paso sec" style="font-size:24px">Un peso solo aprende cuando su entrada está activa. Los sesgos siempre aprenden: su "entrada" vale 1.</p>
+  </div>
+  <aside class="notas">P1 con η = 0,5: b1 = −0,4252; b2 = −0,1327; w31 = 0,2948; w32 = 0,3754; bs = −0,5622. Coincide con la fila P1 de la clase.</aside>
+</section>
+
+<!-- 11 Época 1 completa -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Época 1 · cuatro muestras, cuatro actualizaciones</p><h2 style="font-size:44px;margin-top:6px">En la muestra 4 el error cambia de signo, y los pesos de salida suben</h2></div>
+  <div style="position:absolute;left:88px;top:170px;width:1424px"><table class="mano" id="tEpoca"></table></div>
+  <p class="paso" style="position:absolute;left:88px;top:600px;width:1424px;font-size:28px">Si y = 0, δs = ŷ &gt; 0 y los pesos bajan. Si y = 1, δs = ŷ − 1 &lt; 0 y los pesos suben: el gradiente empuja ŷ hacia la respuesta.</p>
+  <p class="paso" style="position:absolute;left:88px;top:690px;width:1424px;font-size:26px;color:var(--tinta-2)">Al final de la época: w31 = <b class="acento">0,2680</b>, w32 = <b class="acento">0,3642</b>, bs = <b class="acento">−0,6160</b>, igual que la fila P4 de la clase.</p>
+  <aside class="notas">La pérdida media de la época 1 es 0,738. La muestra 4 tiene la pérdida más alta (1,1825) porque la red todavía dice 0,3065 cuando la respuesta es 1. La regla de signo es la de la sección 4 del contexto de la clase.</aside>
+</section>
+
+<!-- 12 En línea contra por lotes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Entrenar: en línea contra por lotes</p><h2 style="font-size:46px;margin-top:6px">Con el mismo η, actualizar tras cada muestra aprende AND en 40 épocas; por lotes, en 199</h2></div>
+  <svg id="curvas" class="diagrama" viewBox="0 0 1500 600" style="position:absolute;left:50px;top:180px;width:1500px;height:600px" role="img" aria-label="Pérdida media por época en línea y por lotes durante 400 épocas"></svg>
+  <aside class="notas">En línea hace cuatro actualizaciones por época; por lotes, una con el promedio de los cuatro gradientes. Por eso, con el mismo η, en línea avanza más por época. Tras 2.000 épocas, en línea la pérdida media es 0,0008 y por lotes 0,0044. "Clasificar bien" significa ŷ ≥ 0,5 exactamente en la muestra 4.</aside>
+</section>
+
+<!-- 13 Del juguete a los datos reales -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:60px;width:700px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Del ejemplo a los datos reales</p>
+    <h2 style="font-size:50px;line-height:1.06">La misma idea, con 2.850 clientes de churn</h2>
+    <p class="paso" style="font-size:28px">Red con <b>8</b> neuronas ocultas sigmoides, la partición sin duplicados de la semana 12.</p>
+    <p class="paso" style="font-size:28px">Encuentra el <b class="acento">72,3 %</b> de los clientes que se van; la regresión logística, el <b>48,2 %</b>.</p>
+    <p class="paso sec" style="font-size:24px">Más capacidad también significa más riesgo de sobreajuste y menos interpretabilidad: se valida como en la semana 12.</p>
+  </div>
+  <svg id="puente" class="diagrama" viewBox="0 0 720 620" style="position:absolute;left:830px;top:120px;width:720px;height:620px" role="img" aria-label="Exactitud y sensibilidad de la regresión logística y de la red neuronal en el churn"></svg>
+  <aside class="notas">MLPClassifier de scikit-learn, una capa de 8 neuronas con activación logística, datos estandarizados, semilla 42; prueba de 713 clientes. Exactitud 0,941 frente a 0,903. Es una sola partición: para un número honesto, validación cruzada como en la semana 12.</aside>
+</section>
+
+<!-- 14 Línea de tiempo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">De dónde viene</p><h2 style="font-size:46px;margin-top:6px">80 años de investigación detrás de nueve parámetros</h2></div>
+  <svg id="linea" class="diagrama" viewBox="0 0 1600 700" style="position:absolute;left:0;top:170px;width:1600px;height:700px" role="img" aria-label="Línea de tiempo de 1943 a 2018"></svg>
+  <aside class="notas">Todos con DOI verificado en Crossref, salvo el libro de Minsky y Papert (1969), que no tiene DOI. La bibliografía comentada está en la guía de investigación.</aside>
+</section>
+
+<!-- 15 Videos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Para estudiar en casa</p><h2 style="font-size:46px;margin:6px 0 24px">Ocho videos verificados, en español e inglés</h2>
+    <div class="videos" id="videos"></div>
+  </div>
+  <aside class="notas">Confirmados con la ficha oficial de YouTube. La serie de 3Blue1Brown tiene versión doblada al español en su canal 3Blue1Brown Español.</aside>
+</section>
+
+<!-- 16 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="plano" style="position:absolute;left:120px;top:60px;width:1360px;padding:36px 44px">
+    <p class="rot">English immersion · 10 minutes · read a review</p>
+    <p style="font-size:40px;line-height:1.2;font-weight:700;margin:20px 0 16px">“Large-scale machine learning represents a distinctive setting in which the <span class="acento">stochastic gradient (SG) method</span> has traditionally played a central role while conventional gradient-based nonlinear optimization techniques typically falter.”</p>
+    <p style="font-size:21px;color:var(--tinta-2);margin-bottom:22px">Bottou, L., Curtis, F. E. and Nocedal, J. (2018). Optimization Methods for Large-Scale Machine Learning. SIAM Review, 60(2), abstract.</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:18px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:20px">
+      <i class="ico paso" data-i="circle-help" style="font-size:48px;color:var(--cian)"></i><p class="paso" style="font-size:29px">In our class, which method was faster per epoch, online or batch? Why?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:48px;color:var(--cian)"></i><p class="paso" style="font-size:29px">Explain “the chain rule” to a classmate using the words “error”, “weight” and “backwards”.</p>
+      <i class="ico paso" data-i="languages" style="font-size:48px;color:var(--cian)"></i><p class="paso" style="font-size:29px">Why does a weight not change when its input is zero?</p>
+    </div>
+  </div>
+  <aside class="notas">Cita textual del resumen del artículo, verificado en Crossref (doi:10.1137/16M1080173).</aside>
+</section>
+
+<!-- 17 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Excel, simulador, cuaderno y lectura"></svg>
+  <a class="boton" href="simulador_red_neuronal.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir el simulador</a>
+  <a class="boton" href="Datos/Red_Neuronal_Epoca1_Estudiante.xlsx" download style="position:absolute;left:400px;bottom:76px">Plantilla de Excel</a>
+  <a class="boton" href="Investigacion_Redes_Neuronales.html" target="_blank" rel="noopener" style="position:absolute;left:720px;bottom:76px">Guía de investigación</a>
+  <aside class="notas">Como en la clase: primero la época 1 a mano en Excel (la muestra 1 viene resuelta con fórmulas), luego el simulador para comprobar y entrenar, después el cuaderno con datos reales.</aside>
+</section>
+
+<!-- 18 Síntesis -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:44px;width:1424px"><p class="rot">Síntesis</p><h2 style="font-size:46px;margin-top:6px">Cuatro pasos que se repiten millones de veces en cualquier red</h2></div>
+  <svg id="sintesis" class="diagrama" viewBox="0 0 1600 700" style="position:absolute;left:0;top:170px;width:1600px;height:700px" role="img" aria-label="Adelante, pérdida, atrás, actualizar"></svg>
+  <aside class="notas">Pregunta de salida: si la red tuviera 60 millones de parámetros (Krizhevsky y otros), ¿qué cambiaría de estos cuatro pasos? Nada: solo el tamaño.</aside>
+</section>
+
+<!-- 19 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:40px;width:1424px" class="bib">
+    <p class="rot">Bibliografía verificada (DOI en Crossref)</p>
+    <div style="columns:2;column-gap:40px;margin-top:10px" id="bib"></div>
+  </div>
+  <aside class="notas">Método de búsqueda en la guía de investigación.</aside>
+</section>
+
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras_rn.js"></script>
+<script src="recursos_redes_neuronales.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS_RN, S = C.resumen, R = window.RECURSOS_RN, ic = CUR.ic, luz = CUR.luz;
+  var f4 = function (x) { return (+x).toFixed(4).replace('.', ',').replace('-', '−'); };
+  if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }] });
+  /* Dibujo de la red reutilizable */
+  function dibRed(P, o) {
+    o = o || {};
+    var N = o.N || { x1: [140, 160], x2: [140, 500], h1: [700, 160], h2: [700, 500], s: [1260, 330] }, r = o.r || 64, s = '';
+    var ar = function (a, b, w, n, pos) {
+      var p = N[a], q = N[b], mx = p[0] + (q[0] - p[0]) * (pos || .5), my = p[1] + (q[1] - p[1]) * (pos || .5);
+      return '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + (w >= 0 ? 'var(--cian)' : 'var(--magenta)') + '" stroke-width="' + (2 + Math.abs(w) * 8).toFixed(1) + '" opacity=".75"/>' + (o.etq === false ? '' : DS.txt(mx, my - 12, n + ' = ' + f4(w), 't-n', ' text-anchor="middle" font-size="' + (o.fs || 26) + '"'));
+    };
+    s += ar('x1', 'h1', P.w11, 'w11', .5) + ar('x2', 'h1', P.w12, 'w12', .28) + ar('x1', 'h2', P.w21, 'w21', .28) + ar('x2', 'h2', P.w22, 'w22', .5) + ar('h1', 's', P.w31, 'w31', .5) + ar('h2', 's', P.w32, 'w32', .5);
+    if (o.luz) s += luz('M' + N.x1.join(' ') + 'L' + N.h1.join(' ') + 'L' + N.s.join(' '), 0, 3.2, 'fuerte') + luz('M' + N.x2.join(' ') + 'L' + N.h2.join(' ') + 'L' + N.s.join(' '), 1.2, 3.2);
+    [['x1', 'x₁'], ['x2', 'x₂'], ['h1', 'a₁'], ['h2', 'a₂'], ['s', 'ŷ']].forEach(function (q) {
+      var p = N[q[0]];
+      s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + r + '" fill="var(--fondo)" stroke="var(--cian)" stroke-width="5"/>' + DS.txt(p[0], p[1] + 12, q[1], 't-n', ' text-anchor="middle" font-size="' + Math.round(r * .55) + '"');
+    });
+    if (o.sesgos !== false) [['h1', P.b1, 'b1'], ['h2', P.b2, 'b2'], ['s', P.bs, 'bs']].forEach(function (q) { var p = N[q[0]]; s += DS.txt(p[0], p[1] - r - 16, q[2] + ' = ' + f4(q[1]), 't-o', ' text-anchor="middle" font-size="' + (o.fs || 26) + '"'); });
+    return s;
+  }
+  CUR.poner('portada', dibRed(S.P0, { N: { x1: [960, 260], x2: [960, 640], h1: [1220, 260], h2: [1220, 640], s: [1480, 450] }, r: 46, etq: false, sesgos: false, luz: true }));
+  /* Ruta */
+  var Nn = [['circle-dot', 'Neurona'], ['spline', 'Sigmoide'], ['network', 'Red 2-2-1'], ['arrow-right', 'Adelante'], ['target', 'Pérdida'], ['arrow-left-right', 'Atrás'], ['refresh-cw', 'Actualizar'], ['repeat', 'Entrenar'], ['database', 'Datos reales']], r = '';
+  Nn.forEach(function (n, i) { var x = 110 + i * 172, y = i % 2 ? 470 : 290; if (i) { var px = 110 + (i - 1) * 172, py = (i - 1) % 2 ? 470 : 290; r += luz('M' + px + ' ' + py + 'C' + (px + 90) + ' ' + py + ' ' + (x - 90) + ' ' + y + ' ' + x + ' ' + y, i * .3, 3); } r += '<circle cx="' + x + '" cy="' + y + '" r="58" fill="var(--fondo-2)" stroke="var(--cian)" stroke-width="5"/>' + ic(n[0], x - 32, y - 32, 64, 'var(--cian)') + DS.txt(x, y + (i % 2 ? 100 : -78), n[1], 't-n', ' text-anchor="middle" font-size="26"'); });
+  CUR.poner('ruta', r);
+  /* XOR */
+  var xo = '', pts = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]];
+  pts.forEach(function (q) { var x = 80 + q[0] * 360, y = 240 - q[1] * 190; xo += '<circle cx="' + x + '" cy="' + y + '" r="26" fill="' + (q[2] ? 'var(--compra)' : 'var(--cian)') + '"/>' + DS.txt(x, y + 9, q[2], 't-n', ' text-anchor="middle" font-size="24" style="fill:var(--fondo)"'); });
+  xo += '<line x1="20" y1="20" x2="500" y2="280" stroke="var(--tinta-2)" stroke-width="3" stroke-dasharray="10 8"/>' + DS.txt(260, 296, 'ninguna recta separa naranja de azul', 't-s', ' text-anchor="middle" font-size="20"');
+  CUR.poner('xor', xo);
+  /* Sigmoide */
+  var X = DS.esc(0, -6, 6, 60, 620), Y = DS.esc(0, 0, 1, 520, 40), sg = '', d1 = '', d2 = '';
+  for (var z = -6; z <= 6.001; z += .1) { var a = 1 / (1 + Math.exp(-z)); d1 += (z < -5.99 ? 'M' : 'L') + X(z).toFixed(1) + ' ' + Y(a).toFixed(1); d2 += (z < -5.99 ? 'M' : 'L') + X(z).toFixed(1) + ' ' + Y(a * (1 - a)).toFixed(1); }
+  [0, .25, .5, 1].forEach(function (v) { sg += '<line x1="60" x2="620" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--regla)"/>' + DS.txt(50, Y(v) + 8, (v + '').replace('.', ','), 't-eje', ' text-anchor="end"'); });
+  sg += '<path d="' + d1 + '" fill="none" stroke="var(--cian)" stroke-width="6"/>' + DS.txt(560, Y(.95) - 12, 'σ(z)', 't-c', ' font-size="28"');
+  sg += '<g class="paso-capa"><path d="' + d2 + '" fill="none" stroke="var(--compra)" stroke-width="6"/>' + DS.txt(X(0), Y(.25) - 16, 'σ\'(z) máx. 0,25', 't-o', ' text-anchor="middle" font-size="24"') + '</g>';
+  [-6, -3, 0, 3, 6].forEach(function (v) { sg += DS.txt(X(v), 560, v, 't-eje', ' text-anchor="middle"'); });
+  sg += DS.txt(340, 600, 'z', 't-eje', ' text-anchor="middle"');
+  CUR.poner('sigmoide', sg);
+  /* Red con P0 */
+  CUR.poner('red', dibRed(S.P0));
+  /* Tabla adelante */
+  var m1 = S.epoca1_online[0], filas = [['z₁ = w11·0 + w12·0 + b1', m1.z1], ['a₁ = σ(z₁)', m1.a1], ['z₂ = w21·0 + w22·0 + b2', m1.z2], ['a₂ = σ(z₂)', m1.a2], ['z_s = w31·a₁ + w32·a₂ + bs', m1.zs], ['ŷ = σ(z_s)', m1.yh], ['Pérdida = −ln(1 − ŷ)', m1.L]];
+  document.getElementById('tAdelante').innerHTML = '<tr><th>Cálculo</th><th>Valor</th></tr>' + filas.map(function (f, i) { return '<tr class="paso"><td>' + f[0] + '</td><td class="' + (i >= 5 ? 'f' : '') + '">' + f4(f[1]) + '</td></tr>'; }).join('');
+  /* Atrás */
+  CUR.poner('atras', dibRed(S.P0, { N: { x1: [70, 120], x2: [70, 480], h1: [330, 120], h2: [330, 480], s: [600, 300] }, r: 46, etq: false, sesgos: false }) + luz('M600 300L330 120', 0, 2.6, 'fuerte') + luz('M600 300L330 480', .5, 2.6, 'fuerte') + DS.txt(600, 400, 'δs = ' + f4(m1.ds), 't-m', ' text-anchor="middle" font-size="28"') + DS.txt(330, 40, 'δ₁ = ' + f4(m1.d1), 't-m', ' text-anchor="middle" font-size="28"') + DS.txt(330, 590, 'δ₂ = ' + f4(m1.d2), 't-m', ' text-anchor="middle" font-size="28"'));
+  /* Actualizar */
+  var nom = ['w11', 'w12', 'b1', 'w21', 'w22', 'b2', 'w31', 'w32', 'bs'], P1 = m1.P_despues;
+  document.getElementById('tUpdate').innerHTML = '<tr><th>Parámetro</th><th>P0</th><th>Gradiente</th><th>P1</th></tr>' + nom.map(function (n) { var cero = m1.grad[n] === 0; return '<tr><td>' + n + '</td><td>' + f4(S.P0[n]) + '</td><td class="' + (cero ? '' : 'b') + '">' + f4(m1.grad[n]) + '</td><td class="' + (cero ? '' : 'f') + '">' + f4(P1[n]) + '</td></tr>'; }).join('');
+  /* Época 1 */
+  document.getElementById('tEpoca').innerHTML = '<tr><th>Muestra</th><th>x₁, x₂ → y</th><th>z_s</th><th>ŷ</th><th>Pérdida</th><th>δs</th><th>δ₁</th><th>δ₂</th></tr>' + S.epoca1_online.map(function (f) { return '<tr class="paso"><td>' + f.muestra + '</td><td>' + f.x1 + ', ' + f.x2 + ' → ' + f.y + '</td><td>' + f4(f.zs) + '</td><td class="f">' + f4(f.yh) + '</td><td>' + f4(f.L) + '</td><td class="b">' + f4(f.ds) + '</td><td>' + f4(f.d1) + '</td><td>' + f4(f.d2) + '</td></tr>'; }).join('');
+  /* Curvas */
+  var e = DS.ejes({ x: 110, y: 30, w: 1300, h: 460, xd: [1, 400], yd: [0, .8], xt: [1, 40, 100, 199, 300, 400], yt: [0, .2, .4, .6, .8], fy: function (v) { return (v + '').replace('.', ','); }, xl: 'Época', yl: 'Pérdida media' }), cs = e.s;
+  [['curva_online', 'var(--compra)', 'En línea (SGD)'], ['curva_lote', 'var(--cian)', 'Por lotes']].forEach(function (q, j) {
+    cs += '<path' + (j ? ' class="paso-capa"' : '') + ' d="' + C[q[0]].map(function (v, i) { return (i ? 'L' : 'M') + e.X(i + 1).toFixed(1) + ' ' + e.Y(v).toFixed(1); }).join('') + '" fill="none" stroke="' + q[1] + '" stroke-width="5"/>';
+    cs += '<rect x="' + (900 + j * 260) + '" y="44" width="26" height="26" fill="' + q[1] + '"/>' + DS.txt(936 + j * 260, 66, q[2], 't-n', ' font-size="24"');
+  });
+  cs += '<g class="paso"><line x1="' + e.X(40) + '" x2="' + e.X(40) + '" y1="30" y2="490" stroke="var(--compra)" stroke-width="3" stroke-dasharray="8 7"/>' + DS.txt(e.X(40) + 10, 120, 'época 40', 't-o', ' font-size="24"') + '<line x1="' + e.X(199) + '" x2="' + e.X(199) + '" y1="30" y2="490" stroke="var(--cian)" stroke-width="3" stroke-dasharray="8 7"/>' + DS.txt(e.X(199) + 10, 160, 'época 199', 't-c', ' font-size="24"') + '</g>';
+  CUR.poner('curvas', cs);
+  /* Puente */
+  var B = S.churn_puente, pb = '', Yb = DS.esc(0, 0, 1, 520, 60);
+  [0, .25, .5, .75, 1].forEach(function (v) { pb += '<line x1="80" x2="700" y1="' + Yb(v) + '" y2="' + Yb(v) + '" stroke="var(--regla)"/>' + DS.txt(70, Yb(v) + 8, Math.round(v * 100) + ' %', 't-eje', ' text-anchor="end"'); });
+  [['Exactitud', 'exactitud', 140], ['Sensibilidad', 'recall', 440]].forEach(function (m) {
+    [['logistica', 'var(--punto)', 'Logística'], ['red_8_ocultas', 'var(--compra)', 'Red']].forEach(function (q, j) {
+      var v = B[q[0]][m[1]], x = m[2] + j * 110;
+      pb += '<rect class="paso-capa" x="' + x + '" y="' + Yb(v) + '" width="90" height="' + (Yb(0) - Yb(v)) + '" fill="' + q[1] + '"/>' + DS.txt(x + 45, Yb(v) - 12, (v * 100).toFixed(1).replace('.', ',') + ' %', 't-n', ' text-anchor="middle" font-size="24"') + DS.txt(x + 45, 552, q[2], 't-s', ' text-anchor="middle" font-size="20"');
+    });
+    pb += DS.txt(m[2] + 100, 596, m[0], 't-n', ' text-anchor="middle" font-size="26"');
+  });
+  CUR.poner('puente', pb);
+  /* Línea de tiempo */
+  var T = [[1943, 'McCulloch y Pitts', 'Neurona lógica'], [1951, 'Robbins y Monro', 'Aproximación estocástica'], [1958, 'Rosenblatt', 'Perceptrón'], [1969, 'Minsky y Papert', 'Límites del perceptrón'], [1986, 'Rumelhart, Hinton y Williams', 'Retropropagación'], [1989, 'Cybenko · Hornik y otros', 'Aproximación universal'], [2015, 'LeCun, Bengio y Hinton', 'Aprendizaje profundo'], [2017, 'Krizhevsky y otros', 'ImageNet (versión CACM)'], [2018, 'Bottou, Curtis y Nocedal', 'Optimización a gran escala']];
+  var tx = DS.esc(0, 1938, 2024, 100, 1500), ln = '<line x1="70" x2="1530" y1="330" y2="330" stroke="var(--cian)" stroke-width="6"/>';
+  T.forEach(function (q, i) {
+    var x = tx(q[0]) + (i === 7 ? 40 : i === 8 ? 70 : i === 6 ? -10 : 0), arriba = i % 2 === 0, y = arriba ? (i % 4 === 0 ? 120 : 220) : (i % 4 === 1 ? 470 : 590);
+    ln += '<g class="paso-capa"><line x1="' + x + '" x2="' + x + '" y1="330" y2="' + (arriba ? y + 40 : y - 60) + '" stroke="var(--regla)" stroke-width="3"/><circle cx="' + x + '" cy="330" r="12" fill="var(--fondo)" stroke="var(--cian)" stroke-width="5"/>';
+    ln += DS.txt(x, y - 30, q[0], 't-c', ' text-anchor="middle" font-size="25"') + DS.txt(x, y, q[1], 't-n', ' text-anchor="middle" font-size="20"') + DS.txt(x, y + 26, q[2], 't-s', ' text-anchor="middle" font-size="18"') + '</g>';
+  });
+  CUR.poner('linea', ln);
+  /* Videos */
+  document.getElementById('videos').innerHTML = R.videos.slice(0, 8).map(function (v) { return '<a href="' + v.url + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="" loading="lazy"><div><b>' + v.titulo + '</b><span>' + v.canal + ' · ' + v.duracion + ' · ' + v.idioma + '</span></div></a>'; }).join('');
+  CUR.poner('taller', DS.ruta([['file-spreadsheet', 'Excel', 'Época 1 a mano'], ['mouse-pointer-click', 'Simulador', 'Comprobar y entrenar'], ['git-compare', 'En línea o lote', '40 contra 199'], ['database', 'Cuaderno', 'Churn real'], ['book-open', 'Lectura', 'Bottou y otros']], 'Como en la clase: primero a mano, luego a escala', 'Parejas · Excel · simulador propio · Colab', 'var(--cian)'));
+  /* Síntesis */
+  var D4 = [['arrow-right', 'Adelante', 'z = w·x + b, a = σ(z)'], ['target', 'Pérdida', 'BCE: δs = ŷ − y'], ['arrow-left-right', 'Atrás', 'δj = δs·w·a(1 − a)'], ['refresh-cw', 'Actualizar', 'θ ← θ − η·∇L']], sy = '';
+  D4.forEach(function (q, i) { var x = 230 + i * 380, y = 280; sy += (i ? luz('M' + (x - 300) + ' ' + y + 'L' + (x - 80) + ' ' + y, i * .4, 2.6, 'fuerte') : '') + '<circle cx="' + x + '" cy="' + y + '" r="80" fill="var(--fondo-2)" stroke="var(--cian)" stroke-width="6"/>' + ic(q[0], x - 42, y - 42, 84, 'var(--cian)') + DS.txt(x, y + 132, q[1], 't-n', ' text-anchor="middle" font-size="32"') + DS.txt(x, y + 172, q[2], 't-o', ' text-anchor="middle" font-size="24"'); });
+  sy += luz('M1370 280C1480 280 1480 560 800 560C120 560 120 280 150 280', 1.5, 6) + DS.txt(800, 610, 'Se repite por cada muestra (en línea) o por cada lote, durante muchas épocas', 't-s', ' text-anchor="middle" font-size="25"');
+  CUR.poner('sintesis', sy);
+  document.getElementById('bib').innerHTML = R.articulos.map(function (a) { return '<p style="break-inside:avoid;font-size:17.5px;line-height:1.22;margin-bottom:7px">' + a.cita + (a.doi ? ' <a href="https://doi.org/' + a.doi + '" target="_blank" rel="noopener">doi:' + a.doi + '</a>' : '') + '</p>'; }).join('') + '<p style="font-size:16.5px;margin-top:6px">Clase original: guía, presentación y Excel del docente (Red_Neuronal). Iconos: Lucide (ISC). Fórmulas: KaTeX. Uso de IA declarado en la guía de investigación.</p>';
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMI activity</title>
+<link rel="stylesheet" href="../assets/puntos/quiz.css">
+</head>
+<body>
+<header><p id="ses"></p><h1 id="tema"></h1></header>
+<main id="quiz" aria-live="polite"></main>
+<script>window.QUIZ = {"sesion": 12, "tema": "How a neural network learns", "cierre": "Forward, loss, backward, update: the same four steps train our 9-parameter network and networks with millions of parameters.", "preguntas": [
+{"q": "For sample 1 (inputs 0 and 0), the weights w11, w12, w21 and w22 do not change. Why?", "o": ["The learning rate is too small", "Their gradient is delta times the input, and the inputs are zero", "The network has converged", "Biases absorb the change"], "a": 1, "e": "A weight only learns when its input is active. Biases always learn, because their input is 1."},
+{"q": "With binary cross-entropy and a sigmoid output, the output error is:", "o": ["(ŷ − y) ŷ (1 − ŷ)", "ŷ − y", "(ŷ − y)²", "y / ŷ"], "a": 1, "e": "The sigmoid derivative cancels the denominator of the loss derivative."},
+{"q": "In sample 4 (1, 1 → 1), δs is negative (−0.6935). What happens to the output weights?", "o": ["They decrease", "They increase", "They stay the same", "They become zero"], "a": 1, "e": "Subtracting the learning rate times a negative gradient increases them, pushing ŷ towards 1."},
+{"q": "With the same learning rate, online SGD classified AND correctly after 40 epochs and batch gradient descent after 199. Why is online faster per epoch?", "o": ["It uses a different loss", "It makes four updates per epoch instead of one", "It has more neurons", "It uses ReLU"], "a": 1, "e": "Batch averages the four gradients into a single step per epoch."},
+{"q": "A single neuron (logistic regression) gets 50 % accuracy on XOR. What is the reason?", "o": ["Not enough data", "No straight line separates the two classes", "The learning rate is wrong", "XOR is random"], "a": 1, "e": "A hidden layer lets the network bend the decision boundary."},
+{"q": "On real churn data, a network with 8 hidden neurons found 72.3 % of leaving customers versus 48.2 % for logistic regression. What should you do before recommending it?", "o": ["Nothing, it is better", "Validate it with cross-validation, as in week 12", "Add more layers", "Remove the test set"], "a": 1, "e": "One train-test split is not enough. More capacity also means more risk of overfitting."}
+]};</script>
+<script src="../assets/puntos/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de red neuronal 2-2-1 | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<style>
+  :root { --p-fondo: #071826; --p-panel: #0e2740; --p-tinta: #e8f3fb; --p-tinta2: #9bb6cc; --p-regla: rgba(155,182,204,.22); --p-cian: #5fd4ff; --p-naranja: #ff7a1f; --p-magenta: #ff5fa2; }
+  body { background: var(--p-fondo); color: var(--p-tinta); margin: 0; }
+  .sim { max-width: 1340px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 32px) 60px; }
+  .sim h1 { color: var(--p-tinta); font-size: clamp(26px, 3.4vw, 40px); margin: 0 0 6px; }
+  .bajada { color: var(--p-tinta2); font-size: 17px; max-width: 920px; margin: 0 0 18px; }
+  .rej { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 980px) { .rej { grid-template-columns: minmax(0, 1fr); } }
+  .caja { background: var(--p-panel); padding: 16px 18px; border-top: 5px solid var(--p-cian); min-width: 0; }
+  .caja h2 { font-size: 17px; color: var(--p-cian); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px; }
+  svg { width: 100%; height: auto; display: block; }
+  .ctr { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+  .ctr label { font-size: 14px; color: var(--p-tinta2); display: flex; flex-direction: column; gap: 3px; min-width: 120px; flex: 1 1 120px; }
+  .ctr select, .ctr input { background: #06121d; color: var(--p-tinta); border: 1px solid var(--p-regla); padding: 6px; font-size: 15px; max-width: 100%; }
+  .ctr button { flex: 1 1 auto; min-width: 0; background: #06121d; color: var(--p-tinta); border: 1px solid var(--p-cian); padding: 9px 10px; font: 600 15px 'Schibsted Grotesk', sans-serif; cursor: pointer; }
+  .ctr button.pri { background: var(--p-cian); color: #06121d; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; color: var(--p-tinta); }
+  table.t th, table.t td { border-bottom: 1px solid var(--p-regla); padding: 4px 6px; text-align: right; color: var(--p-tinta); }
+  table.t th:first-child, table.t td:first-child { text-align: left; }
+  table.t tr.act td { color: var(--p-naranja); font-weight: 700; }
+  .estado { font-size: 15px; color: var(--p-tinta2); min-height: 44px; line-height: 1.35; margin: 8px 0 0; }
+  .retos { margin-top: 22px; background: var(--p-panel); padding: 18px 22px; }
+  .retos h2 { color: var(--p-cian); margin: 0 0 8px; font-size: 22px; }
+  .retos li { margin: 8px 0; font-size: 16px; line-height: 1.4; color: var(--p-tinta); }
+  .retos a { color: var(--p-cian); }
+  canvas { width: 100%; height: auto; display: block; background: #06121d; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .duo { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Simulador de la red 2-2-1 de la clase</h1>
+  <p class="bajada">Los pesos iniciales, la tasa de aprendizaje y la compuerta AND son los de la clase en Excel. Avance muestra por muestra: adelante, atrás y actualizar. Cambie a XOR para ver por qué hace falta la capa oculta.</p>
+  <div class="rej">
+    <div class="caja">
+      <h2>La red</h2>
+      <svg id="red" viewBox="0 0 760 460" role="img" aria-label="Red con dos entradas, dos neuronas ocultas y una de salida, con los pesos y valores actuales"></svg>
+      <p class="estado" id="estado" aria-live="polite">Pulse "1. Adelante" para la muestra 1.</p>
+      <div class="ctr">
+        <button type="button" id="bAd">1. Adelante</button><button type="button" id="bAt">2. Atrás</button><button type="button" id="bUp">3. Actualizar</button><button type="button" id="bSig" class="pri">Muestra completa</button>
+      </div>
+      <div class="ctr">
+        <button type="button" id="bEp">1 época</button><button type="button" id="bEp100">100 épocas</button><button type="button" id="bRe">Reiniciar</button>
+      </div>
+    </div>
+    <div class="caja">
+      <h2>Configuración</h2>
+      <div class="ctr">
+        <label>Tarea<select id="tarea"><option value="AND">AND (la de la clase)</option><option value="OR">OR</option><option value="XOR">XOR</option></select></label>
+        <label>Modo<select id="modo"><option value="linea">En línea (SGD)</option><option value="lote">Por lotes</option></select></label>
+        <label>Tasa η: <b id="etaV">0,5</b><input id="eta" type="range" min="0.05" max="3" step="0.05" value="0.5"></label>
+        <label>Pesos iniciales<select id="ini"><option value="clase">Los de la clase (P0)</option><option value="azar">Al azar</option></select></label>
+      </div>
+      <h2 style="margin-top:12px">Parámetros</h2>
+      <table class="t" id="tp"></table>
+      <h2 style="margin-top:12px">Salidas por muestra</h2>
+      <table class="t" id="ts"></table>
+    </div>
+  </div>
+  <div class="duo" style="margin-top:20px">
+    <div class="caja"><h2>Pérdida media por época</h2><canvas id="curva" width="640" height="320" aria-label="Curva de pérdida"></canvas></div>
+    <div class="caja"><h2>Región de decisión</h2><canvas id="region" width="640" height="320" aria-label="Probabilidad de la red para cada punto del cuadrado de entradas"></canvas></div>
+  </div>
+  <section class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>Con AND y los pesos de la clase, complete la muestra 1. Compare con la tabla de la clase: ŷ = 0,5245, pérdida 0,7434, δs = 0,5245.</li>
+      <li>¿Por qué en la muestra 1 no cambian w11, w12, w21 ni w22? Mire las entradas.</li>
+      <li>Termine la época 1. Los parámetros deben coincidir con P4 de la clase: w31 = 0,2680, w32 = 0,3642, bs = −0,6160.</li>
+      <li>Entrene en línea y por lotes con η = 0,5. ¿En qué época clasifica bien cada uno? (El script del curso da 40 y 199.)</li>
+      <li>Cambie a XOR con pesos al azar y entrene. ¿Siempre lo logra? Pruebe varias veces y explique qué ve en la región de decisión.</li>
+      <li>Suba η a 3. ¿Qué le pasa a la curva de pérdida?</li>
+    </ol>
+    <p style="font-size:14px;color:var(--p-tinta2)">AND, OR y XOR son ejemplos para calcular a mano, no datos reales. El puente con datos reales está en la guía: la misma idea aplicada a 2.850 clientes de churn. Para seguir jugando: <a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a>.</p>
+  </section>
+</div>
+<script>
+(function () {
+  'use strict';
+  var P0 = { w11: .2, w12: -.3, b1: -.4, w21: .3, w22: .2, b2: -.1, w31: .4, w32: .5, bs: -.3 };
+  var TAREAS = { AND: [0, 0, 0, 1], OR: [0, 1, 1, 1], XOR: [0, 1, 1, 0] }, X = [[0, 0], [0, 1], [1, 0], [1, 1]];
+  var P, k, fase, v, g, ep, curva, semilla = 7;
+  var $ = function (id) { return document.getElementById(id); };
+  var sig = function (z) { return 1 / (1 + Math.exp(-z)); };
+  var f4 = function (x) { return (x == null || isNaN(x)) ? '–' : x.toFixed(4).replace('.', ','); };
+  function Y() { return TAREAS[$('tarea').value]; }
+  function eta() { return +$('eta').value; }
+  function azar() { semilla = (semilla * 16807) % 2147483647; return (semilla - 1) / 2147483646; }
+  function adelante(P, x1, x2, y) {
+    var z1 = P.w11 * x1 + P.w12 * x2 + P.b1, a1 = sig(z1), z2 = P.w21 * x1 + P.w22 * x2 + P.b2, a2 = sig(z2), zs = P.w31 * a1 + P.w32 * a2 + P.bs, yh = sig(zs);
+    var L = -(y * Math.log(yh) + (1 - y) * Math.log(1 - yh));
+    return { x1: x1, x2: x2, y: y, z1: z1, a1: a1, z2: z2, a2: a2, zs: zs, yh: yh, L: L };
+  }
+  function atras(P, v) {
+    var ds = v.yh - v.y, d1 = ds * P.w31 * v.a1 * (1 - v.a1), d2 = ds * P.w32 * v.a2 * (1 - v.a2);
+    v.ds = ds; v.d1 = d1; v.d2 = d2;
+    return { w31: ds * v.a1, w32: ds * v.a2, bs: ds, w11: d1 * v.x1, w12: d1 * v.x2, b1: d1, w21: d2 * v.x1, w22: d2 * v.x2, b2: d2 };
+  }
+  function reiniciar() {
+    if ($('ini').value === 'clase') P = Object.assign({}, P0);
+    else { P = {}; Object.keys(P0).forEach(function (n) { P[n] = (azar() - .5) * 2; }); }
+    k = 0; fase = 0; v = null; g = null; ep = 0; curva = [];
+    estado('Muestra 1 lista. Pulse "1. Adelante".'); todo();
+  }
+  function paso(que) {
+    var y = Y(), modo = $('modo').value;
+    if (modo === 'lote') { epoca(1); return; }
+    if (que === 'ad' || fase === 0) { v = adelante(P, X[k][0], X[k][1], y[k]); fase = 1; estado('Adelante, muestra ' + (k + 1) + ': z_s = ' + f4(v.zs) + ', ŷ = ' + f4(v.yh) + ', pérdida = ' + f4(v.L) + '.'); if (que === 'ad') return todo(); }
+    if (que === 'at' || fase === 1) { g = atras(P, v); fase = 2; estado('Atrás: δs = ŷ − y = ' + f4(v.ds) + ', δ1 = ' + f4(v.d1) + ', δ2 = ' + f4(v.d2) + '.'); if (que === 'at') return todo(); }
+    if (que === 'up' || fase === 2) {
+      Object.keys(P).forEach(function (n) { P[n] -= eta() * g[n]; });
+      estado('Actualizado con η = ' + eta().toString().replace('.', ',') + ': cada parámetro restó η por su gradiente. ' + (X[k][0] === 0 && X[k][1] === 0 ? 'Con entradas 0, los pesos de la capa oculta no cambian.' : ''));
+      fase = 0; k = (k + 1) % 4; if (k === 0) { ep++; curva.push(perdida()); }
+    }
+    todo();
+  }
+  function perdida() { var y = Y(), s = 0; X.forEach(function (x, i) { s += adelante(P, x[0], x[1], y[i]).L; }); return s / 4; }
+  function epoca(n) {
+    var y = Y(), modo = $('modo').value;
+    for (var e = 0; e < n; e++) {
+      if (modo === 'linea') X.forEach(function (x, i) { var vv = adelante(P, x[0], x[1], y[i]), gg = atras(P, vv); Object.keys(P).forEach(function (nn) { P[nn] -= eta() * gg[nn]; }); });
+      else { var acc = {}; Object.keys(P).forEach(function (nn) { acc[nn] = 0; }); X.forEach(function (x, i) { var gg = atras(P, adelante(P, x[0], x[1], y[i])); Object.keys(P).forEach(function (nn) { acc[nn] += gg[nn] / 4; }); }); Object.keys(P).forEach(function (nn) { P[nn] -= eta() * acc[nn]; }); }
+      ep++; curva.push(perdida());
+    }
+    k = 0; fase = 0; v = null;
+    var bien = X.every(function (x, i) { return (adelante(P, x[0], x[1], y[i]).yh >= .5) === (y[i] === 1); });
+    estado('Época ' + ep + ' (' + (modo === 'linea' ? 'en línea' : 'por lotes') + '). Pérdida media: ' + f4(curva[curva.length - 1]) + '. ' + (bien ? 'Clasifica bien las cuatro muestras.' : 'Todavía se equivoca en alguna.'));
+    todo();
+  }
+  function estado(s) { $('estado').textContent = s; }
+  function todo() { red(); tablas(); dibCurva(); dibRegion(); }
+  function red() {
+    var N = { x1: [90, 120], x2: [90, 340], h1: [380, 120], h2: [380, 340], s: [660, 230] }, s = '';
+    var arista = function (a, b, w, n) {
+      var p = N[a], q = N[b], col = w >= 0 ? 'var(--p-cian)' : 'var(--p-magenta)', ancho = 1.5 + Math.min(8, Math.abs(w) * 4);
+      var cruza = (a === 'x1' && b === 'h2') || (a === 'x2' && b === 'h1'), t = cruza ? .27 : .5, mx = p[0] + (q[0] - p[0]) * t, my = p[1] + (q[1] - p[1]) * t + (cruza ? (a === 'x1' ? -14 : 30) : 0);
+      return '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + col + '" stroke-width="' + ancho.toFixed(1) + '" opacity=".8"/><text x="' + mx + '" y="' + (my - 8) + '" text-anchor="middle" fill="#e8f3fb" font-size="15" font-weight="700">' + n + ' = ' + f4(w) + '</text>';
+    };
+    s += arista('x1', 'h1', P.w11, 'w11') + arista('x2', 'h1', P.w12, 'w12') + arista('x1', 'h2', P.w21, 'w21') + arista('x2', 'h2', P.w22, 'w22') + arista('h1', 's', P.w31, 'w31') + arista('h2', 's', P.w32, 'w32');
+    var nodo = function (id, t, sub, val, b) {
+      var p = N[id];
+      return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="46" fill="#06121d" stroke="' + (fase && v ? 'var(--p-naranja)' : 'var(--p-cian)') + '" stroke-width="4"/><text x="' + p[0] + '" y="' + (p[1] - 6) + '" text-anchor="middle" fill="#e8f3fb" font-size="20" font-weight="800">' + t + '</text><text x="' + p[0] + '" y="' + (p[1] + 18) + '" text-anchor="middle" fill="#ffb27a" font-size="15">' + val + '</text>' + (sub ? '<text x="' + p[0] + '" y="' + (p[1] + 70) + '" text-anchor="middle" fill="#9bb6cc" font-size="14">' + sub + '</text>' : '') + (b != null ? '<text x="' + p[0] + '" y="' + (p[1] - 58) + '" text-anchor="middle" fill="#9bb6cc" font-size="14">sesgo ' + f4(b) + '</text>' : '');
+    };
+    s += nodo('x1', 'x₁', '', v ? v.x1 : '–') + nodo('x2', 'x₂', '', v ? v.x2 : '–');
+    s += nodo('h1', 'a₁', v && fase >= 2 ? 'δ1 = ' + f4(v.d1) : '', v ? f4(v.a1) : '–', P.b1) + nodo('h2', 'a₂', v && fase >= 2 ? 'δ2 = ' + f4(v.d2) : '', v ? f4(v.a2) : '–', P.b2);
+    s += nodo('s', 'ŷ', v && fase >= 2 ? 'δs = ' + f4(v.ds) : v ? 'y = ' + v.y : '', v ? f4(v.yh) : '–', P.bs);
+    $('red').innerHTML = s;
+  }
+  function tablas() {
+    var nombres = ['w11', 'w12', 'b1', 'w21', 'w22', 'b2', 'w31', 'w32', 'bs'];
+    $('tp').innerHTML = '<tr><th>Parámetro</th><th>Valor</th><th>Gradiente</th></tr>' + nombres.map(function (n) { return '<tr><td>' + n + '</td><td>' + f4(P[n]) + '</td><td>' + (g && fase === 2 ? f4(g[n]) : '–') + '</td></tr>'; }).join('');
+    var y = Y();
+    $('ts').innerHTML = '<tr><th>Muestra</th><th>x₁, x₂</th><th>y</th><th>ŷ</th><th>Pérdida</th></tr>' + X.map(function (x, i) { var o = adelante(P, x[0], x[1], y[i]); return '<tr' + (i === k && $('modo').value === 'linea' ? ' class="act"' : '') + '><td>' + (i + 1) + '</td><td>' + x.join(', ') + '</td><td>' + y[i] + '</td><td>' + f4(o.yh) + '</td><td>' + f4(o.L) + '</td></tr>'; }).join('');
+  }
+  function dibCurva() {
+    var c = $('curva'), x = c.getContext('2d'), W = c.width, H = c.height, m = 40;
+    x.fillStyle = '#06121d'; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(155,182,204,.3)'; x.strokeRect(m, 10, W - m - 10, H - m - 10);
+    x.fillStyle = '#9bb6cc'; x.font = '14px sans-serif'; x.fillText('época ' + ep, W - 110, H - 12); x.fillText('pérdida', 4, 20);
+    if (!curva.length) return;
+    var mx = Math.max.apply(null, curva.concat([.8]));
+    x.strokeStyle = '#5fd4ff'; x.lineWidth = 2.5; x.beginPath();
+    curva.forEach(function (v, i) { var px = m + i / Math.max(1, curva.length - 1) * (W - m - 12), py = 10 + (1 - v / mx) * (H - m - 12); if (i) x.lineTo(px, py); else x.moveTo(px, py); }); x.stroke();
+  }
+  function dibRegion() {
+    var c = $('region'), x = c.getContext('2d'), W = c.width, H = c.height, n = 40, y = Y();
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) {
+      var a = i / (n - 1), b = j / (n - 1), p = adelante(P, a, b, 0).yh;
+      x.fillStyle = 'rgb(' + Math.round(6 + 249 * p) + ',' + Math.round(18 + 104 * p) + ',' + Math.round(29 + 2 * p) + ')';
+      x.fillRect(i * W / n, H - (j + 1) * H / n, W / n + 1, H / n + 1);
+    }
+    X.forEach(function (q, i) { x.beginPath(); x.arc(20 + q[0] * (W - 40), H - 20 - q[1] * (H - 40), 13, 0, 6.3); x.fillStyle = y[i] ? '#ff7a1f' : '#5fd4ff'; x.fill(); x.lineWidth = 3; x.strokeStyle = '#e8f3fb'; x.stroke(); });
+    x.fillStyle = '#e8f3fb'; x.font = '14px sans-serif'; x.fillText('x₁ →', W - 50, H - 4); x.fillText('↑ x₂', 4, 16);
+  }
+  $('bAd').onclick = function () { paso('ad'); }; $('bAt').onclick = function () { if (!v || fase < 1) paso('ad'); paso('at'); };
+  $('bUp').onclick = function () { if (fase < 2) { if (fase < 1) paso('ad'); paso('at'); } paso('up'); };
+  $('bSig').onclick = function () { if ($('modo').value === 'lote') return epoca(1); if (fase === 0) paso('ad'); if (fase === 1) paso('at'); paso('up'); };
+  $('bEp').onclick = function () { epoca(1); }; $('bEp100').onclick = function () { epoca(100); };
+  $('bRe').onclick = reiniciar; $('tarea').onchange = reiniciar; $('ini').onchange = reiniciar; $('modo').onchange = reiniciar;
+  $('eta').oninput = function () { $('etaV').textContent = (+this.value).toString().replace('.', ','); };
+  window.SIM_RN = { P: function () { return P; }, epoca: epoca, paso: paso, reiniciar: reiniciar };
+  reiniciar();
+})();
+</script>
+</body>
+</html>

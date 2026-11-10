@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller: la red 2-2-1 paso a paso | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>Una red neuronal a mano: la 2-2-1 de la clase</h1>
+  <p>Cinco ejercicios para hacer en una hoja de cálculo lo que hace cualquier red neuronal: propagar hacia adelante, medir el error, retropropagarlo y actualizar los pesos. Después, comprobarlo en el simulador, entrenar, y llevar la idea a datos reales.</p>
+  <div class="datos-clase"><span><b>Semana</b>12</span><span><b>Tiempo</b>90 minutos en clase</span><span><b>Herramienta</b>Excel, simulador y Colab</span><span><b>Entrega</b>Excel y cuaderno</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Hacia adelante</a></li>
+  <li><a href="#e2">2. Pérdida y error de salida</a></li>
+  <li><a href="#e3">3. Hacia atrás y actualizar</a></li>
+  <li><a href="#e4">4. Completar la época</a></li>
+  <li><a href="#e5">5. Entrenar y llevarlo a datos reales</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+  <li><a href="#fuentes">Para profundizar</a></li>
+</ol></nav>
+<main>
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="Datos/Red_Neuronal_Epoca1_Estudiante.xlsx" download>Plantilla de Excel</a>
+    <a class="boton sec" href="simulador_red_neuronal.html" target="_blank" rel="noopener">Simulador</a>
+    <a class="boton sec" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_12/Colab_Redes_Neuronales.ipynb" target="_blank" rel="noopener">Cuaderno en Colab</a>
+  </div>
+  <p><strong>La red.</strong> Dos entradas, una capa oculta con dos neuronas sigmoides y una neurona de salida sigmoide. Pérdida: entropía cruzada binaria. Optimizador: descenso de gradiente estocástico en línea con η = 0,5.</p>
+  <div class="tablon"><table>
+    <tr><th>Parámetros iniciales P0</th><th>Neurona 1</th><th>Neurona 2</th><th>Salida</th></tr>
+    <tr><td>Pesos</td><td class="d">w11 = 0,2; w12 = −0,3</td><td class="d">w21 = 0,3; w22 = 0,2</td><td class="d">w31 = 0,4; w32 = 0,5</td></tr>
+    <tr><td>Sesgo</td><td class="d">b1 = −0,4</td><td class="d">b2 = −0,1</td><td class="d">bs = −0,3</td></tr>
+  </table></div>
+  <div class="aviso"><strong>Ejemplo de cálculo, no caso real.</strong> La compuerta AND (cuatro muestras: 0,0 → 0; 0,1 → 0; 1,0 → 0; 1,1 → 1) sirve para hacer cada cuenta a mano. En el ejercicio 5 la misma idea se aplica a 2.850 clientes reales de una telefónica (Iranian Churn, UCI, CC BY 4.0). La plantilla trae la muestra 1 resuelta con fórmulas de Excel; las celdas amarillas son para completar.</div>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Hacia adelante, muestra 1</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule las sumas de la capa oculta: $z_1 = w_{11}x_1 + w_{12}x_2 + b_1$ y $z_2 = w_{21}x_1 + w_{22}x_2 + b_2$.</li>
+    <li>Aplique la sigmoide: $a = 1/(1 + e^{-z})$. En Excel: <code>=1/(1+EXP(-N6))</code>.</li>
+    <li>Calcule $z_s = w_{31}a_1 + w_{32}a_2 + b_s$ y $\hat y = \sigma(z_s)$.</li>
+    <li>Revise las fórmulas de la fila 6 de la plantilla: deben dar lo mismo que usted.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>z1 = −0,4000; a1 = 0,4013; z2 = −0,1000; a2 = 0,4750; zs = 0,0980; ŷ = 0,5245.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Pérdida y error de salida</h2>
+  <p class="meta">15 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule la pérdida: $L = -[y\ln\hat y + (1-y)\ln(1-\hat y)]$. Con y = 0 queda $-\ln(1-\hat y)$.</li>
+    <li>Deduzca en el cuaderno, con la regla de la cadena, que $\delta_s = \partial L/\partial z_s = \hat y - y$. Pista: $\sigma'(z) = \sigma(z)(1-\sigma(z))$.</li>
+    <li>Explique en una frase por qué esa cancelación es una ventaja frente a usar el error cuadrático.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Pérdida = 0,7434; δs = 0,5245. La derivada de la pérdida respecto a ŷ es (ŷ − y)/[ŷ(1 − ŷ)] y la de la sigmoide es ŷ(1 − ŷ): se cancelan. Con error cuadrático queda el factor ŷ(1 − ŷ), que es casi cero cuando la sigmoide se satura, y el aprendizaje se frena.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Hacia atrás y actualizar</h2>
+  <p class="meta">20 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule los errores ocultos: $\delta_1 = \delta_s\,w_{31}\,a_1(1-a_1)$ y $\delta_2 = \delta_s\,w_{32}\,a_2(1-a_2)$.</li>
+    <li>Calcule los nueve gradientes: $\partial L/\partial w_{3j} = \delta_s a_j$, $\partial L/\partial b_s = \delta_s$, $\partial L/\partial w_{ji} = \delta_j x_i$, $\partial L/\partial b_j = \delta_j$.</li>
+    <li>Actualice cada parámetro: $\theta \leftarrow \theta - \eta\,\partial L/\partial\theta$. La fila 7 de la plantilla lo hace con fórmulas.</li>
+    <li>¿Por qué no cambian w11, w12, w21 ni w22?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <p>δ1 = 0,0504; δ2 = 0,0654. P1: w11 = 0,2000; w12 = −0,3000; b1 = −0,4252; w21 = 0,3000; w22 = 0,2000; b2 = −0,1327; w31 = 0,2948; w32 = 0,3754; bs = −0,5622.</p>
+    <p>Los cuatro pesos de la capa oculta no cambian porque su gradiente es δ·x y en la muestra 1 las dos entradas valen 0.</p>
+  </div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Completar la época</h2>
+  <p class="meta">25 minutos. En parejas: uno calcula, el otro verifica en el simulador.</p>
+  <ol class="pasos">
+    <li>Repita los pasos 1 a 3 para las muestras 2, 3 y 4, cada una con los parámetros que dejó la anterior.</li>
+    <li>Compruebe cada muestra en el <a href="simulador_red_neuronal.html" target="_blank" rel="noopener">simulador</a> con "Muestra completa".</li>
+    <li>En la muestra 4, ¿qué signo tiene δs? ¿Qué les pasa a los pesos de salida?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Muestra</th><th class="d">z_s</th><th class="d">ŷ</th><th class="d">Pérdida</th><th class="d">δs</th><th class="d">δ1</th><th class="d">δ2</th></tr>
+      <tr><td>1 (0, 0 → 0)</td><td class="d">0,0980</td><td class="d">0,5245</td><td class="d">0,7434</td><td class="d">0,5245</td><td class="d">0,0504</td><td class="d">0,0654</td></tr>
+      <tr><td>2 (0, 1 → 0)</td><td class="d">−0,2721</td><td class="d">0,4324</td><td class="d">0,5663</td><td class="d">0,4324</td><td class="d">0,0280</td><td class="d">0,0405</td></tr>
+      <tr><td>3 (1, 0 → 0)</td><td class="d">−0,5382</td><td class="d">0,3686</td><td class="d">0,4598</td><td class="d">0,3686</td><td class="d">0,0204</td><td class="d">0,0242</td></tr>
+      <tr><td>4 (1, 1 → 1)</td><td class="d">−0,8164</td><td class="d">0,3065</td><td class="d">1,1825</td><td class="d">−0,6935</td><td class="d">−0,0229</td><td class="d">−0,0279</td></tr>
+    </table>
+    <p>P4: w11 = 0,2012; w12 = −0,3026; b1 = −0,4380; w21 = 0,3019; w22 = 0,1937; b2 = −0,1511; w31 = 0,2680; w32 = 0,3642; bs = −0,6160. En la muestra 4, δs es negativo: restar η por un gradiente negativo <em>sube</em> los pesos, y ŷ se acerca a 1.</p>
+  </div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Entrenar y llevarlo a datos reales</h2>
+  <p class="meta">15 minutos en Colab.</p>
+  <ol class="pasos">
+    <li>Corra el cuaderno: reproduzca P4 y entrene 2.000 épocas en línea y por lotes. ¿Desde qué época clasifica bien AND cada uno?</li>
+    <li>Pruebe una regresión logística sobre XOR. ¿Qué exactitud obtiene? ¿Por qué?</li>
+    <li>Aplique una red con 8 neuronas ocultas al churn sin duplicados de la semana 12 y compárela con la regresión logística.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <p>En línea clasifica bien desde la época 40; por lotes, desde la 199 (mismo η). Pérdida tras 2.000 épocas: 0,0008 y 0,0044. Regresión logística sobre XOR: exactitud 0,5 y probabilidad 0,5 en los cuatro casos.</p>
+    <table>
+      <tr><th>Modelo (713 clientes de prueba)</th><th class="d">Exactitud</th><th class="d">Sensibilidad</th></tr>
+      <tr><td>Regresión logística</td><td class="d">0,903</td><td class="d">0,482</td></tr>
+      <tr><td>Red con 8 neuronas ocultas sigmoides</td><td class="d">0,941</td><td class="d">0,723</td></tr>
+    </table>
+    <p>Es una sola partición. Antes de recomendar la red, valídela con validación cruzada como en la semana 12.</p>
+  </div></details>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>En el simulador, entrene XOR con pesos al azar diez veces. ¿Cuántas veces lo logra? Investigue por qué una red puede quedarse atascada (mínimos locales, saturación de la sigmoide) y cómo lo resuelven las redes modernas (ReLU, inicialización). Entregue un párrafo con dos fuentes de la guía de investigación.</p>
+</section>
+
+<section id="fuentes">
+  <h2>Para profundizar</h2>
+  <ul>
+    <li><a href="Investigacion_Redes_Neuronales.html">Guía de investigación de redes neuronales</a>: artículos verificados, videos y lectura guiada.</li>
+    <li>Nielsen, M. (2015). <a href="http://neuralnetworksanddeeplearning.com/" target="_blank" rel="noopener">Neural Networks and Deep Learning</a>, capítulo 2: retropropagación.</li>
+    <li>Goodfellow, I., Bengio, Y. y Courville, A. (2016). <a href="https://www.deeplearningbook.org/" target="_blank" rel="noopener">Deep Learning</a>, capítulo 6. MIT Press.</li>
+    <li><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a>: una red que se entrena en el navegador.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$', right: '$', display: false }] });
+window.GUIA_PUNTOS = [0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1];
+</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>
