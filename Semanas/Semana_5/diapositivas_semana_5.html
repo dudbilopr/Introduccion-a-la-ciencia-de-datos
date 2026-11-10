@@ -1,714 +1,366 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <title>Ciencia de Datos - Semana 5</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/monokai.min.css">
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-    <style>
-        :root {
-            --data-blue: #003865;
-            --data-orange: #E85C0B;
-            --cyber-dark: #050510;
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff007f;
-        }
-
-        body { font-family: 'Inter', sans-serif; }
-
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            color: var(--data-blue);
-            text-transform: none;
-            font-weight: 800;
-        }
-
-        .reveal h2 {
-            border-bottom: 3px solid var(--data-orange);
-            display: inline-block;
-            padding-bottom: 8px;
-            margin-bottom: 30px;
-        }
-
-        .accent { color: var(--data-orange) !important; font-weight: bold; }
-        .cyber-accent { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan); }
-
-        .reveal .controls, .reveal .progress { color: var(--data-orange); }
-
-        .icon-container {
-            font-size: 5rem;
-            color: var(--data-orange);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .box-glass {
-            background: rgba(240, 244, 248, 0.9);
-            border-left: 6px solid var(--data-orange);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: left;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            margin-top: 15px;
-            color: #333;
-            font-size: 0.9em;
-        }
-
-        .callout-tip {
-            background: #e6f7ff;
-            border-left: 5px solid #1890ff;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        /* Dark Mode / Cyber Mode slides */
-        .reveal.cyber-mode,
-        .reveal.cyber-mode .slide-background,
-        .reveal.cyber-mode .slide-background-content {
-            background-color: var(--cyber-dark) !important;
-        }
-
-        .reveal.cyber-mode h1, .reveal.cyber-mode h2, .reveal.cyber-mode h3, .reveal.cyber-mode p, .reveal.cyber-mode ul, .reveal.cyber-mode li {
-            color: #fff !important;
-        }
-
-        .reveal.cyber-mode h2 { border-bottom: 3px solid var(--neon-cyan); }
-
-        .reveal.cyber-mode .box-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border-left: 6px solid var(--neon-cyan);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
-        }
-
-        .clickable-concept {
-            cursor: pointer;
-            color: var(--data-blue);
-            font-weight: bold;
-            border-bottom: 2px dashed var(--data-orange);
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .cyber-mode .clickable-concept {
-            color: var(--neon-cyan);
-            border-bottom: 2px dashed var(--neon-cyan);
-        }
-
-        .clickable-concept:hover {
-            color: var(--data-orange);
-            transform: translateY(-2px);
-        }
-
-        .concept-modal {
-            display: none;
-            position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff; color: #333;
-            padding: 40px; border-radius: 12px;
-            border: 3px solid var(--data-blue);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            z-index: 1000; width: 85%; max-width: 700px;
-            text-align: left; font-size: 1.1rem;
-        }
-
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(8px);
-        }
-
-        .close-modal {
-            float: right; cursor: pointer; color: #ff4444;
-            font-weight: bold; font-size: 2rem; line-height: 1; transition: 0.2s;
-        }
-        .close-modal:hover { color: #cc0000; transform: scale(1.1); }
-
-        .split-layout {
-            display: flex; gap: 30px; align-items: stretch;
-            height: 100%;
-        }
-        .split-layout > div { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-
-        .reveal code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
-
-        /* Nuevos Componentes Visuales */
-        .quote-container {
-            position: relative;
-            padding: 30px 40px;
-            background: #f9f9f9;
-            border-left: 8px solid var(--data-blue);
-            font-style: italic;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
-            text-align: left;
-        }
-        .quote-container::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            font-size: 6rem;
-            color: rgba(0, 56, 101, 0.1);
-            font-family: Georgia, serif;
-        }
-        .quote-author {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            font-style: normal;
-            color: var(--data-orange);
-            text-align: right;
-        }
-
-        /* Animación Distribución Simple */
-        .simulation-box {
-            background: #fff;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .data-point {
-            width: 30px;
-            height: 30px;
-            background: var(--data-blue);
-            border-radius: 50%;
-            position: absolute;
-            bottom: 20px;
-            transition: all 1.5s ease-in-out;
-            color: white;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .data-point.outlier {
-            background: var(--data-orange);
-            right: 10px !important;
-            transform: scale(1.5);
-            animation: pulse-outlier 2s infinite;
-        }
-
-        @keyframes pulse-outlier {
-            0% { box-shadow: 0 0 0 0 rgba(232, 92, 11, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(232, 92, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(232, 92, 11, 0); }
-        }
-
-        .line-mean, .line-median {
-            position: absolute;
-            top: 10px;
-            bottom: 10px;
-            width: 4px;
-            transition: all 1.5s ease-in-out;
-        }
-        .line-mean { background: var(--data-orange); z-index: 10; }
-        .line-median { background: #28a745; z-index: 5; border-left: 2px dashed #fff; }
-        
-        .sim-label {
-            position: absolute;
-            top: -25px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            background: inherit;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .reveal .slides section {
-            max-height: 95vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 10px; /* Space for scrollbar */
-        }
-
-        /* Custom Premium Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--data-orange); 
-            border-radius: 4px; 
-        }
-        ::-webkit-scrollbar-thumb:hover { background: #c24d09; }
-
-        /* Contenedores de Gráficos Plotly */
-        .plotly-container {
-            width: 100%;
-            height: 250px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-            margin-top: 10px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 5 · El tribunal de los números | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/puntos.css">
+<link rel="stylesheet" href="../assets/puntos/cine.css">
+<link rel="stylesheet" href="../assets/puntos/curso.css">
+<style>
+  /* Mundo: un tribunal. Cada medida es un testigo; el método socrático las interroga hasta saber cuál dice la verdad sobre el cliente típico. */
+  :root { --fondo: #1b1117; --fondo-2: #2b1c25; --tinta: #f7eef2; --tinta-2: #bda7b2; --regla: rgba(189,167,178,.24); --punto: #85677a; --compra: #ff7a1f; --acento-texto: #ffa263; --toga: #ff9fb6; }
+  :root[data-tema="claro"] { --fondo: #f8f1f3; --fondo-2: #ecdfe4; --tinta: #26141d; --tinta-2: #634b57; --regla: rgba(38,20,29,.2); --punto: #a08795; --compra: #e85c0b; --acento-texto: #b94504; --toga: #b0335a; }
+  .rot { font: 700 23px Consolas, 'Courier New', monospace; letter-spacing: .1em; color: var(--toga); text-transform: uppercase; }
+  svg text:not([font-family]) { font-family: inherit; }
+  .t-eje { fill: var(--tinta-2); font-size: 22px; }
+  .t-n { fill: var(--tinta); font-weight: 700; }
+  .t-s { fill: var(--tinta-2); }
+  .t-o { fill: var(--acento-texto); font-weight: 800; }
+  .t-r { fill: var(--toga); font-weight: 800; }
+  .hoja { background: var(--fondo-2); border-left: 8px solid var(--toga); padding: 26px 30px; }
+  .hoja.naranja { border-left-color: var(--compra); }
+  .testigos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .testigos div { background: var(--fondo-2); padding: 24px 22px; border-top: 6px solid var(--toga); min-height: 300px; display: flex; flex-direction: column; gap: 10px; }
+  .testigos b { font-size: 34px; }
+  .testigos strong { font-size: 54px; color: var(--acento-texto); line-height: 1; }
+  .testigos span { font-size: 23px; color: var(--tinta-2); line-height: 1.25; }
+  .escalera { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .escalera div { background: var(--fondo-2); padding: 18px 16px; border-top: 6px solid var(--toga); min-height: 300px; }
+  .escalera b { display: block; font-size: 28px; margin: 8px 0; }
+  .escalera span { font-size: 22px; color: var(--tinta-2); line-height: 1.25; display: block; }
+  .escalera em { font-style: normal; font-size: 21px; color: var(--acento-texto); display: block; margin-top: 10px; line-height: 1.25; }
+  .glosa { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .glosa div { background: var(--fondo-2); padding: 18px 16px 22px; border-top: 4px solid var(--toga); min-height: 262px; }
+  .glosa .ico { font-size: 46px; color: var(--toga); }
+  .glosa b { display: block; font-size: 27px; line-height: 1.08; margin: 10px 0 8px; }
+  .glosa span { font-size: 22.5px; line-height: 1.22; color: var(--tinta-2); display: block; }
+  .cita { font-size: 42px; line-height: 1.22; font-weight: 700; }
+</style>
 </head>
+<body data-cine="paneo">
+<div id="escenario">
+<div id="reflector"></div>
+<canvas id="lienzo" aria-hidden="true"></canvas>
 
-<body>
-    <div class="reveal">
-        <div class="slides">
+<!-- 1 Portada -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:1424px">
+    <p class="rot">El tribunal de los números · Semana 5</p>
+    <h1 style="font-size:92px;margin-top:14px;line-height:1.03;width:1380px">¿Cuánto vale un cliente típico? <span class="acento">Depende de a qué testigo le pregunte.</span></h1>
+    <p class="sec" style="font-size:27px;margin-top:22px">Introducción a la Ciencia de Datos · Dudbil Olvasada Pabón Riaño · UNAB</p>
+  </div>
+  <div style="position:absolute;left:88px;top:580px;width:1000px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div class="hoja"><p class="rot">La media declara</p><p style="font-size:64px;font-weight:800;margin-top:8px" id="pMedia"></p></div>
+    <div class="hoja naranja"><p class="rot" style="color:var(--acento-texto)">La mediana declara</p><p style="font-size:64px;font-weight:800;margin-top:8px" id="pMediana"></p></div>
+  </div>
+  <aside class="notas">Valor del cliente de 3.150 clientes reales de una empresa de telecomunicaciones de Irán (Iranian Churn, UCI, CC BY 4.0). Las unidades no se especifican en la documentación. Son los mismos clientes que se predicen en la semana 11. Pregunte: ¿cuál de los dos números le daría al gerente? ¿Por qué no coinciden?</aside>
+</section>
 
-            <!-- Slide 1: Título -->
-            <section>
-                <div class="icon-container">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <h1>Ciencia de Datos</h1>
-                <h3>Semana 5: <span class="accent">Estadística Descriptiva</span></h3>
-                <p><small>Programa de Ciencia de Datos - UNAB</small></p>
-            </section>
+<!-- 2 Apuesta -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:700px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">Apuesta antes del dato</p>
+    <h2 style="font-size:56px;line-height:1.06">¿Cuántos SMS envía un cliente en nueve meses?</h2>
+    <p class="paso" style="font-size:31px">La media dice <b class="acento" id="pSm"></b>. La mediana, <b class="acento" id="pSd"></b>.</p>
+    <p class="paso" style="font-size:31px">El <b id="pS0"></b> no envió ni uno.</p>
+    <p class="paso" style="font-size:31px">El 10 % que más escribe envió el <b class="acento" id="pS10"></b> de todos los SMS.</p>
+    <p class="paso sec" style="font-size:26px">Cuando unos pocos concentran tanto, la media describe a casi nadie.</p>
+  </div>
+  <svg id="sms" class="diagrama" viewBox="0 0 760 760" style="position:absolute;left:800px;top:60px;width:760px;height:760px" role="img" aria-label="Histograma de la frecuencia de SMS con la media y la mediana"></svg>
+  <aside class="notas">Pida que apuesten un número antes de cada paso. Frequency of SMS: total de mensajes de los meses 1 a 9. La concentración del 10 % superior se calcula ordenando a los clientes de mayor a menor.</aside>
+</section>
 
-            <!-- Slide 2: Introducción y RAE -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-compass"></i> El Arte del EDA</h2>
-                    <p>Análisis Exploratorio de Datos (John Tukey, 1977)</p>
-                    <div class="box-glass">
-                        <p>En lugar de limitarnos a la memorización de fórmulas mecánicas, el <strong>EDA</strong> promueve descubrir los datos a través de la visualización y el código.</p>
-                        <hr>
-                        <h4 class="accent text-center"><i class="fa-solid fa-comments"></i> Pregunta en vivo:</h4>
-                        <p class="text-center" style="font-weight:bold;">¿Qué es lo primero que haces cuando te entregan un archivo CSV nuevo?</p>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-bullseye"></i> Resultados de Aprendizaje</h2>
-                    <div class="box-glass">
-                        <ul>
-                            <li class="fragment"><strong>RAE 1:</strong> Calcular e interpretar medidas de tendencia central y dispersión robusta (MAD, IQR).</li>
-                            <li class="fragment"><strong>RAE 2:</strong> Evaluar la asimetría de los datos (Skewness) y su impacto en el modelado.</li>
-                            <li class="fragment"><strong>RAE 3:</strong> Identificar relaciones bivariadas e interpretar Diagramas de Caja y Histogramas como herramientas diagnósticas.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
+<!-- 3 Agenda -->
+<section class="esc">
+  <p class="rot" style="position:absolute;left:88px;top:62px">Ruta de hoy · 7:00 a 10:00</p>
+  <svg id="agenda" class="diagrama" viewBox="0 0 1600 760" style="position:absolute;left:0;top:112px;width:1600px;height:760px" role="img" aria-label="Agenda de la sesión"></svg>
+  <aside class="notas">El taller de storytelling con método socrático es el centro: los equipos defienden una historia de tres frases y el grupo la interroga.</aside>
+</section>
 
-            <!-- Slide 3: Agenda -->
-            <section>
-                <h2><i class="fa-solid fa-list"></i> Agenda</h2>
-                <div class="split-layout">
-                    <div>
-                        <ul>
-                            <li class="fragment">El Tablero de Juego (Tipos de Datos)</li>
-                            <li class="fragment">Localización y el Peligro de los Outliers</li>
-                            <li class="fragment">Variabilidad y Dispersión Robusta</li>
-                            <li class="fragment">Herramientas de Diagnóstico Visual</li>
-                            <li class="fragment">Asimetría y Relaciones Bivariadas</li>
-                            <li class="fragment">Pair Programming</li>
-                        </ul>
-                    </div>
-                    <div class="fragment" style="display:flex; justify-content:center; align-items:center;">
-                        <i class="fa-solid fa-chart-pie text-gray-300" style="font-size:8rem;"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 4: Tipos de Datos -->
-            <section>
-                <h2><i class="fa-solid fa-cubes"></i> El Tablero: Tipos de Datos</h2>
-                <p>La naturaleza del dato determina qué operaciones matemáticas son válidas.</p>
-                <div class="split-layout" style="margin-bottom:10px;">
-                    <div class="box-glass">
-                        <h3 class="accent"><i class="fa-solid fa-hashtag"></i> Numéricos</h3>
-                        <ul>
-                            <li><strong>Continuos:</strong> Valores en cualquier intervalo (ej. Salario, Temperatura).</li>
-                            <li><strong>Discretos:</strong> Valores enteros o conteos (ej. Número de hijos).</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass">
-                        <h3 class="accent"><i class="fa-solid fa-tags"></i> Categóricos</h3>
-                        <ul>
-                            <li><strong>Ordinales:</strong> Tienen un orden lógico (ej. Nivel de educación).</li>
-                            <li><strong>Binarios / Nominales:</strong> (ej. Booleanos, Código Postal).</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="callout-tip fragment" style="border-left-color: #d9534f; background-color: #fdf2f2;">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #d9534f;"></i> <strong style="color: #d9534f;">La Advertencia del Experto:</strong> Aunque usemos números para los datos Ordinales (ej. Satisfacción de 1 a 5), calcular una <em>Media Aritmética</em> $\left( \bar{x} \right)$ sobre ellos carece de sentido matemático. Usa la Mediana o Moda.
-                </div>
-            </section>
-
-            <!-- Slide 5: Medidas de Tendencia Central y Outliers -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-crosshairs"></i> Localización: ¿Dónde está el centro?</h2>
-                    <p>El punto de equilibrio gravitacional de nuestros datos.</p>
-                    <div class="box-glass">
-                        <p>Haz clic para explorar las ecuaciones fundamentales:</p>
-                        <ul>
-                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('mediaModal')">Media Aritmética (Promedio)</span></li>
-                            <li class="mb-4"><span class="clickable-concept" onclick="openModal('medianaModal')">Mediana (Percentil 50)</span></li>
-                            <li><span class="clickable-concept" onclick="openModal('modaModal')">Moda (Valor Frecuente)</span></li>
-                        </ul>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-bolt"></i> El Peligro de los Outliers</h2>
-                    <p>La Media es ingenua. La Mediana es robusta.</p>
-                    <div class="split-layout">
-                        <div class="quote-container" style="font-size: 0.95rem;">
-                            "Al comparar salarios del vecindario de Medina, usar la media daría resultados absurdos porque <strong>Bill Gates</strong> vive ahí. Si usamos la mediana, el centro se mantiene intacto."
-                            <span class="quote-author">— Practical Statistics for Data Scientists</span>
-                        </div>
-                        <div class="quote-container fragment" style="font-size: 0.95rem;">
-                            "En 1984, el salario promedio de los graduados en geografía de la Univ. de Carolina del Norte se disparó a niveles récord debido a un solo estudiante: <strong>Michael Jordan</strong>."
-                            <span class="quote-author">— Caso Real Estadístico</span>
-                        </div>
-                    </div>
-                    <p class="fragment text-center accent" style="margin-top: 15px; font-weight: bold;">
-                        ¿Si fueras el director de la universidad, qué métrica reportarías en el folleto publicitario?
-                    </p>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-eye"></i> Simulación Visual del Sesgo</h2>
-                    <div class="box-glass">
-                        <div class="simulation-box" id="sim1">
-                            <!-- Datos normales -->
-                            <div class="data-point" style="left: 10%;">1</div>
-                            <div class="data-point" style="left: 20%;">2</div>
-                            <div class="data-point" style="left: 30%;">3</div>
-                            <div class="data-point" style="left: 40%;">4</div>
-                            <div class="data-point" style="left: 50%;">5</div>
-                            
-                            <!-- Indicadores -->
-                            <div class="line-median" style="left: 30%;" id="sim1-median"><span class="sim-label" style="background: #28a745; left: -25px;">Mediana</span></div>
-                            <div class="line-mean" style="left: 30%;" id="sim1-mean"><span class="sim-label" style="background: var(--data-orange);">Media</span></div>
-                        </div>
-                        <div style="text-align: center; margin-top: 15px;">
-                            <button onclick="triggerOutlier()" style="padding:10px 20px; cursor:pointer; background:var(--data-blue); color:white; border:none; border-radius:6px; font-weight:bold;">
-                                <i class="fa-solid fa-plus"></i> Añadir a Michael Jordan / Bill Gates
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 7: Dispersión -->
-            <section>
-                <section>
-                    <h2><i class="fa-solid fa-arrows-left-right"></i> Dispersión: El Ruido de los Datos</h2>
-                    <p>Conocer el centro no basta; necesitamos medir qué tan dispersos están los datos.</p>
-                    <div class="split-layout">
-                        <div class="box-glass">
-                            <h3 class="accent">Varianza ($s^2$)</h3>
-                            <div style="font-size: 1.2rem; text-align: center;">$$s^2 = \frac{\sum (x_i - \bar{x})^2}{n - 1}$$</div>
-                            <p>Dividimos por $n-1$ (grados de libertad para muestras). Penaliza fuertemente a los outliers, pero sus unidades son irreales (ej. $ dólares cuadrados).</p>
-                        </div>
-                        <div class="box-glass fragment">
-                            <h3 class="accent">Desviación Estándar ($s$)</h3>
-                            <div style="font-size: 1.2rem; text-align: center;">$$s = \sqrt{s^2}$$</div>
-                            <p>La raíz cuadrada de la Varianza. Es la <strong>métrica reina</strong> porque regresa a la escala original de los datos.</p>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-shield"></i> Dispersión Robusta</h2>
-                    <p>El Rango simple (Max - Min) es inútil y frágil si hay outliers reales.</p>
-                    <div class="box-glass fragment">
-                        <h4 class="accent">1. Rango Intercuartílico (IQR)</h4>
-                        <div style="text-align: center; font-weight:bold;">$$IQR = Q_3 - Q_1$$</div>
-                        <p>La diferencia entre el percentil 75 (Q3) y el percentil 25 (Q1). Representa el <strong>corazón del 50%</strong> de los datos centrales, ignorando las colas extremas.</p>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h4 class="accent">2. Desviación Absoluta de la Mediana (MAD)</h4>
-                        <div style="text-align: center; font-weight:bold;">$$MAD = \text{Mediana}(|x_i - \tilde{x}|)$$</div>
-                        <p>La mediana de las diferencias absolutas de todos los datos respecto a su propia mediana. Es la métrica matemáticamente más inmune a los extremos.</p>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Slide 8: Distribución Visual -->
-            <section>
-                <h2><i class="fa-solid fa-chart-column"></i> Diagnóstico Visual de la Forma</h2>
-                <p>No son "dibujos bonitos", son radiografías estadísticas de tus datos.</p>
-                <div class="split-layout">
-                    <div class="box-glass" style="padding: 10px 20px;">
-                        <h3 class="accent text-center">El Histograma</h3>
-                        <p style="font-size:0.7em;">Revela la frecuencia, modas y asimetría de los datos.</p>
-                        <div id="histPlot" class="plotly-container"></div>
-                    </div>
-                    <div class="box-glass fragment" style="padding: 10px 20px;">
-                        <h3 class="accent text-center">El Boxplot</h3>
-                        <p style="font-size:0.7em;">Caja=IQR. Línea=Mediana. Puntos=$1.5 \times \text{IQR}$ (Outliers).</p>
-                        <div id="boxPlot" class="plotly-container"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 9: Momentos Estadísticos y Asimetría -->
-            <section>
-                <h2><i class="fa-solid fa-scale-unbalanced"></i> Momentos y Asimetría</h2>
-                <div class="box-glass">
-                    <p>Los 4 momentos del Data Science: Localización (1er), Variabilidad (2do), <strong>Asimetría / Skewness (3er)</strong>, y <strong>Curtosis / Kurtosis (4to)</strong> que evalúa el peso de las colas.</p>
-                </div>
-                <div class="split-layout" style="margin-top: 20px;">
-                    <div class="box-glass fragment" style="text-align: center;">
-                        <h4 style="color: #d9534f;">Sesgo Negativo</h4>
-                        <p>(Cola Izquierda)</p>
-                        <p><code>Media < Mediana < Moda</code></p>
-                    </div>
-                    <div class="box-glass fragment" style="text-align: center; border-left: 6px solid #28a745;">
-                        <h4 style="color: #28a745;">Distribución Normal</h4>
-                        <p>(Simétrica)</p>
-                        <p><code>Media = Mediana = Moda</code></p>
-                    </div>
-                    <div class="box-glass fragment" style="text-align: center;">
-                        <h4 style="color: #f0ad4e;">Sesgo Positivo</h4>
-                        <p>(Cola Derecha)</p>
-                        <p><code>Moda < Mediana < Media</code></p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 9.5: Relaciones Bivariadas -->
-            <section>
-                <h2><i class="fa-solid fa-link"></i> Descriptiva Bivariada</h2>
-                <p>¿Cómo se mueven dos variables numéricas juntas?</p>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <h3 class="accent">Covarianza ($Cov$)</h3>
-                        <p>Nos indica la <strong>dirección</strong> (positiva o negativa), pero su valor numérico no está estandarizado.</p>
-                        <div id="scatterPlot" class="plotly-container" style="height: 180px;"></div>
-                    </div>
-                    <div class="box-glass fragment">
-                        <h3 class="accent">Correlación de Pearson ($r$)</h3>
-                        <div style="font-size: 1.1rem; text-align: center;">$$r = \frac{Cov(x,y)}{s_x s_y}$$</div>
-                        <p>Mide la <strong>fuerza</strong> de la relación lineal en un rango exacto de <code>-1 a 1</code>.</p>
-                        <div style="background:#fdf2f2; border-left:4px solid #d9534f; padding:8px; margin-top:10px; font-size:0.85em;">
-                            <strong style="color:#d9534f;">¡Límite!</strong> Pearson solo mide relaciones lineales y es muy sensible a outliers.
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 10: Glosario -->
-            <section>
-                <h2><i class="fa-solid fa-language"></i> Glosario EMI</h2>
-                <div class="split-layout">
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Mean / Trimmed Mean:</strong> Media / Media Recortada.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Median / Mode:</strong> Mediana / Moda.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Variance:</strong> Varianza.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Standard Deviation:</strong> Desv. Estándar.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass">
-                        <ul>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Skewness / Kurtosis:</strong> Asimetría / Curtosis.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Covariance:</strong> Covarianza.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Correlation:</strong> Correlación.</li>
-                            <li><i class="fa-solid fa-check" style="color: #28a745;"></i> <strong>Outliers / IQR:</strong> Atípicos / Rango Intercuartílico.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 11: Pair Programming -->
-            <section data-state="cyber-mode">
-                <h2><i class="fa-solid fa-terminal"></i> Pair Programming</h2>
-                <div class="box-glass">
-                    <h3 class="cyber-accent">Misión: Análisis Exploratorio en Python</h3>
-                    <p>Abran Google Colab y carguen el <code>Colab_Guiado_Semana_5.ipynb</code>.</p>
-                    <p>Usaremos el comando estrella <code>df.describe()</code> en Pandas. Plotearán un Boxplot y un Histograma utilizando Seaborn para identificar la <strong>Asimetría</strong> real de los datos, demostrando empíricamente que la Mediana es superior a la Media en este dataset y calculando su <strong>Correlación</strong>.</p>
-                    <p><i class="fa-solid fa-code" style="color: #00ffcc;"></i> ¡Manos a la obra!</p>
-                </div>
-            </section>
-
-            <!-- Slide 12: Cyber Status y Conclusiones -->
-            <section data-state="cyber-mode">
-                <section>
-                    <h2><i class="fa-solid fa-microchip"></i> System Status</h2>
-                    <div class="box-glass" style="min-height: 200px;">
-                        <span id="typed-output" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--neon-cyan);"></span>
-                    </div>
-                </section>
-                <section>
-                    <h2><i class="fa-solid fa-clipboard-check"></i> Conclusiones</h2>
-                    <div class="box-glass" style="margin-bottom: 20px;">
-                        <ul>
-                            <li>La <strong>Mediana</strong> y la <strong>Media Recortada</strong> son indispensables en el mundo real donde los outliers son la norma.</li>
-                            <li>Las medidas de dispersión calibran nuestro nivel de confianza sobre el promedio.</li>
-                            <li>Los histogramas y boxplots diagnostican asimetrías y colas pesadas antes del modelado.</li>
-                        </ul>
-                    </div>
-                    <div class="box-glass" style="font-size: 0.8em; background: #fff; color:#333;">
-                        <strong>Bibliografía de la Clase:</strong>
-                        <ul>
-                            <li>Bruce, P., Bruce, A., & Gedeck, P. (2020). <em>Practical Statistics for Data Scientists</em>. O'Reilly.</li>
-                            <li>Tukey, J. W. (1977). <em>Exploratory Data Analysis</em>. Addison-Wesley.</li>
-                        </ul>
-                    </div>
-                </section>
-            </section>
-
-        </div>
+<!-- 4 RAE -->
+<section class="esc">
+  <div class="hoja" style="position:absolute;left:140px;top:100px;width:1320px">
+    <p class="rot">Resultado de aprendizaje 1.2</p>
+    <h2 style="font-size:52px;margin:16px 0 30px">Mide la distancia entre atributos categóricos, atributos ordinales y tipos mixtos.</h2>
+    <div style="display:grid;grid-template-columns:88px 1fr;gap:24px 18px;align-items:center">
+      <i class="ico" data-i="sigma" style="font-size:62px;color:var(--toga)"></i><p style="font-size:32px">Calculas medidas de centro, dispersión y posición, y eliges la que corresponde.</p>
+      <i class="ico" data-i="list-ordered" style="font-size:62px;color:var(--toga)"></i><p style="font-size:32px">Distingues qué medida tiene sentido para un atributo ordinal y cuál no.</p>
+      <i class="ico" data-i="message-square" style="font-size:62px;color:var(--toga)"></i><p style="font-size:32px">Cuentas una historia con datos y la defiendes ante preguntas socráticas.</p>
     </div>
+  </div>
+  <aside class="notas">Para medir distancias entre atributos ordinales primero hay que saber qué se puede calcular con ellos: la mediana y los cuartiles sí, la media no siempre. Esa es la conexión con el RAE.</aside>
+</section>
 
-    <!-- Modales -->
-    <div class="modal-overlay" id="overlay" onclick="closeModals()"></div>
-    
-    <div class="concept-modal" id="mediaModal">
-        <span class="close-modal" onclick="closeModals()">&times;</span>
-        <h2 class="accent"><i class="fa-solid fa-scale-unbalanced"></i> Media Aritmética</h2>
-        <p>Suma de todos los valores dividida por el número de observaciones.</p>
-        <div style="font-size: 1.5rem; text-align: center;">$$\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i$$</div>
-        <p>Sensible a valores extremos. Ideal para distribuciones simétricas.</p>
+<!-- 5 Los datos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">El expediente</p><h2 style="font-size:52px;margin-top:6px">3.150 clientes, nueve meses de uso y una pregunta: ¿quién se va?</h2></div>
+  <svg id="expediente" class="diagrama" viewBox="0 0 1424 620" style="position:absolute;left:88px;top:190px;width:1424px;height:620px" role="img" aria-label="Línea de tiempo de los datos: variables de los meses 1 a 9 y etiqueta de abandono en el mes 12"></svg>
+  <aside class="notas">Las variables se midieron de los meses 1 a 9 y la etiqueta Churn (se fue o no) en el mes 12. Hay 300 filas repetidas: hoy no se quitan porque se describe el archivo tal como llega; en la semana 12 se verá cómo inflan la validación.</aside>
+</section>
+
+<!-- 6 Tres testigos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Tres testigos del centro · valor del cliente</p><h2 style="font-size:50px;margin:6px 0 20px">Media, mediana y moda no tienen por qué coincidir</h2></div>
+  <svg id="valor" class="diagrama" viewBox="0 0 1424 640" style="position:absolute;left:88px;top:180px;width:1424px;height:640px" role="img" aria-label="Histograma del valor del cliente con la media y la mediana marcadas"></svg>
+  <aside class="notas">La media es el punto de equilibrio: la jalan los valores grandes. La mediana deja la mitad de los clientes a cada lado. La asimetría de Customer Value es 1,43: cola larga a la derecha.</aside>
+</section>
+
+<!-- 7 Testigo extremo -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:56px;width:660px;display:flex;flex-direction:column;gap:22px">
+    <p class="rot">Interrogatorio · un cliente gigante</p>
+    <h2 style="font-size:50px;line-height:1.08">Llega un cliente que vale 100 veces el máximo</h2>
+    <p class="paso" style="font-size:29px">La media salta de <b id="x1"></b> a <b class="acento" id="x2"></b>.</p>
+    <p class="paso" style="font-size:29px">La desviación estándar, de <b id="x3"></b> a <b class="acento" id="x4"></b>.</p>
+    <p class="paso" style="font-size:29px">La mediana: de <b id="x5"></b> a <b id="x6"></b>. No se movió.</p>
+    <p class="paso sec" style="font-size:26px">Un solo dato entre 3.151 puede mover la media; para mover la mediana hay que cambiar la mitad.</p>
+  </div>
+  <svg id="extremo" class="diagrama" viewBox="0 0 780 720" style="position:absolute;left:790px;top:80px;width:780px;height:720px" role="img" aria-label="Media, mediana y desviación estándar antes y después de agregar un cliente extremo"></svg>
+  <aside class="notas">Experimento hecho con los datos reales: se agregó un cliente con 100 veces el valor máximo (216.528). Se llama punto de quiebre: la proporción de datos que hay que contaminar para que la medida se vaya al infinito. Media: 0 %; mediana: 50 %. Rousseeuw y Croux (1993) parten de esa propiedad.</aside>
+</section>
+
+<!-- 8 Dispersión -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Tres testigos de la dispersión</p><h2 style="font-size:50px;margin:6px 0 20px">¿Qué tan distintos son los clientes entre sí?</h2>
+    <div class="testigos">
+      <div class="paso"><b>Desviación estándar</b><strong id="d1"></strong><span>Promedio de distancias a la media, al cuadrado. Sensible a extremos.</span></div>
+      <div class="paso"><b>Rango intercuartílico</b><strong id="d2"></strong><span>Q3 − Q1: el ancho del 50 % central. De <span id="d2a"></span> a <span id="d2b"></span>.</span></div>
+      <div class="paso"><b>MAD</b><strong id="d3"></strong><span>Mediana de las distancias a la mediana. La más resistente.</span></div>
     </div>
+  </div>
+  <p class="paso sec" style="position:absolute;left:88px;top:600px;width:1424px;font-size:27px">Regla del tribunal: centro y dispersión se reportan en pareja. Media con desviación estándar; mediana con rango intercuartílico.</p>
+  <aside class="notas">Customer Value. La MAD sin escalar es 160,6; multiplicada por 1,4826 se compara con la desviación estándar en datos normales (Rousseeuw y Croux, 1993). Los cuartiles se calculan con interpolación lineal, como pandas; Hyndman y Fan (1996) muestran que los programas usan definiciones distintas.</aside>
+</section>
 
-    <div class="concept-modal" id="medianaModal">
-        <span class="close-modal" onclick="closeModals()">&times;</span>
-        <h2 class="accent"><i class="fa-solid fa-align-center"></i> Mediana</h2>
-        <p>Valor central de un conjunto de datos ordenados. Divide el conjunto por la mitad.</p>
-        <div style="font-size: 1.5rem; text-align: center;">$$\tilde{x} = x_{(n+1)/2}$$</div>
-        <p>Robusta ante outliers. Ideal para salarios o distribuciones sesgadas.</p>
+<!-- 9 Asimetría -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Testigos que se contradicen · asimetría</p><h2 style="font-size:50px;margin-top:6px">La cola larga jala a la media hacia su lado</h2></div>
+  <svg id="asim" class="diagrama" viewBox="0 0 1424 560" style="position:absolute;left:88px;top:180px;width:1424px;height:560px" role="img" aria-label="Dos distribuciones: segundos de uso con cola a la derecha y meses de suscripción con cola a la izquierda"></svg>
+  <p class="paso" style="position:absolute;left:88px;top:770px;width:1424px;font-size:27px">Von Hippel (2005) advierte que la regla "media a la derecha de la mediana si hay cola a la derecha" <b>falla con frecuencia</b>, sobre todo en datos discretos. Se comprueba, no se supone.</p>
+  <aside class="notas">Segundos de uso: media 4.472, mediana 2.990, asimetría 1,32. Meses de suscripción: media 32,5, mediana 35, asimetría −1,30. Aquí la regla se cumple; en la siguiente escena, con datos discretos, hay que mirar con cuidado.</aside>
+</section>
+
+<!-- 10 Ordinales -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">RAE 1.2 · testigos falsos</p><h2 style="font-size:48px;margin:6px 0 20px">Dos columnas parecen números y no lo son</h2></div>
+  <div style="position:absolute;left:88px;top:170px;width:1424px;display:grid;grid-template-columns:1fr 1fr;gap:26px">
+    <div class="hoja paso"><p class="rot">Age</p><h3 style="font-size:34px;margin:10px 0">"La edad media es <span id="o1"></span> años"</h3><p style="font-size:26px">Age solo toma cinco valores: 15, 25, 30, 45 y 55. Es la misma columna Age Group con otras etiquetas. Su media no describe a nadie.</p></div>
+    <div class="hoja paso"><p class="rot">Charge Amount</p><h3 style="font-size:34px;margin:10px 0">Mediana <span id="o2"></span>, media <span id="o3"></span></h3><p style="font-size:26px">Es un nivel ordenado de 0 a 10, no un monto. Se reporta con la mediana y la tabla de frecuencias.</p></div>
+  </div>
+  <svg id="cargo" class="diagrama" viewBox="0 0 1424 250" style="position:absolute;left:88px;top:600px;width:1424px;height:250px" role="img" aria-label="Clientes por nivel de Charge Amount"></svg>
+  <aside class="notas">pd.crosstab(df["Age Group"], df["Age"]) muestra que cada grupo tiene una sola edad: la columna Age es redundante. Para ordinales: mediana, cuartiles, moda y frecuencias. La media de un ordinal supone que los saltos entre niveles son iguales.</aside>
+</section>
+
+<!-- 11 Historia por grupos -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">La historia aparece al comparar</p><h2 style="font-size:48px;margin-top:6px">Quien se va habla, escribe y llama mucho menos</h2></div>
+  <svg id="grupos" class="diagrama" viewBox="0 0 1424 640" style="position:absolute;left:88px;top:170px;width:1424px;height:640px" role="img" aria-label="Medianas de cinco variables para clientes que se quedan y que se van"></svg>
+  <aside class="notas">Medianas, porque las distribuciones son asimétricas. Dos variables no muestran diferencia (fallas de llamada y meses de suscripción): también es un hallazgo. Una buena historia dice qué no cambia.</aside>
+</section>
+
+<!-- 12 Quejas -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:70px;width:720px;display:flex;flex-direction:column;gap:24px">
+    <p class="rot">El testigo clave</p>
+    <h2 style="font-size:54px;line-height:1.06">De cada 100 clientes que se quejaron, se fueron <span class="acento" id="q1"></span></h2>
+    <p class="paso" style="font-size:31px">Entre quienes no se quejaron: <b id="q2"></b> de cada 100.</p>
+    <p class="paso" style="font-size:31px">Solo <b id="q3"></b> clientes se quejaron: un grupo pequeño con una señal enorme.</p>
+    <p class="paso sec" style="font-size:26px">Pregunta socrática: ¿la queja causa la salida, o los dos tienen una causa común?</p>
+  </div>
+  <svg id="quejas" class="diagrama" viewBox="0 0 720 720" style="position:absolute;left:840px;top:80px;width:720px;height:720px" role="img" aria-label="Cien clientes como cuadros: proporción que se va entre quienes se quejaron y quienes no"></svg>
+  <aside class="notas">Complains: 1 si el cliente presentó una queja en los meses 1 a 9. Es la variable que más separa en la semana 11. Correlación no es causa: un mal servicio puede producir la queja y la salida.</aside>
+</section>
+
+<!-- 13 Método socrático -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:46px;width:1424px"><p class="rot">Método socrático · cinco preguntas al dato</p><h2 style="font-size:48px;margin:6px 0 22px">Toda cifra que se presenta se interroga así</h2>
+    <div class="escalera">
+      <div class="paso"><i class="ico" data-i="circle-help" style="font-size:44px;color:var(--toga)"></i><b>Aclarar</b><span>¿Qué mide exactamente?</span><em>¿El valor del cliente está en qué unidad?</em></div>
+      <div class="paso"><i class="ico" data-i="layers" style="font-size:44px;color:var(--toga)"></i><b>Supuestos</b><span>¿Qué se da por cierto?</span><em>¿Que la distribución es simétrica?</em></div>
+      <div class="paso"><i class="ico" data-i="scale" style="font-size:44px;color:var(--toga)"></i><b>Evidencia</b><span>¿Qué número lo respalda?</span><em>¿Media o mediana? ¿Con cuántos clientes?</em></div>
+      <div class="paso"><i class="ico" data-i="git-fork" style="font-size:44px;color:var(--toga)"></i><b>Alternativas</b><span>¿Qué otra explicación cabe?</span><em>¿Y si la queja y la salida tienen causa común?</em></div>
+      <div class="paso"><i class="ico" data-i="flag" style="font-size:44px;color:var(--acento-texto)"></i><b>Consecuencias</b><span>¿Qué se haría con esto?</span><em>¿A quién llama primero el equipo de retención?</em></div>
     </div>
+  </div>
+  <aside class="notas">La guía de aprendizaje pide justificar verbalmente cada medida con método socrático. Wild y Pfannkuch (1999) describen un ciclo interrogativo en el pensamiento estadístico: generar, buscar, interpretar, criticar y juzgar. Esta escalera es su versión de aula.</aside>
+</section>
 
-    <div class="concept-modal" id="modaModal">
-        <span class="close-modal" onclick="closeModals()">&times;</span>
-        <h2 class="accent"><i class="fa-solid fa-users"></i> Moda</h2>
-        <p>Valor más frecuente en el conjunto de datos.</p>
-        <p>Única medida aplicable matemáticamente a datos categóricos nominales (como país o color).</p>
+<!-- 14 Taller -->
+<section class="esc">
+  <svg id="taller" class="diagrama" viewBox="0 0 1600 900" style="position:absolute;inset:0;width:1600px;height:900px" role="img" aria-label="Cinco pasos del taller de storytelling"></svg>
+  <a class="boton" href="Guia_Laboratorio_Semana5.html" target="_blank" rel="noopener" style="position:absolute;left:88px;bottom:76px">Abrir la guía del taller</a>
+  <aside class="notas">Equipos de tres. Cada equipo presenta una historia de tres frases (hallazgo, número con su medida, qué no se puede afirmar) y otro equipo la interroga con las cinco preguntas. Segel y Heer (2010) describen cómo se cuentan historias con datos en el periodismo.</aside>
+</section>
+
+<!-- 15 EMI -->
+<section class="esc" data-cine="pagina">
+  <div class="hoja" style="position:absolute;left:120px;top:60px;width:1360px;padding:40px 48px">
+    <p class="rot">English immersion · 10 minutes · statistical literacy</p>
+    <p class="cita" style="margin:22px 0 18px">“Statistical literacy is portrayed as the ability to <span class="acento">interpret, critically evaluate, and communicate</span> about statistical information and messages.”</p>
+    <p style="font-size:22px;color:var(--tinta-2);margin-bottom:24px">Gal (2002), Adults’ statistical literacy, International Statistical Review 70(1), 1-25</p>
+    <div style="display:grid;grid-template-columns:70px 1fr;gap:20px 16px;align-items:center;border-top:2px solid var(--regla);padding-top:24px">
+      <i class="ico paso" data-i="circle-help" style="font-size:50px;color:var(--toga)"></i><p class="paso" style="font-size:31px">The mean SMS count is 73 and the median is 21. Which one would you report? Why?</p>
+      <i class="ico paso" data-i="message-square" style="font-size:50px;color:var(--toga)"></i><p class="paso" style="font-size:31px">Explain “robust” with the giant customer example.</p>
+      <i class="ico paso" data-i="languages" style="font-size:50px;color:var(--toga)"></i><p class="paso" style="font-size:31px">Tell your story in English: “Customers who leave… The median is… We cannot say…”.</p>
     </div>
+    <p class="paso" style="font-size:25px;margin-top:22px;color:var(--tinta-2)"><b>Words:</b> mean · median · mode · spread · skewed · quartile · robust · outlier · churn</p>
+  </div>
+  <aside class="notas">Cita textual del resumen de Gal (2002). Cinco minutos en parejas y cinco en plenaria.</aside>
+</section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
-    
-    <script>
-        Reveal.initialize({
-            hash: true, transition: 'slide', controls: true, progress: true,
-            margin: 0.1, minScale: 0.2, maxScale: 2.0,
-            mathjax2: {
-                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
-                config: 'TeX-AMS_HTML-full',
-                tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    displayMath: [['$$','$$'], ['\\[','\\]']]
-                }
-            },
-            plugins: [ RevealHighlight, RevealMath.MathJax2 ]
-        });
+<!-- 16 Glosario -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:50px;width:1424px"><p class="rot">Código del tribunal</p><h2 style="font-size:52px;margin:6px 0 22px">Glosario de hoy</h2>
+    <div class="glosa">
+      <div><i class="ico" data-i="scale"></i><b>Media</b><span>Punto de equilibrio; la jalan los extremos.</span></div>
+      <div><i class="ico" data-i="split"></i><b>Mediana</b><span>Deja la mitad de los datos a cada lado.</span></div>
+      <div><i class="ico" data-i="bar-chart-3"></i><b>Moda</b><span>El valor más frecuente; sirve para categorías.</span></div>
+      <div><i class="ico" data-i="move"></i><b>Desviación estándar</b><span>Dispersión respecto a la media.</span></div>
+      <div><i class="ico" data-i="columns"></i><b>RIC</b><span>Q3 − Q1: ancho del 50 % central.</span></div>
+      <div><i class="ico" data-i="shield"></i><b>Robusta</b><span>Medida que resiste a unos pocos extremos.</span></div>
+      <div><i class="ico" data-i="trending-up"></i><b>Asimetría</b><span>Cola más larga hacia un lado.</span></div>
+      <div><i class="ico" data-i="list-ordered"></i><b>Ordinal</b><span>Se resume con mediana y frecuencias.</span></div>
+      <div><i class="ico" data-i="pie-chart"></i><b>Concentración</b><span>Qué parte del total tiene el grupo de arriba.</span></div>
+      <div><i class="ico" data-i="message-square"></i><b>Storytelling</b><span>Hallazgo, número y límite en pocas frases.</span></div>
+    </div>
+  </div>
+  <aside class="notas">Estos términos entran en la Evaluación auténtica de la semana 8.</aside>
+</section>
 
-        function openModal(id) {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById(id).style.display = 'block';
-        }
+<!-- 17 Cierre -->
+<section class="esc">
+  <div class="hoja naranja" style="position:absolute;left:180px;top:90px;width:1240px">
+    <p class="rot" style="color:var(--acento-texto)">Veredicto</p>
+    <h2 style="font-size:54px;margin:12px 0 30px">Tres reglas para el tribunal</h2>
+    <div style="display:grid;grid-template-columns:86px 1fr;gap:28px 18px;align-items:center">
+      <i class="ico paso" data-i="split" style="font-size:60px;color:var(--toga)"></i><p class="paso" style="font-size:34px"><b>Con cola larga, la mediana:</b> describe mejor al cliente típico.</p>
+      <i class="ico paso" data-i="columns" style="font-size:60px;color:var(--toga)"></i><p class="paso" style="font-size:34px"><b>Centro y dispersión en pareja:</b> un número solo miente por omisión.</p>
+      <i class="ico paso" data-i="list-ordered" style="font-size:60px;color:var(--toga)"></i><p class="paso" style="font-size:34px"><b>Primero el tipo de atributo:</b> la media de una etiqueta no significa nada.</p>
+    </div>
+    <p class="paso" style="font-size:27px;margin-top:30px;color:var(--tinta-2)">Semana 6: visualización. Histogramas, cajas y dispersión, y por qué hay que graficar antes de calcular.</p>
+  </div>
+  <aside class="notas">Pregunta de salida: escriba en una frase, con un número y su medida, algo que aprendió hoy de los clientes que se van.</aside>
+</section>
 
-        function closeModals() {
-            document.getElementById('overlay').style.display = 'none';
-            var modals = document.getElementsByClassName('concept-modal');
-            for(var i=0; i<modals.length; i++) modals[i].style.display = 'none';
-        }
+<!-- 18 Fuentes -->
+<section class="esc">
+  <div style="position:absolute;left:88px;top:54px;width:1424px" class="bib">
+    <p class="rot">Fuentes del expediente</p>
+    <h2 style="font-size:48px;margin:6px 0 16px">Bibliografía y datos</h2>
+    <p><em>Iranian Churn</em> [conjunto de datos] (2020). UCI Machine Learning Repository. CC BY 4.0. <a href="https://doi.org/10.24432/C5JW3Z" target="_blank" rel="noopener">doi:10.24432/C5JW3Z</a></p>
+    <p>Gal, I. (2002). Adults' statistical literacy: Meanings, components, responsibilities. <em>International Statistical Review</em>, 70(1), 1-25. <a href="https://doi.org/10.1111/j.1751-5823.2002.tb00336.x" target="_blank" rel="noopener">doi:10.1111/j.1751-5823.2002.tb00336.x</a></p>
+    <p>von Hippel, P. T. (2005). Mean, median, and skew: Correcting a textbook rule. <em>Journal of Statistics Education</em>, 13(2). <a href="https://doi.org/10.1080/10691898.2005.11910556" target="_blank" rel="noopener">doi:10.1080/10691898.2005.11910556</a></p>
+    <p>Rousseeuw, P. J. y Croux, C. (1993). Alternatives to the median absolute deviation. <em>Journal of the American Statistical Association</em>, 88(424), 1273-1283. <a href="https://doi.org/10.1080/01621459.1993.10476408" target="_blank" rel="noopener">doi:10.1080/01621459.1993.10476408</a></p>
+    <p>Wild, C. J. y Pfannkuch, M. (1999). Statistical thinking in empirical enquiry. <em>International Statistical Review</em>, 67(3), 223-248. <a href="https://doi.org/10.1111/j.1751-5823.1999.tb00442.x" target="_blank" rel="noopener">doi:10.1111/j.1751-5823.1999.tb00442.x</a></p>
+    <p>Segel, E. y Heer, J. (2010). Narrative visualization: Telling stories with data. <em>IEEE TVCG</em>, 16(6), 1139-1148. <a href="https://doi.org/10.1109/TVCG.2010.179" target="_blank" rel="noopener">doi:10.1109/TVCG.2010.179</a> · Iconos: Lucide, ISC. Cifras: <span class="mono">cifras_1a6.py</span>. Uso de IA: Claude ayudó a programar y redactar; el docente revisó cada cifra y cita.</p>
+  </div>
+  <aside class="notas">Cifras: Material_Privado/Cifras/cifras_s05.json.</aside>
+</section>
 
-        // Simulación interactiva del Outlier
-        let outlierAdded = false;
-        function triggerOutlier() {
-            if(outlierAdded) return;
-            outlierAdded = true;
-            
-            const sim = document.getElementById('sim1');
-            const outlier = document.createElement('div');
-            outlier.className = 'data-point outlier';
-            outlier.style.left = '90%';
-            outlier.innerHTML = '<i class="fa-solid fa-basketball"></i>';
-            sim.appendChild(outlier);
+<div id="haz"></div>
+<div id="ayuda">Flechas para avanzar · F pantalla completa · N notas · L tema</div>
+<div id="barra"></div>
+<div id="contador"></div>
+<div id="notas"></div>
+</div>
+<script src="../assets/puntos/iconos.js"></script>
+<script src="../assets/puntos/curso.js"></script>
+<script src="../assets/puntos/ds.js"></script>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, R = S.resumen, num = DS.num, txt = DS.txt, ic = CUR.ic, CV = R['Customer Value'], SM = R['Frequency of SMS'], X = S.extremo;
+  function pon(id, v) { document.getElementById(id).textContent = v; }
+  function pct(x) { return num(x, 1) + ' %'; }
+  pon('pMedia', num(CV.media, 1)); pon('pMediana', num(CV.mediana, 1));
+  pon('pSm', num(SM.media, 1)); pon('pSd', num(SM.mediana)); pon('pS0', pct(S.sms.cero_pct)); pon('pS10', pct(S.sms.top10_pct_del_total));
+  pon('x1', num(X.media_antes, 1)); pon('x2', num(X.media_despues, 1)); pon('x3', num(X.de_antes, 1)); pon('x4', num(X.de_despues, 1)); pon('x5', num(X.mediana_antes, 1)); pon('x6', num(X.mediana_despues, 1));
+  pon('d1', num(CV.de, 1)); pon('d2', num(CV.ric, 1)); pon('d2a', num(CV.q1, 1)); pon('d2b', num(CV.q3, 1)); pon('d3', num(S.customer_value_mad, 1));
+  pon('o1', num(S.edad.media_enganosa, 1)); pon('o2', num(S.charge_amount.mediana)); pon('o3', num(S.charge_amount.media, 2));
+  pon('q1', num(S.quejas['1'].churn_pct, 0)); pon('q2', num(S.quejas['0'].churn_pct, 0)); pon('q3', num(S.quejas['1'].clientes));
 
-            document.getElementById('sim1-mean').style.left = '65%';
-            document.getElementById('sim1-median').style.left = '32%';
-        }
+  CUR.poner('agenda', DS.agenda([['7:00', 'Apuesta', 'dice-5'], ['7:10', 'El centro', 'scale'], ['7:35', 'Dispersión', 'move'], ['8:00', 'Ordinales', 'list-ordered'], ['8:20', 'Pausa', 'coffee'], ['8:35', 'English', 'languages'], ['8:45', 'Storytelling', 'message-square'], ['9:50', 'Veredicto', 'gavel']], 6, { color: 'var(--toga)' }));
 
-        // Plotly Graphs Generation
-        function drawPlotlyGraphs() {
-            // Generar datos aleatorios sesgados para el histograma
-            var histData = [];
-            for (var i = 0; i < 500; i++) {
-                histData.push(Math.pow(Math.random(), 2) * 100); 
-            }
-            
-            // 1. Histograma
-            var traceHist = { x: histData, type: 'histogram', marker: {color: '#003865'} };
-            var layoutHist = { margin: {l: 20, r: 20, t: 20, b: 20}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false}, yaxis: {showgrid: false} };
-            Plotly.newPlot('histPlot', [traceHist], layoutHist, {displayModeBar: false});
+  /* SMS: histograma */
+  var h = DS.histo({ x: 90, y: 50, w: 620, h: 520, vals: C.Frequency_of_SMS, bins: [0, 540, 20], yt: [0, 500, 1000, 1500], xt: [0, 100, 200, 300, 400, 500], xl: 'SMS en nueve meses', color: 'var(--punto)' });
+  var s = h.s;
+  s += '<g class="paso-capa"><line x1="' + h.X(SM.mediana) + '" x2="' + h.X(SM.mediana) + '" y1="50" y2="570" stroke="var(--compra)" stroke-width="4"/>' + txt(h.X(SM.mediana) + 10, 90, 'mediana ' + num(SM.mediana), 't-o', ' font-size="26"') + '</g>';
+  s += '<g class="paso-capa"><line x1="' + h.X(SM.media) + '" x2="' + h.X(SM.media) + '" y1="50" y2="570" stroke="var(--toga)" stroke-width="4" stroke-dasharray="10 7"/>' + txt(h.X(SM.media) + 10, 140, 'media ' + num(SM.media, 1), 't-r', ' font-size="26"') + '</g>';
+  CUR.poner('sms', s);
 
-            // 2. Boxplot
-            var traceBox = { x: histData, type: 'box', name: '', marker: {color: '#E85C0B'} };
-            var layoutBox = { margin: {l: 20, r: 20, t: 20, b: 20}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false} };
-            Plotly.newPlot('boxPlot', [traceBox], layoutBox, {displayModeBar: false});
+  /* Expediente: línea de tiempo */
+  var e = '', Xm = DS.esc(0, 0, 12.5, 60, 1380);
+  e += '<line x1="60" x2="1380" y1="300" y2="300" stroke="var(--regla)" stroke-width="5"/>';
+  e += '<rect x="' + Xm(0.5) + '" y="250" width="' + (Xm(9.5) - Xm(0.5)) + '" height="100" fill="var(--fondo-2)" stroke="var(--toga)" stroke-width="3"/>' + txt((Xm(0.5) + Xm(9.5)) / 2, 312, 'Meses 1 a 9: uso, llamadas, SMS, quejas, valor', 't-n', ' text-anchor="middle" font-size="28"');
+  for (var m = 1; m <= 12; m++) e += txt(Xm(m), 390, 'mes ' + m, 't-eje', ' text-anchor="middle" font-size="19"');
+  e += '<g class="paso"><circle cx="' + Xm(12) + '" cy="300" r="40" fill="var(--compra)"/>' + ic('user-x', Xm(12) - 24, 276, 48, '#1b1117') + txt(Xm(12), 210, '¿se fue?', 't-o', ' text-anchor="middle" font-size="28"') + '</g>';
+  e += '<g class="paso">' + txt(60, 480, num(S.filas) + ' clientes · 14 columnas · ' + pct(S.tasa_churn_pct) + ' se fue · ' + S.duplicadas + ' filas repetidas (semana 12)', 't-s', ' font-size="28"') + '</g>';
+  CUR.poner('expediente', e);
 
-            // 3. Scatter Plot (Correlación)
-            var scatterX = []; var scatterY = [];
-            for (var j = 0; j < 50; j++) {
-                var xVal = Math.random() * 100;
-                scatterX.push(xVal);
-                scatterY.push(xVal + (Math.random() * 20 - 10)); // Alta correlación positiva
-            }
-            var traceScatter = { x: scatterX, y: scatterY, mode: 'markers', type: 'scatter', marker: {color: '#003865'} };
-            var layoutScatter = { margin: {l: 10, r: 10, t: 10, b: 10}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: {showgrid: false, zeroline:false, showticklabels:false}, yaxis: {showgrid: false, zeroline:false, showticklabels:false} };
-            Plotly.newPlot('scatterPlot', [traceScatter], layoutScatter, {displayModeBar: false});
-        }
+  /* Valor del cliente */
+  var hv = DS.histo({ x: 100, y: 40, w: 1240, h: 500, vals: C.Customer_Value, bins: [0, 2200, 50], yt: [0, 200, 400, 600, 800], xt: [0, 500, 1000, 1500, 2000], xl: 'Valor del cliente', color: 'var(--punto)' });
+  var v = hv.s;
+  v += '<g class="paso-capa"><line x1="' + hv.X(CV.mediana) + '" x2="' + hv.X(CV.mediana) + '" y1="40" y2="540" stroke="var(--compra)" stroke-width="5"/>' + txt(hv.X(CV.mediana) + 12, 80, 'mediana ' + num(CV.mediana, 1), 't-o', ' font-size="30"') + '</g>';
+  v += '<g class="paso-capa"><line x1="' + hv.X(CV.media) + '" x2="' + hv.X(CV.media) + '" y1="40" y2="540" stroke="var(--toga)" stroke-width="5" stroke-dasharray="12 8"/>' + txt(hv.X(CV.media) + 12, 130, 'media ' + num(CV.media, 1), 't-r', ' font-size="30"') + '</g>';
+  var km = hv.conteos.indexOf(Math.max.apply(null, hv.conteos));
+  v += '<g class="paso"><rect x="' + (hv.X(km * 50) + 1) + '" y="40" width="' + (hv.X(50) - hv.X(0) - 2) + '" height="500" fill="none" stroke="var(--tinta)" stroke-width="2" stroke-dasharray="6 5"/>' + txt(hv.X(900), 260, 'moda: el intervalo de ' + num(km * 50) + ' a ' + num(km * 50 + 50) + ', con ' + num(hv.conteos[km]) + ' clientes', 't-s', ' font-size="25"') + '</g>';
+  CUR.poner('valor', v);
 
-        // Render charts once the slide is visible
-        Reveal.on('ready', event => { drawPlotlyGraphs(); });
+  /* Cliente extremo */
+  var ex = '', filas = [['Media', X.media_antes, X.media_despues, 600], ['Mediana', X.mediana_antes, X.mediana_despues, 600], ['Desviación estándar', X.de_antes, X.de_despues, 4000]];
+  filas.forEach(function (f, i) {
+    var y = 60 + i * 220, W = 540, k = W / f[3];
+    ex += txt(20, y, f[0], 't-n', ' font-size="30"');
+    ex += '<rect x="20" y="' + (y + 20) + '" width="' + (f[1] * k).toFixed(1) + '" height="56" fill="var(--punto)"/>' + txt(30 + f[1] * k, y + 60, num(f[1], 1), 't-n', ' font-size="26"');
+    ex += '<g class="paso-capa"><rect x="20" y="' + (y + 90) + '" width="' + Math.min(W, f[2] * k).toFixed(1) + '" height="56" fill="' + (Math.abs(f[2] - f[1]) > 1 ? 'var(--compra)' : 'var(--toga)') + '"/>' + txt(30 + Math.min(W, f[2] * k), y + 130, num(f[2], 1), Math.abs(f[2] - f[1]) > 1 ? 't-o' : 't-r', ' font-size="26"') + '</g>';
+  });
+  ex += txt(20, 700, 'Gris: 3.150 clientes reales · color: con el cliente gigante', 't-s', ' font-size="22"');
+  CUR.poner('extremo', ex);
 
-        // Eventos dinámicos por Slide (Typed.js)
-        var typedInstance = null;
+  /* Asimetría */
+  var A = R['Seconds of Use'], B = R['Subscription Length'];
+  var h1 = DS.histo({ x: 60, y: 40, w: 580, h: 380, vals: C.Seconds_of_Use, bins: [0, 18000, 600], yt: [0, 200, 400, 600], xt: [0, 6000, 12000, 18000], xl: 'Segundos de uso', color: 'var(--punto)' });
+  var h2 = DS.histo({ x: 800, y: 40, w: 580, h: 380, vals: C.Subscription_Length, bins: [0, 48, 2], yt: [0, 300, 600, 900], xt: [0, 12, 24, 36, 48], xl: 'Meses de suscripción', color: 'var(--punto)' });
+  var a = h1.s + h2.s;
+  [[h1, A], [h2, B]].forEach(function (p, i) {
+    var hh = p[0], r = p[1], x0 = i ? 800 : 60;
+    a += '<line x1="' + hh.X(r.mediana) + '" x2="' + hh.X(r.mediana) + '" y1="40" y2="420" stroke="var(--compra)" stroke-width="4"/><line x1="' + hh.X(r.media) + '" x2="' + hh.X(r.media) + '" y1="40" y2="420" stroke="var(--toga)" stroke-width="4" stroke-dasharray="10 7"/>';
+    a += txt(x0, 530, 'media ' + num(r.media, i ? 1 : 0) + ' · mediana ' + num(r.mediana) + ' · asimetría ' + num(r.asimetria, 2), 't-n', ' font-size="24"');
+  });
+  CUR.poner('asim', a);
 
-        Reveal.on('slidechanged', event => {
-            if (event.currentSlide.getAttribute('data-state') === 'cyber-mode' && event.currentSlide.querySelector('#typed-output')) {
-                if(typedInstance) { typedInstance.destroy(); document.getElementById('typed-output').innerHTML = ''; }
-                setTimeout(() => {
-                    typedInstance = new Typed('#typed-output', {
-                        strings: [
-                            "> Analizando Matriz de Covarianza...",
-                            "> [ALERTA] Outlier extremo detectado en índice: Michael_Jordan",
-                            "> Recalibrando centro de masa mediante Trimmed Mean...",
-                            "> Evaluando coeficiente de Pearson: r = 0.89",
-                            "> SISTEMA ESTABLE.",
-                            "> [TAREA]: Ejecutar validación estadística en Python."
-                        ],
-                        typeSpeed: 30,
-                        backSpeed: 10,
-                        loop: false,
-                        showCursor: true,
-                        cursorChar: '█'
-                    });
-                }, 500);
-            } else if (typedInstance) {
-                typedInstance.destroy();
-                var el = document.getElementById('typed-output');
-                if(el) el.innerHTML = '';
-            }
-            
-            // Forzar redibujado de Plotly si entramos a la slide de gráficos (bug de redibujado en tabs ocultos)
-            if (event.indexh === 6 || event.indexh === 8) {
-                window.dispatchEvent(new Event('resize'));
-            }
-        });
-    </script>
+  /* Charge Amount */
+  var ca = S.charge_amount.clientes_por_nivel, cg = '', mx = ca['0'], Xc = DS.esc(0, -0.5, 10.5, 60, 1360);
+  for (var nv = 0; nv <= 10; nv++) { var n = ca[String(nv)] || 0, hgt = n / mx * 170; cg += '<rect x="' + (Xc(nv) - 44) + '" y="' + (200 - hgt) + '" width="88" height="' + hgt + '" fill="' + (nv === 0 ? 'var(--compra)' : 'var(--punto)') + '"/>' + txt(Xc(nv), 192 - hgt, num(n), 't-n', ' text-anchor="middle" font-size="20"') + txt(Xc(nv), 236, nv, 't-eje', ' text-anchor="middle" font-size="20"'); }
+  CUR.poner('cargo', cg);
+
+  /* Grupos: medianas se queda contra se va */
+  var PC = S.por_churn, vars = [['Segundos de uso', 'Seconds of Use'], ['Valor del cliente', 'Customer Value'], ['Números distintos', 'Distinct Called Numbers'], ['Fallas de llamada', 'Call Failure'], ['Meses de suscripción', 'Subscription Length']], g = '';
+  g += '<rect x="900" y="0" width="22" height="22" fill="var(--punto)"/>' + txt(930, 19, 'se queda', 't-s', ' font-size="22"') + '<rect x="1060" y="0" width="22" height="22" fill="var(--compra)"/>' + txt(1090, 19, 'se va', 't-s', ' font-size="22"');
+  vars.forEach(function (vv, i) {
+    var q = PC[vv[1]].se_quedo.mediana, f = PC[vv[1]].se_fue.mediana, mm = Math.max(q, f), y = 50 + i * 118, W = 820;
+    g += '<g class="paso">' + txt(0, y + 46, vv[0], 't-n', ' font-size="27"');
+    g += '<rect x="320" y="' + (y + 10) + '" width="' + (q / mm * W).toFixed(1) + '" height="40" fill="var(--punto)"/>' + txt(330 + q / mm * W, y + 40, num(q, q < 100 ? 0 : 0), 't-n', ' font-size="24"');
+    g += '<rect x="320" y="' + (y + 54) + '" width="' + (f / mm * W).toFixed(1) + '" height="40" fill="var(--compra)"/>' + txt(330 + f / mm * W, y + 84, num(f, 0), 't-o', ' font-size="24"') + '</g>';
+  });
+  CUR.poner('grupos', g);
+
+  /* Quejas: dos rejillas de 100 */
+  var qq = '';
+  [['Se quejaron', S.quejas['1'].churn_pct], ['No se quejaron', S.quejas['0'].churn_pct]].forEach(function (grp, j) {
+    var x0 = j * 360, k = Math.round(grp[1]);
+    qq += txt(x0 + 10, 40, grp[0], 't-n', ' font-size="28"');
+    for (var c = 0; c < 100; c++) qq += '<rect x="' + (x0 + 10 + (c % 10) * 32) + '" y="' + (70 + Math.floor(c / 10) * 32) + '" width="26" height="26" fill="' + (c < k ? 'var(--compra)' : 'var(--fondo-2)') + '"/>';
+    qq += txt(x0 + 10, 440, k + ' de 100 se fueron', k > 50 ? 't-o' : 't-s', ' font-size="26"');
+  });
+  CUR.poner('quejas', qq);
+
+  CUR.poner('taller', DS.ruta([['circle-help', 'Pregunta', 'qué quiere saber'], ['sigma', 'Medida', 'media o mediana'], ['split', 'Comparación', 'se queda contra se va'], ['bar-chart-3', 'Gráfica', 'una sola'], ['message-square', 'Historia', 'tres frases']],
+    'Storytelling socrático: 65 minutos, una historia defendible', 'Equipos de tres · Colab · otro equipo interroga con las cinco preguntas', 'var(--toga)'));
+})();
+</script>
+<script src="../assets/puntos/cine.js"></script>
+<script src="../assets/puntos/puntos.js"></script>
 </body>
 </html>

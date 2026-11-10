@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semana 5: storytelling socrático | Introducción a la Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+</head>
+<body>
+<header class="portada">
+  <canvas class="puntitos" aria-hidden="true"></canvas>
+  <h1>El tribunal de los números: storytelling con 3.150 clientes reales</h1>
+  <p>Taller de estadística descriptiva. Calculan medidas de centro, dispersión y forma sobre los clientes de una empresa de telecomunicaciones, descubren qué columnas son números falsos y construyen una historia de tres frases que otro equipo interroga con el método socrático.</p>
+  <div class="datos-clase"><span><b>Semana</b>5</span><span><b>Tiempo</b>65 minutos en clase</span><span><b>Herramienta</b>Google Colab</span><span><b>Resultado</b>RAE 1.2</span></div>
+</header>
+<div class="marco">
+<nav class="indice" aria-label="Contenido"><ol>
+  <li><a href="#inicio">Antes de empezar</a></li>
+  <li><a href="#e1">1. Tres testigos del centro</a></li>
+  <li><a href="#e2">2. El cliente gigante</a></li>
+  <li><a href="#e3">3. Dispersión y forma</a></li>
+  <li><a href="#e4">4. Testigos falsos</a></li>
+  <li><a href="#e5">5. Comparar grupos</a></li>
+  <li><a href="#e6">6. La historia y el tribunal</a></li>
+  <li><a href="#entrega">Qué entregan</a></li>
+  <li><a href="#reto">Reto autónomo</a></li>
+</ol></nav>
+<main>
+
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <div class="descargas">
+    <a class="boton" href="https://colab.research.google.com/github/dudbilopr/Introduccion-a-la-ciencia-de-datos/blob/main/Semanas/Semana_5/Colab_Guiado_Semana_5.ipynb" target="_blank" rel="noopener">Abrir el cuaderno en Colab</a>
+    <a class="boton sec" href="simulador_testigos.html">Interrogatorio de testigos</a>
+    <a class="boton sec" href="../Datos/churn_telecom.csv" download>Descargar el CSV</a>
+  </div>
+  <p><code>churn_telecom.csv</code>: 3.150 clientes y 14 columnas. Iranian Churn, <a href="https://doi.org/10.24432/C5JW3Z" target="_blank" rel="noopener">UCI, doi:10.24432/C5JW3Z</a>, CC BY 4.0. Las variables cubren los meses 1 a 9; <code>Churn</code> = 1 si el cliente se fue en el mes 12. Algunos nombres de columna traen dos espacios: el cuaderno los normaliza.</p>
+</section>
+
+<section id="e1">
+  <h2><span class="num">1.</span> Tres testigos del centro</h2>
+  <p class="meta">10 minutos. Apuesten antes de correr.</p>
+  <ol class="pasos">
+    <li>Calcule media, mediana y moda (en intervalos de 50) de <code>Customer Value</code>.</li>
+    <li>Calcule media y mediana de <code>Frequency of SMS</code>, el porcentaje de clientes sin SMS y la parte del total que envía el 10 % que más escribe.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Valor del cliente: media 470,97, mediana 228,48 y moda en el intervalo de 150 a 200 (381 clientes). SMS: media 73,17 y mediana 21; el 19,1 % no envió ninguno y el 10 % que más escribe envió el 48,6 % de todos.</p></div></details>
+</section>
+
+<section id="e2">
+  <h2><span class="num">2.</span> Interrogatorio: el cliente gigante</h2>
+  <p class="meta">8 minutos.</p>
+  <ol class="pasos">
+    <li>Agregue un cliente que valga 100 veces el máximo y recalcule media, mediana y desviación estándar.</li>
+    <li>Repítalo en el <a href="simulador_testigos.html">simulador</a> moviendo el control de 0 a 100.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Media de 471,0 a 539,5; desviación estándar de 517,0 a 3.883,5; mediana de 228,5 a 228,5. Un solo dato mueve la media; para mover la mediana habría que cambiar la mitad de los datos.</p></div></details>
+</section>
+
+<section id="e3">
+  <h2><span class="num">3.</span> Dispersión y forma</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Para <code>Customer Value</code>, calcule la desviación estándar, el rango intercuartílico y la MAD (<code>scipy.stats.median_abs_deviation</code>).</li>
+    <li>Calcule media, mediana y asimetría de <code>Seconds of Use</code> y <code>Subscription Length</code>. ¿De qué lado está la media en cada una?</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Desviación estándar 517,02; rango intercuartílico 674,59 (de 113,8 a 788,39); MAD 160,6. Segundos de uso: media 4.472,46, mediana 2.990, asimetría 1,321 (cola a la derecha, media a la derecha). Meses de suscripción: media 32,54, mediana 35, asimetría −1,299 (cola a la izquierda, media a la izquierda). Von Hippel (2005) advierte que esa regla no siempre se cumple: hay que comprobarla.</p></div></details>
+</section>
+
+<section id="e4">
+  <h2><span class="num">4.</span> Testigos falsos: atributos ordinales (RAE 1.2)</h2>
+  <p class="meta">10 minutos.</p>
+  <ol class="pasos">
+    <li>Cruce <code>Age Group</code> con <code>Age</code>. ¿Qué descubre?</li>
+    <li>Calcule la "edad media". ¿Qué significa ese número?</li>
+    <li>Para <code>Charge Amount</code>, compare media y mediana y haga la tabla de frecuencias. Calcule el porcentaje de abandono por nivel.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div><p>Cada grupo de edad tiene una sola "edad" (15, 25, 30, 45 o 55): Age es una reetiqueta de Age Group. La "edad media" de 31,0 no describe a nadie. Charge Amount: mediana 0 y media 0,94; 1.768 clientes en el nivel 0. El abandono baja con el nivel: 23,8 % en el 0, 7,0 % en el 1 y 0 % del 5 en adelante. Para un ordinal se reportan mediana, cuartiles y frecuencias.</p></div></details>
+</section>
+
+<section id="e5">
+  <h2><span class="num">5.</span> Comparar grupos</h2>
+  <p class="meta">12 minutos.</p>
+  <ol class="pasos">
+    <li>Calcule las medianas de cinco variables para quienes se quedan y quienes se van.</li>
+    <li>Calcule el porcentaje de abandono de quienes se quejaron y de quienes no.</li>
+    <li>Haga un diagrama de cajas de <code>Seconds of Use</code> por <code>Churn</code>.</li>
+  </ol>
+  <details><summary>Punto de control</summary><div>
+    <table>
+      <tr><th>Mediana</th><th class="d">Se queda</th><th class="d">Se va</th></tr>
+      <tr><td>Segundos de uso</td><td class="d">3.530</td><td class="d">1.182</td></tr>
+      <tr><td>Valor del cliente</td><td class="d">268,07</td><td class="d">96,84</td></tr>
+      <tr><td>Números distintos llamados</td><td class="d">23</td><td class="d">10</td></tr>
+      <tr><td>Fallas de llamada</td><td class="d">6</td><td class="d">5</td></tr>
+      <tr><td>Meses de suscripción</td><td class="d">35</td><td class="d">35</td></tr>
+    </table>
+    <p>Se fue el 83,0 % de quienes se quejaron (241 clientes) y el 10,1 % de quienes no (2.909). Las fallas de llamada y los meses de suscripción casi no cambian: también es un hallazgo.</p>
+  </div></details>
+</section>
+
+<section id="e6">
+  <h2><span class="num">6.</span> La historia y el tribunal</h2>
+  <p class="meta">15 minutos: 7 para escribir, 8 para el tribunal.</p>
+  <ol class="pasos">
+    <li>Escriban su historia en tres frases: <strong>hallazgo</strong>, <strong>número con su medida</strong> y <strong>lo que no se puede afirmar</strong>.</li>
+    <li>Otro equipo la interroga con las cinco preguntas: aclarar, supuestos, evidencia, alternativas, consecuencias.</li>
+    <li>Ajusten la historia con lo que surgió del interrogatorio.</li>
+  </ol>
+  <div class="aviso"><strong>Ejemplo.</strong> "Los clientes que se van usan mucho menos el servicio: su mediana de segundos de uso es 1.182, frente a 3.530 de los que se quedan. No sabemos si usan menos porque ya pensaban irse o se van porque el servicio no les sirve."</div>
+  <div class="tablon"><table>
+    <tr><th>Criterio</th><th class="d">Puntos</th><th>Qué se espera</th></tr>
+    <tr><td>Medida adecuada</td><td class="d">3</td><td>Mediana con cola larga, media con distribución simétrica, frecuencias con ordinales.</td></tr>
+    <tr><td>Comparación</td><td class="d">3</td><td>El número aparece frente a su grupo de comparación.</td></tr>
+    <tr><td>Límite</td><td class="d">2</td><td>Dice qué no se puede afirmar (causa, generalización).</td></tr>
+    <tr><td>Respuesta al tribunal</td><td class="d">2</td><td>Responde con datos, no con opiniones.</td></tr>
+  </table></div>
+</section>
+
+<section id="entrega">
+  <h2>Qué entregan</h2>
+  <p>El cuaderno ejecutado en GitHub, con la historia final en la última celda y lo que cambió después del tribunal. Declaren el uso de IA si la hubo.</p>
+</section>
+
+<section id="reto" class="reto">
+  <h2>Reto autónomo</h2>
+  <p>Quite las 300 filas repetidas con <code>drop_duplicates()</code> y repita los ejercicios 1 y 5. ¿Cambia alguna conclusión? Escriba una frase sobre por qué conviene revisar duplicados antes de describir. En la semana 12 verá cómo esas filas inflan la evaluación de un modelo. Más lecturas y videos en la <a href="Investigacion_Semana5.html">guía de investigación</a>.</p>
+</section>
+</main>
+</div>
+<script>/* Cien clientes que se quejaron: 83 se fueron (naranja) */ window.GUIA_PUNTOS = (function () { var o = []; for (var i = 0; i < 100; i++) o.push(i < 83 ? 1 : 0); return o; })();</script>
+<script src="../assets/puntos/guia.js"></script>
+</body>
+</html>

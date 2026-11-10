@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interrogatorio de testigos: medidas descriptivas | Ciencia de Datos</title>
+<link rel="stylesheet" href="../assets/puntos/guia.css">
+<link rel="stylesheet" href="../assets/puntos/simulador.css">
+<style>
+  :root { --l-fondo: #1b1117; --l-panel: #2b1c25; --l-hondo: #130c10; --l-tinta: #f7eef2; --l-tinta2: #bda7b2; --l-regla: rgba(189,167,178,.24); --l-acento: #ff9fb6; --l-naranja: #ff7a1f; }
+  .metricas { grid-template-columns: repeat(3, 1fr); }
+  .metricas b.cambio { color: var(--l-acento); }
+  .leyenda2 { display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px; color: var(--l-tinta2); margin-top: 8px; }
+  .leyenda2 i { display: inline-block; width: 18px; height: 4px; vertical-align: middle; margin-right: 6px; }
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>Interrogatorio de testigos: ¿qué medida dice la verdad?</h1>
+  <p class="bajada">3.150 clientes reales de una empresa de telecomunicaciones (Iranian Churn, UCI, CC BY 4.0). Elija una variable y un grupo, agregue un cliente extremo o recorte las colas, y vea qué medidas se mueven y cuáles resisten.</p>
+  <div class="rejilla">
+    <div>
+      <div class="lienzo"><svg id="g" viewBox="0 0 900 470" role="img" aria-label="Histograma de la variable elegida con la media, la mediana y los cuartiles"></svg></div>
+      <div class="leyenda2"><span><i style="background:var(--l-acento)"></i>media</span><span><i style="background:var(--l-naranja)"></i>mediana</span><span><i style="background:#bda7b2"></i>Q1 y Q3</span></div>
+      <div class="metricas" id="met"></div>
+      <p class="estado" id="consejo" aria-live="polite"></p>
+    </div>
+    <div class="panel">
+      <h2>Testigo</h2>
+      <label for="var">Variable</label>
+      <select id="var"><option value="Customer_Value">Valor del cliente</option><option value="Seconds_of_Use">Segundos de uso</option><option value="Frequency_of_SMS">SMS enviados</option><option value="Call_Failure">Fallas de llamada</option><option value="Subscription_Length">Meses de suscripción</option></select>
+      <label for="grupo">Grupo</label>
+      <select id="grupo"><option value="todos">Todos los clientes</option><option value="0">Los que se quedan</option><option value="1">Los que se van</option></select>
+      <h2>Interrogatorio</h2>
+      <label for="ext">Agregar un cliente con <b id="extv">0</b> veces el máximo</label>
+      <input id="ext" type="range" min="0" max="100" step="5" value="0">
+      <label for="rec">Recortar el <b id="recv">0</b> % de cada cola (media recortada)</label>
+      <input id="rec" type="range" min="0" max="25" step="5" value="0">
+      <p class="validado" id="val"></p>
+    </div>
+  </div>
+  <div class="retos">
+    <h2>Retos</h2>
+    <ol>
+      <li>Con "Valor del cliente", agregue un cliente de 100 veces el máximo. ¿Cuánto se mueven la media, la mediana y la desviación estándar?</li>
+      <li>Compare la mediana de "Segundos de uso" entre los que se quedan y los que se van. Escriba la diferencia en una frase para un gerente.</li>
+      <li>Con "Meses de suscripción", ¿está la media a la derecha o a la izquierda de la mediana? ¿Por qué?</li>
+      <li>Recorte el 10 % de cada cola en "SMS enviados". ¿Hacia qué medida se acerca la media recortada?</li>
+      <li>Con "Fallas de llamada", ¿hay diferencia entre grupos? Una historia honesta también dice qué no cambia.</li>
+    </ol>
+    <p class="nota">Cuartiles con interpolación lineal (como pandas), desviación estándar muestral (n − 1), MAD sin escalar y asimetría de Fisher sin corregir (como scipy.stats.skew).</p>
+  </div>
+</div>
+<script src="cifras.js"></script>
+<script>
+(function () {
+  var C = window.CIFRAS, S = C.resumen, NOM = { Customer_Value: 'Customer Value', Seconds_of_Use: 'Seconds of Use', Frequency_of_SMS: 'Frequency of SMS', Call_Failure: 'Call Failure', Subscription_Length: 'Subscription Length' };
+  function fmt(x, d) { if (x == null || isNaN(x)) return '–'; var s = (d ? x.toFixed(d) : Math.round(x).toString()).replace('.', ','); var p = s.split(','); p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return p.join(','); }
+  function orden(v) { return v.slice().sort(function (a, b) { return a - b; }); }
+  function q(s, p) { var h = (s.length - 1) * p, lo = Math.floor(h); return s[lo] + (h - lo) * ((s[lo + 1] === undefined ? s[lo] : s[lo + 1]) - s[lo]); }
+  function stats(v, rec) {
+    var s = orden(v), n = s.length, m = s.reduce(function (a, b) { return a + b; }, 0) / n, va = s.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0);
+    var sd = Math.sqrt(va / (n - 1)), m2 = va / n, m3 = s.reduce(function (a, b) { return a + Math.pow(b - m, 3); }, 0) / n, med = q(s, .5);
+    var mad = q(orden(s.map(function (x) { return Math.abs(x - med); })), .5), k = Math.floor(n * rec / 100), t = s.slice(k, n - k);
+    return { n: n, media: m, mediana: med, de: sd, q1: q(s, .25), q3: q(s, .75), mad: mad, asim: m3 / Math.pow(m2, 1.5), recortada: t.reduce(function (a, b) { return a + b; }, 0) / t.length, min: s[0], max: s[n - 1] };
+  }
+  var base = {};
+  function correr() {
+    var vn = document.getElementById('var').value, gr = document.getElementById('grupo').value, ext = +document.getElementById('ext').value, rec = +document.getElementById('rec').value;
+    document.getElementById('extv').textContent = ext; document.getElementById('recv').textContent = rec;
+    var v = C[vn].filter(function (_, i) { return gr === 'todos' || C.churn[i] === +gr; });
+    var maxReal = Math.max.apply(null, C[vn]);
+    var b = stats(v, 0); base = b;
+    var w = ext ? v.concat([maxReal * ext]) : v, r = stats(w, rec);
+    /* histograma sin el extremo, para que se vean los datos reales */
+    var lo = 0, hi = maxReal, nb = 40, ancho = (hi - lo) / nb || 1, cont = new Array(nb).fill(0);
+    v.forEach(function (x) { var k = Math.min(nb - 1, Math.floor((x - lo) / ancho)); cont[k]++; });
+    var mx = Math.max.apply(null, cont), X = function (x) { return 50 + (x - lo) / (hi - lo) * 820; }, s = '';
+    cont.forEach(function (c, k) { var h = c / mx * 360; s += '<rect x="' + (X(lo + k * ancho) + 1).toFixed(1) + '" y="' + (400 - h).toFixed(1) + '" width="' + Math.max(1, 820 / nb - 2).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="#85677a"/>'; });
+    function linea(x, col, dash, et, y) { if (x > hi) return '<text x="868" y="' + y + '" fill="' + col + '" font-size="15" text-anchor="end">' + et + ' fuera de escala →</text>'; return '<line x1="' + X(x) + '" x2="' + X(x) + '" y1="30" y2="400" stroke="' + col + '" stroke-width="3"' + (dash ? ' stroke-dasharray="8 6"' : '') + '/><text x="' + (X(x) + 6) + '" y="' + y + '" fill="' + col + '" font-size="15">' + et + '</text>'; }
+    s += linea(r.q1, '#bda7b2', true, 'Q1', 50) + linea(r.q3, '#bda7b2', true, 'Q3', 50) + linea(r.mediana, 'var(--l-naranja)', false, 'mediana', 74) + linea(r.media, 'var(--l-acento)', false, 'media', 98);
+    [0, .25, .5, .75, 1].forEach(function (f) { s += '<text x="' + X(lo + f * (hi - lo)) + '" y="428" fill="#bda7b2" font-size="15" text-anchor="middle">' + fmt(lo + f * (hi - lo)) + '</text>'; });
+    s += '<text x="50" y="458" fill="#bda7b2" font-size="15">' + fmt(v.length) + ' clientes' + (ext ? ' + 1 extremo de ' + fmt(maxReal * ext) : '') + '</text>';
+    document.getElementById('g').innerHTML = s;
+    function caja(et, a, b2, d) { var c = Math.abs(a - b2) > Math.abs(b2) * 1e-6 + 1e-9; return '<div><b class="' + (c ? 'cambio' : '') + '">' + fmt(a, d) + '</b><span>' + et + (c ? ' (antes ' + fmt(b2, d) + ')' : '') + '</span></div>'; }
+    var d = vn === 'Call_Failure' || vn === 'Subscription_Length' ? 2 : 1;
+    document.getElementById('met').innerHTML = caja('Media', r.media, b.media, d) + caja('Mediana', r.mediana, b.mediana, d) + caja('Media recortada ' + rec + ' %', r.recortada, b.media, d) + caja('Desviación estándar', r.de, b.de, d) + caja('Rango intercuartílico', r.q3 - r.q1, b.q3 - b.q1, d) + caja('MAD', r.mad, b.mad, d) + caja('Asimetría', r.asim, b.asim, 2) + caja('Mínimo', r.min, b.min, 0) + caja('Máximo', r.max, b.max, 0);
+    var dif = Math.abs(b.media - b.mediana) / (b.de || 1);
+    document.getElementById('consejo').innerHTML = (Math.abs(b.asim) > 1 ? '<b>Distribución asimétrica</b> (asimetría ' + fmt(b.asim, 2) + '): para el cliente típico conviene la mediana con el rango intercuartílico.' : '<b>Distribución bastante simétrica</b>: media y mediana cuentan casi lo mismo.') + ' La media y la mediana difieren en ' + fmt(dif, 2) + ' desviaciones estándar.';
+    /* validación contra pandas */
+    var ok = true, txt = '';
+    if (!ext && !rec) {
+      if (gr === 'todos') { var R = S.resumen[NOM[vn]]; ok = Math.abs(b.media - R.media) < .006 && Math.abs(b.mediana - R.mediana) < .006 && Math.abs(b.de - R.de) < .006 && Math.abs(b.q1 - R.q1) < .006 && Math.abs(b.q3 - R.q3) < .006 && Math.abs(b.asim - R.asimetria) < .0006; txt = 'media, mediana, desviación, cuartiles y asimetría'; }
+      else { var P = S.por_churn[NOM[vn]][gr === '1' ? 'se_fue' : 'se_quedo']; ok = Math.abs(b.mediana - P.mediana) < .051 && Math.abs(b.media - P.media) < .051; txt = 'media y mediana del grupo'; }
+    } else if (vn === 'Customer_Value' && gr === 'todos' && ext === 100 && !rec) { var E = S.extremo; ok = Math.abs(r.media - E.media_despues) < .051 && Math.abs(r.mediana - E.mediana_despues) < .051 && Math.abs(r.de - E.de_despues) < .051; txt = 'el experimento del cliente gigante'; }
+    document.getElementById('val').textContent = txt ? (ok ? 'Coincide con pandas: ' : 'No coincide con pandas: ') + txt + '.' : 'Validación con pandas: sin cliente extremo ni recorte, o con valor del cliente y 100 veces.';
+    window.TESTIGOS_OK = txt ? ok : null;
+  }
+  ['var', 'grupo', 'ext', 'rec'].forEach(function (id) { document.getElementById(id).addEventListener('input', correr); });
+  correr();
+})();
+</script>
+</body>
+</html>
